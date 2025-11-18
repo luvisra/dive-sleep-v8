@@ -1,0 +1,34 @@
+{
+  "Auth": {
+    "Cognito": {
+      "userPoolId": "us-east-1_o2CJoEJrG",
+      "userPoolClientId": "11euhinckffa97gcqv2oq2553b",
+      "identityPoolId": "ap-northeast-2:4dbe72b2-8e71-4417-a832-9d0bbb452066",
+      "region": "us-east-1",
+      "loginWith": {
+        "email": true
+      },
+      "signUpVerificationMethod": "code",
+      "passwordFormat": {
+        "minLength": 8,
+        "requireLowercase": true,
+        "requireUppercase": true,
+        "requireNumbers": true,
+        "requireSpecialCharacters": true
+      }
+    }
+  },
+  "API": {
+    "GraphQL": {
+      "endpoint": "https://sdc2ulo5efbodeuzlfgahtgu5i.appsync-api.ap-northeast-2.amazonaws.com/graphql",
+      "region": "ap-northeast-2",
+      "defaultAuthMode": "userPool"
+    }
+  },
+  "Storage": {
+    "S3": {
+      "bucket": "cnsleep-firmware-management-storage",
+      "region": "ap-northeast-2"
+    }
+  }
+}
