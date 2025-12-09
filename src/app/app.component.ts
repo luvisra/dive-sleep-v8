@@ -6,7 +6,6 @@ import { TranslateConfigService } from './translate-config.service';
 import { UtilService } from './util.service';
 import { StatusBar, Style } from '@capacitor/status-bar';
 import { ScreenOrientation } from '@capacitor/screen-orientation';
-
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',

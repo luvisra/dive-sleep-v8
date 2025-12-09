@@ -1,0 +1,84 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons *ngIf="!authService.signedIn" slot="start"><ion-back-button style="position: absolute;"></ion-back-button></ion-buttons>
+    <ion-title *ngIf="!authService.signedIn">{{ 'LOGIN.title' | translate }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <!-- <amplify-authenticator [signUpConfig]="signUpConfig" framework="Ionic"></amplify-authenticator> -->
+  <div class="login-logo">
+    <!-- <img src="assets/imgs/koala.png" alt="Ionic logo"> -->
+    <h1 *ngIf="!authService.signedIn">{{ 'LOGIN.login' | translate }}</h1>
+  </div>
+
+  <form #loginForm="ngForm" *ngIf="!authService.signedIn" novalidate>
+    <ion-list>
+      <ion-item>
+        <ion-label position="stacked" color="dark">{{ 'LOGIN.phoneNumber' | translate }}</ion-label>
+        <ion-select [value]=" selectedCountryCode " (ionChange)="countryCodeSelected($event)">
+          <ion-select-option value="+82">{{ 'COUNTRY.ko.name' | translate }}(+82)</ion-select-option>
+          <ion-select-option value="+1">{{ 'COUNTRY.en.name' | translate }}(+1)</ion-select-option>
+          <ion-select-option value="+86">{{ 'COUNTRY.cn.name' | translate }}(+86)</ion-select-option>
+        </ion-select>
+        <ion-input minlength="9" maxlength="11" [(ngModel)]="login.username" name="username" type="tel" #username="ngModel" spellcheck="false"
+          autocapitalize="off" required>
+        </ion-input>
+      </ion-item>
+
+      <ion-text color="danger">
+        <p [hidden]="username.valid || submitted == false" class="ion-padding-start">
+          Username is required
+        </p>
+      </ion-text>
+
+      <ion-item>
+        <ion-label position="stacked" color="dark">{{ 'LOGIN.password' | translate }}</ion-label>
+        <ion-input [(ngModel)]="login.password" name="password" type="password" #password="ngModel" (keyup)="onKeyup($event)" required>
+        </ion-input>
+      </ion-item>
+
+      <ion-text color="danger">
+        <p [hidden]="password.valid || submitted == false" class="ion-padding-start">
+          Password is required
+        </p>
+      </ion-text>
+    </ion-list>
+    <ion-row>
+      <ion-col>
+        <ion-button routerLink="/signup" routerDirection="forward" shape="round" expand="block">{{ 'LOGIN.signUp' | translate }}</ion-button>
+      </ion-col>
+      <ion-col>
+        <ion-button [disabled]="disableButton" (click)="onLogin(loginForm)" type="submit" color="warning" shape="round"
+          expand="block">{{ 'LOGIN.login' | translate }}
+        </ion-button>
+
+      </ion-col>
+    </ion-row>
+  </form>
+
+  <!-- <ion-card *ngIf="authService.signedIn">
+    <ion-card-header>
+      <ion-card-subtitle>{{ 'LOGIN.username' | translate }}</ion-card-subtitle>
+      <ion-card-title color="dark">{{ '0' + authService.user.username.substring(3) }}</ion-card-title>
+    </ion-card-header>
+    <ion-card-header>
+      <ion-card-subtitle>{{ 'GOQUAL.registeredDevice' | translate }}</ion-card-subtitle>
+      <ion-card-title color="success" *ngIf="deviceService.devId !== 'null' && deviceService.devId !== 'undefined'">{{ 'LOGIN.deviceRegistered' | translate }}</ion-card-title>
+      <ion-card-title color="danger" *ngIf="deviceService.devId === 'null' || deviceService.devId === 'undefined'">{{ 'LOGIN.deviceNotRegistered' | translate }}</ion-card-title>
+    </ion-card-header>
+  </ion-card>
+
+  <ion-button (click)="onSignOut()" *ngIf="authService.signedIn" color="danger" shape="round" expand="block">로그아웃
+  </ion-button> -->
+  <!-- <ion-button *ngIf="authService.signedIn" (click)="goToHomePage()" color="warning" shape="round" expand="block">홈 화면으로 돌아가기</ion-button> -->
+
+  <div style="text-align: right">
+    <ion-button *ngIf="!authService.signedIn" color='success' fill="clear" routerLink="/change-password"
+      routerDirection="forward">
+      {{ 'LOGIN.lostPassword' | translate }}
+      <ion-icon slot="end" name="arrow-forward"></ion-icon>
+    </ion-button>
+  </div>
+</ion-content>

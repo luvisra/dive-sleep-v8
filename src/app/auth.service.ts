@@ -19,7 +19,7 @@ import { Hub } from 'aws-amplify/utils';
 import { DeviceService } from './device.service';
 import { CheckFirstService } from './check-first.service';
 import { UtilService } from './util.service';
-import { APIService } from './api.service';
+import { APIService } from './API.service';
 import { GLOBAL } from './static_config';
 
 @Injectable({

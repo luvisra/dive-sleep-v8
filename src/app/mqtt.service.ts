@@ -24,7 +24,7 @@ export class MqttService {
   sub: any[] = [];
   currentMqttSession: any;
   firmwareVersionDate: Date | null = null;
-  private pubsub: typeof PubSub;
+  private pubsub: typeof PubSub = PubSub;
 
   constructor(
     private deviceService: DeviceService,

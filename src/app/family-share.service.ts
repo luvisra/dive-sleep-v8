@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { APIService } from './api.service';
+import { APIService } from './API.service';
 import { AuthService } from './auth.service';
 
 @Injectable({
@@ -20,32 +20,48 @@ export class FamilyShareService {
     // });
   }
 
-  updateMyToken(fcmToken) {
+  updateMyToken(fcmToken: string) {
     if (fcmToken === null || fcmToken.length < 10) {
       return;
     }
 
-    const myAccountName = this.authService.user.username;
+    const myAccountName = this.authService.user?.username;
+    if (!myAccountName) {
+      return;
+    }
+
     this.apiService.QueryDiveSleepUserinfo(myAccountName).then((res) => {
-      const link = JSON.parse(res.items[0].link_account);
-      link.forEach(element => {
-        this.apiService.UpdateDiveFamilyShareInfo({
-          username: element.username,
-          requester: myAccountName,
-          token: fcmToken
-        });
-      });
+      if (res.items && res.items.length > 0) {
+        const firstItem = res.items[0];
+        if (firstItem && firstItem.link_account) {
+          const link = JSON.parse(firstItem.link_account);
+          link.forEach((element: any) => {
+            this.apiService.UpdateDiveFamilyShareInfo({
+              username: element.username,
+              requester: myAccountName,
+              token: fcmToken
+            });
+          });
+        }
+      }
     });
   }
 
   checkNewFamilyShareRequest() {
     let count = 0;
-    this.apiService.QueryDiveFamilyShareinfo(this.authService.user.username).then((res) => {
-      res.items.forEach((i) => {
-        if (i.status === 'requested') {
-          count++;
-        }
-      });
+    const username = this.authService.user?.username;
+    if (!username) {
+      return;
+    }
+
+    this.apiService.QueryDiveFamilyShareinfo(username).then((res) => {
+      if (res.items) {
+        res.items.forEach((i: any) => {
+          if (i && i.status === 'requested') {
+            count++;
+          }
+        });
+      }
       this.badgeCount = count;
     });
   }
