@@ -1,0 +1,282 @@
+input CreateCnsleepUserDevMatchTableInput {
+	username: String!
+	dev_id: String!
+}
+
+input CreateDiveSleepDataInput {
+	dev_id: String!
+	time_stamp: String!
+	mac_addr: String
+	data: String
+}
+
+input CreateDiveSleepUserinfoInput {
+	username: String!
+	dev_id: String
+}
+
+input CreateMySleepDataInput {
+	dev_id: String!
+	time_stamp: String!
+}
+
+input DeleteCnsleepUserDevMatchTableInput {
+	username: String!
+	dev_id: String!
+}
+
+input DeleteDiveSleepDataInput {
+	dev_id: String!
+	time_stamp: String!
+}
+
+input DeleteDiveSleepUserinfoInput {
+	username: String!
+}
+
+input DeleteMySleepDataInput {
+	dev_id: String!
+	time_stamp: String!
+}
+
+type DiveSleepData {
+	dev_id: String!
+	time_stamp: String!
+	mac_addr: String
+	data: String
+	feeling: Int
+}
+
+type DiveSleepDataConnection {
+	items: [DiveSleepData]
+	nextToken: String
+}
+
+type DiveSleepUserinfo {
+	username: String!
+	dev_id: String
+	link_account: String
+	user_info: String
+	fcm_token: String
+}
+
+type DiveSleepUserinfoConnection {
+	items: [DiveSleepUserinfo]
+	nextToken: String
+}
+
+type Mutation {
+	createCnsleepUserDevMatchTable(input: CreateCnsleepUserDevMatchTableInput!): cnsleepUserDevMatchTable
+	updateCnsleepUserDevMatchTable(input: UpdateCnsleepUserDevMatchTableInput!): cnsleepUserDevMatchTable
+	deleteCnsleepUserDevMatchTable(input: DeleteCnsleepUserDevMatchTableInput!): cnsleepUserDevMatchTable
+	createMySleepData(input: CreateMySleepDataInput!): MySleepData
+	updateMySleepData(input: UpdateMySleepDataInput!): MySleepData
+	deleteMySleepData(input: DeleteMySleepDataInput!): MySleepData
+	createDiveSleepData(input: CreateDiveSleepDataInput!): DiveSleepData
+	updateDiveSleepData(input: UpdateDiveSleepDataInput!): DiveSleepData
+	deleteDiveSleepData(input: DeleteDiveSleepDataInput!): DiveSleepData
+	createDiveSleepUserinfo(input: CreateDiveSleepUserinfoInput!): DiveSleepUserinfo
+	updateDiveSleepUserinfo(input: UpdateDiveSleepUserinfoInput!): DiveSleepUserinfo
+	deleteDiveSleepUserinfo(input: DeleteDiveSleepUserinfoInput!): DiveSleepUserinfo
+}
+
+type MySleepData {
+	dev_id: String!
+	time_stamp: String!
+	ev_type: String
+	value: String
+	sd: String
+	snoring: Int
+	respiration: Int
+	heartrate: Int
+	impulse: Float
+	band: String
+}
+
+type MySleepDataConnection {
+	items: [MySleepData]
+	nextToken: String
+}
+
+type Query {
+	getCnsleepUserDevMatchTable(username: String!, dev_id: String): cnsleepUserDevMatchTable
+	queryCnsleepUserDevMatchTable(username: String!): cnsleepUserDevMatchTableConnection
+	listCnsleepUserDevMatchTables(filter: TableCnsleepUserDevMatchTableFilterInput, limit: Int, nextToken: String): cnsleepUserDevMatchTableConnection
+	getMySleepData(dev_id: String!, time_stamp: String!): MySleepData
+	queryMySleepData(
+		dev_id: String!,
+		time_stamp: String,
+		time_stamp2: String,
+		ev_type: String
+	): MySleepDataConnection
+	listMySleepData(filter: TableMySleepDataFilterInput, limit: Int, nextToken: String): MySleepDataConnection
+	getDiveSleepData(dev_id: String!, time_stamp: String!): DiveSleepData
+	listDiveSleepData(filter: TableDiveSleepDataFilterInput, limit: Int, nextToken: String): DiveSleepDataConnection
+	queryDiveSleepData(dev_id: String!, time_start: String!, time_end: String): DiveSleepDataConnection
+	getDiveSleepUserinfo(username: String!): DiveSleepUserinfo
+	queryDiveSleepUserinfo(username: String!): DiveSleepUserinfoConnection
+	listDiveSleepUserinfos(filter: TableDiveSleepUserinfoFilterInput, limit: Int, nextToken: String): DiveSleepUserinfoConnection
+}
+
+type Subscription {
+	onCreateCnsleepUserDevMatchTable(username: String, dev_id: String): cnsleepUserDevMatchTable
+		@aws_subscribe(mutations: ["createCnsleepUserDevMatchTable"])
+	onUpdateCnsleepUserDevMatchTable(username: String, dev_id: String): cnsleepUserDevMatchTable
+		@aws_subscribe(mutations: ["updateCnsleepUserDevMatchTable"])
+	onDeleteCnsleepUserDevMatchTable(username: String, dev_id: String): cnsleepUserDevMatchTable
+		@aws_subscribe(mutations: ["deleteCnsleepUserDevMatchTable"])
+	onCreateMySleepData(dev_id: String, time_stamp: String): MySleepData
+		@aws_subscribe(mutations: ["createMySleepData"])
+	onUpdateMySleepData(dev_id: String, time_stamp: String): MySleepData
+		@aws_subscribe(mutations: ["updateMySleepData"])
+	onDeleteMySleepData(dev_id: String, time_stamp: String): MySleepData
+		@aws_subscribe(mutations: ["deleteMySleepData"])
+	onCreateDiveSleepData(
+		dev_id: String,
+		time_stamp: String,
+		mac_addr: String,
+		data: String
+	): DiveSleepData
+		@aws_subscribe(mutations: ["createDiveSleepData"])
+	onUpdateDiveSleepData(
+		dev_id: String,
+		time_stamp: String,
+		mac_addr: String,
+		data: String
+	): DiveSleepData
+		@aws_subscribe(mutations: ["updateDiveSleepData"])
+	onDeleteDiveSleepData(
+		dev_id: String,
+		time_stamp: String,
+		mac_addr: String,
+		data: String
+	): DiveSleepData
+		@aws_subscribe(mutations: ["deleteDiveSleepData"])
+	onCreateDiveSleepUserinfo(username: String): DiveSleepUserinfo
+		@aws_subscribe(mutations: ["createDiveSleepUserinfo"])
+	onUpdateDiveSleepUserinfo(username: String): DiveSleepUserinfo
+		@aws_subscribe(mutations: ["updateDiveSleepUserinfo"])
+	onDeleteDiveSleepUserinfo(username: String): DiveSleepUserinfo
+		@aws_subscribe(mutations: ["deleteDiveSleepUserinfo"])
+}
+
+input TableBooleanFilterInput {
+	ne: Boolean
+	eq: Boolean
+}
+
+input TableCnsleepUserDevMatchTableFilterInput {
+	username: TableStringFilterInput
+	dev_id: TableStringFilterInput
+}
+
+input TableDiveSleepDataFilterInput {
+	dev_id: TableStringFilterInput
+	time_stamp: TableStringFilterInput
+	mac_addr: TableStringFilterInput
+	data: TableStringFilterInput
+}
+
+input TableDiveSleepUserinfoFilterInput {
+	username: TableStringFilterInput
+	dev_id: TableStringFilterInput
+}
+
+input TableFloatFilterInput {
+	ne: Float
+	eq: Float
+	le: Float
+	lt: Float
+	ge: Float
+	gt: Float
+	contains: Float
+	notContains: Float
+	between: [Float]
+}
+
+input TableIDFilterInput {
+	ne: ID
+	eq: ID
+	le: ID
+	lt: ID
+	ge: ID
+	gt: ID
+	contains: ID
+	notContains: ID
+	between: [ID]
+	beginsWith: ID
+}
+
+input TableIntFilterInput {
+	ne: Int
+	eq: Int
+	le: Int
+	lt: Int
+	ge: Int
+	gt: Int
+	contains: Int
+	notContains: Int
+	between: [Int]
+}
+
+input TableMySleepDataFilterInput {
+	dev_id: TableStringFilterInput
+	time_stamp: TableStringFilterInput
+	ev_type: TableStringFilterInput
+}
+
+input TableStringFilterInput {
+	ne: String
+	eq: String
+	le: String
+	lt: String
+	ge: String
+	gt: String
+	contains: String
+	notContains: String
+	between: [String]
+	beginsWith: String
+}
+
+input UpdateCnsleepUserDevMatchTableInput {
+	username: String!
+	dev_id: String!
+	link_account: String
+	user_info: String
+	fcm_token: String
+}
+
+input UpdateDiveSleepDataInput {
+	dev_id: String!
+	time_stamp: String!
+	mac_addr: String
+	data: String
+	feeling: Int
+}
+
+input UpdateDiveSleepUserinfoInput {
+	username: String!
+	dev_id: String
+	link_account: String
+	user_info: String
+	fcm_token: String
+}
+
+input UpdateMySleepDataInput {
+	dev_id: String!
+	time_stamp: String!
+}
+
+type cnsleepUserDevMatchTable {
+	username: String!
+	dev_id: String
+	link_account: String
+	user_info: String
+	fcm_token: String
+}
+
+type cnsleepUserDevMatchTableConnection {
+	items: [cnsleepUserDevMatchTable]
+	nextToken: String
+}
+

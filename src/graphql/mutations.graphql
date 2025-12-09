@@ -1,0 +1,127 @@
+# this is an auto generated file. This will be overwritten
+mutation CreateMySleepData($input: CreateMySleepDataInput!) {
+  createMySleepData(input: $input) {
+    dev_id
+    time_stamp
+    ev_type
+    value
+    sd
+    snoring
+    respiration
+    heartrate
+    impulse
+    band
+  }
+}
+mutation UpdateMySleepData($input: UpdateMySleepDataInput!) {
+  updateMySleepData(input: $input) {
+    dev_id
+    time_stamp
+    ev_type
+    value
+    sd
+    snoring
+    respiration
+    heartrate
+    impulse
+    band
+  }
+}
+mutation DeleteMySleepData($input: DeleteMySleepDataInput!) {
+  deleteMySleepData(input: $input) {
+    dev_id
+    time_stamp
+    ev_type
+    value
+    sd
+    snoring
+    respiration
+    heartrate
+    impulse
+    band
+  }
+}
+mutation CreateDiveSleepData($input: CreateDiveSleepDataInput!) {
+  createDiveSleepData(input: $input) {
+    dev_id
+    time_stamp
+    mac_addr
+    data
+    feeling
+  }
+}
+mutation UpdateDiveSleepData($input: UpdateDiveSleepDataInput!) {
+  updateDiveSleepData(input: $input) {
+    dev_id
+    time_stamp
+    mac_addr
+    data
+    feeling
+  }
+}
+mutation DeleteDiveSleepData($input: DeleteDiveSleepDataInput!) {
+  deleteDiveSleepData(input: $input) {
+    dev_id
+    time_stamp
+    mac_addr
+    data
+    feeling
+  }
+}
+mutation CreateDiveSleepUserinfo($input: CreateDiveSleepUserinfoInput!) {
+  createDiveSleepUserinfo(input: $input) {
+    username
+    dev_id
+    link_account
+    user_info
+    fcm_token
+  }
+}
+mutation UpdateDiveSleepUserinfo($input: UpdateDiveSleepUserinfoInput!) {
+  updateDiveSleepUserinfo(input: $input) {
+    username
+    dev_id
+    link_account
+    user_info
+    fcm_token
+  }
+}
+mutation DeleteDiveSleepUserinfo($input: DeleteDiveSleepUserinfoInput!) {
+  deleteDiveSleepUserinfo(input: $input) {
+    username
+    dev_id
+    link_account
+    user_info
+    fcm_token
+  }
+}
+mutation CreateDiveFamilyShareInfo($input: CreateDiveFamilyShareInfoInput!) {
+  createDiveFamilyShareInfo(input: $input) {
+    username
+    requester
+    nickname
+    status
+    token
+    enabled
+  }
+}
+mutation UpdateDiveFamilyShareInfo($input: UpdateDiveFamilyShareInfoInput!) {
+  updateDiveFamilyShareInfo(input: $input) {
+    username
+    requester
+    nickname
+    status
+    token
+    enabled
+  }
+}
+mutation DeleteDiveFamilyShareInfo($input: DeleteDiveFamilyShareInfoInput!) {
+  deleteDiveFamilyShareInfo(input: $input) {
+    username
+    requester
+    nickname
+    status
+    token
+    enabled
+  }
+}

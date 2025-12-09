@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 22.0.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="menubar_Device_def" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px"
+	 y="0px" viewBox="0 0 76 76" style="enable-background:new 0 0 76 76;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:none;}
+	.st1{fill-rule:evenodd;}
+	.st2{fill:none;stroke:#8D8D8D#;stroke-width:4;}
+</style>
+<rect id="사각형_1913" class="st0" width="76" height="76"/>
+<g id="그룹_1062">
+	<g id="사각형_1877">
+		<path id="사각형_1914" class="st0" d="M16,1h44c5,0,9,4,9,9v56c0,5-4,9-9,9H16c-5,0-9-4-9-9V10C7,5,11,1,16,1z"/>
+		<g id="그룹_1063">
+			<path id="패스_899" class="st1" d="M60,75H16c-5,0-9-4-9-9V10c0-5,4-9,9-9h44c5,0,9,4,9,9v56C69,71,65,75,60,75z M16,3
+				c-3.9,0-7,3.1-7,7v56c0,3.9,3.1,7,7,7h44c3.9,0,7-3.1,7-7V10c0-3.9-3.1-7-7-7H16z"/>
+		</g>
+	</g>
+	<g id="타원_404" transform="translate(20 27.703)">
+		<circle class="st0" cx="18" cy="18" r="18"/>
+		<circle class="st1" cx="18" cy="18" r="16"/>
+	</g>
+	<ellipse id="타원_405" class="st1" cx="25" cy="45.6" rx="4" ry="6"/>
+	<path id="사각형_1878" class="st1" d="M15,8h7c0.6,0,1,0.4,1,1l0,0c0,0.6-0.4,1-1,1h-7c-0.6,0-1-0.4-1-1l0,0C14,8.4,14.4,8,15,8
+		z"/>
+	<path id="사각형_1879" class="st1" d="M27,8h15c0.6,0,1,0.4,1,1l0,0c0,0.6-0.4,1-1,1H27c-0.6,0-1-0.4-1-1l0,0
+		C26,8.4,26.4,8,27,8z"/>
+	<circle id="타원_406" class="st1" cx="58" cy="9" r="3"/>
+	<rect id="사각형_1880" x="8" y="14" class="st1" width="60" height="2"/>
+</g>
+</svg>

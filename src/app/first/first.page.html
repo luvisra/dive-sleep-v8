@@ -1,0 +1,52 @@
+<ion-header no-border>
+  <ion-toolbar>
+    <ion-buttons slot="end">
+      <ion-button color='secondary' (click)="startApp()" [hidden]="!showSkip">Skip</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content fullscreen>
+  <swiper-container #slides (slidechange)="onSlideChangeStart()">
+    <swiper-slide>
+      <div class="slide-content">
+        <h2 class="slide-title">
+          {{ 'FIRST.one_1' | translate }}
+        </h2>
+        <h2 class="slide-title">
+          {{ 'FIRST.one_2' | translate }}
+        </h2>
+        <img src="assets/imgs/first_page_01.png" class="slide-image" />
+      </div>
+    </swiper-slide>
+
+    <swiper-slide>
+      <div class="slide-content">
+        <h2 class="slide-title">
+          {{ 'FIRST.two_1' | translate }}
+        </h2>
+        <h2 class="slide-title">
+          {{ 'FIRST.two_2' | translate }}
+        </h2>
+        <img src="assets/imgs/first_page_02.png" class="slide-image" />
+      </div>
+    </swiper-slide>
+
+    <swiper-slide>
+      <div class="slide-content">
+        <h2 class="slide-title">
+          {{ 'FIRST.three_1' | translate }}
+        </h2>
+        <h2 class="slide-title">
+          {{ 'FIRST.three_2' | translate }}
+        </h2>
+        <img src="assets/imgs/first_page_03.png" class="slide-image" />
+        <br>
+        <ion-button color='success' fill="clear" (click)="startApp()">
+          {{ 'FIRST.done' | translate }}
+          <ion-icon slot="end" name="arrow-forward"></ion-icon>
+        </ion-button>
+      </div>
+    </swiper-slide>
+  </swiper-container>
+</ion-content>

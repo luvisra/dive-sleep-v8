@@ -1,0 +1,28 @@
+ion-content {
+  --background: none;
+  background-image: url('/assets/imgs/intro.png');
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.dive_logo {
+  max-height: 40%;
+  max-width: 40%;
+  margin: 10.0em 0px;
+  font-weight: 900;
+  pointer-events: none;
+}
+
+.mg {
+  text-align: center;
+  margin-top: 10.0em;
+}
+
+div {
+  text-align: center;
+}
+
+ion-button {
+  margin-bottom: 1.0em;
+}

@@ -1,0 +1,29 @@
+<ion-content fullscreen="true" style="height: 100%;" scrollY="false" padding>
+  <ion-grid style="height: 100%;">
+    <ion-row>
+      <ion-col>
+        <div><img class="dive_logo" src="../../assets/imgs/dive_logo_with_text.png"></div>
+        <div style="margin-top: -5.0em; margin-bottom: 0.3em">
+          <ion-label style="font-size: 1.0rem">
+            Around for a deep sleep
+          </ion-label>
+        </div>
+        <div>
+          <ion-label style="font-size: 0.8rem">
+            심면으로 빠져드는 공간, 다이브
+          </ion-label>
+        </div>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <div class="mg">
+          <ion-button routerLink="/signup" routerDirection="forward" color="teritiary" shape="round" expand="block">
+            {{ 'LOGIN.signUp' | translate}}</ion-button>
+          <ion-button routerLink="/userlogin" routerDirection="forward" color="dark" fill="outline" shape="round"
+            expand="block">{{ 'LOGIN.login' | translate}}</ion-button>
+        </div>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

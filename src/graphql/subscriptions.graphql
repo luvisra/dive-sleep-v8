@@ -1,0 +1,188 @@
+# this is an auto generated file. This will be overwritten
+subscription OnCreateMySleepData($dev_id: String, $time_stamp: String) {
+  onCreateMySleepData(dev_id: $dev_id, time_stamp: $time_stamp) {
+    dev_id
+    time_stamp
+    ev_type
+    value
+    sd
+    snoring
+    respiration
+    heartrate
+    impulse
+    band
+  }
+}
+subscription OnUpdateMySleepData($dev_id: String, $time_stamp: String) {
+  onUpdateMySleepData(dev_id: $dev_id, time_stamp: $time_stamp) {
+    dev_id
+    time_stamp
+    ev_type
+    value
+    sd
+    snoring
+    respiration
+    heartrate
+    impulse
+    band
+  }
+}
+subscription OnDeleteMySleepData($dev_id: String, $time_stamp: String) {
+  onDeleteMySleepData(dev_id: $dev_id, time_stamp: $time_stamp) {
+    dev_id
+    time_stamp
+    ev_type
+    value
+    sd
+    snoring
+    respiration
+    heartrate
+    impulse
+    band
+  }
+}
+subscription OnCreateDiveSleepData(
+  $dev_id: String
+  $time_stamp: String
+  $mac_addr: String
+  $data: String
+) {
+  onCreateDiveSleepData(
+    dev_id: $dev_id
+    time_stamp: $time_stamp
+    mac_addr: $mac_addr
+    data: $data
+  ) {
+    dev_id
+    time_stamp
+    mac_addr
+    data
+    feeling
+  }
+}
+subscription OnUpdateDiveSleepData(
+  $dev_id: String
+  $time_stamp: String
+  $mac_addr: String
+  $data: String
+) {
+  onUpdateDiveSleepData(
+    dev_id: $dev_id
+    time_stamp: $time_stamp
+    mac_addr: $mac_addr
+    data: $data
+  ) {
+    dev_id
+    time_stamp
+    mac_addr
+    data
+    feeling
+  }
+}
+subscription OnDeleteDiveSleepData(
+  $dev_id: String
+  $time_stamp: String
+  $mac_addr: String
+  $data: String
+) {
+  onDeleteDiveSleepData(
+    dev_id: $dev_id
+    time_stamp: $time_stamp
+    mac_addr: $mac_addr
+    data: $data
+  ) {
+    dev_id
+    time_stamp
+    mac_addr
+    data
+    feeling
+  }
+}
+subscription OnCreateDiveSleepUserinfo($username: String) {
+  onCreateDiveSleepUserinfo(username: $username) {
+    username
+    dev_id
+    link_account
+    user_info
+    fcm_token
+  }
+}
+subscription OnUpdateDiveSleepUserinfo($username: String) {
+  onUpdateDiveSleepUserinfo(username: $username) {
+    username
+    dev_id
+    link_account
+    user_info
+    fcm_token
+  }
+}
+subscription OnDeleteDiveSleepUserinfo($username: String) {
+  onDeleteDiveSleepUserinfo(username: $username) {
+    username
+    dev_id
+    link_account
+    user_info
+    fcm_token
+  }
+}
+subscription OnCreateDiveFamilyShareInfo(
+  $username: String
+  $requester: String
+  $nickname: String
+  $status: String
+  $token: String
+  $enabled: Boolean
+) {
+  onCreateDiveFamilyShareInfo(
+    username: $username
+    requester: $requester
+    nickname: $nickname
+    status: $status
+    token: $token
+    enabled: $enabled
+  ) {
+    username
+    requester
+    nickname
+    status
+    token
+    enabled
+  }
+}
+subscription OnUpdateDiveFamilyShareInfo(
+  $username: String
+  $requester: String
+  $nickname: String
+  $status: String
+  $token: String
+  $enabled: Boolean
+) {
+  onUpdateDiveFamilyShareInfo(
+    username: $username
+    requester: $requester
+    nickname: $nickname
+    status: $status
+    token: $token
+    enabled: $enabled
+  ) {
+    username
+    requester
+    nickname
+    status
+    token
+    enabled
+  }
+}
+subscription OnDeleteDiveFamilyShareInfo(
+  $username: String
+  $requester: String
+) {
+  onDeleteDiveFamilyShareInfo(username: $username, requester: $requester) {
+    username
+    requester
+    nickname
+    status
+    token
+    enabled
+  }
+}

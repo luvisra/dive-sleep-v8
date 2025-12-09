@@ -1,0 +1,284 @@
+{
+    "COMMON": {
+        "motionBed": "Motion Bed",
+        "snoring": "Snore",
+        "respiratory": "Respiratory",
+        "heartrate": "Heart Rate",
+        "apnea": "Apnea",
+        "device": "Device",
+        "sleepScore": "Sleep Score",
+        "sleepTime": "Sleep Time",
+        "hour": "H",
+        "hours": "H",
+        "minute": "m",
+        "month": "M",
+        "days": "D",
+        "day": "Day",
+        "night": "Night",
+        "score": "p",
+        "count": "Counts",
+        "average": "Avg",
+        "sensor": "Sleep Sensor",
+        "ok": "Done",
+        "confirm": "Confirm",
+        "cancel": "Cancel",
+        "goal": "Goal",
+        "monday": "Mon",
+        "tuesday": "Tue",
+        "wednesday": "Wed",
+        "thursday": "Thu",
+        "friday": "Fri",
+        "saturday": "Sat",
+        "sunday": "Sun",
+        "connected": "Connected",
+        "scanning": "Scanning.."
+
+    },
+
+    "SOUND": {
+
+    },
+
+    "COUNTRY": {
+        "ko": {
+            "lang": "Korean",
+            "name": "South Korea"
+
+        },
+        "en": {
+            "lang": "English",
+            "name": "United States"
+        },
+        "cn": {
+            "lang": "Chinese",
+            "name": "China"
+        }
+    },
+
+    "FIRST": {
+        "one_1": "Without wearing on the body.",
+        "one_2": "Smart sleep measurement",
+        "two_1": "Make good sleep habits.",
+        "two_2": "With the accurate sleep analysis.",
+        "three_1": "Sharing my data",
+        "three_2": "with family worldwide.",
+        "done": "Starting with sign up "
+    },
+
+    "TABS": {
+        "home": "Home",
+        "analysis": "Analysis",
+        "devices": "Devices",
+        "settings": "Settings",
+        "store": "Store"
+    },
+
+    "TAB1": {
+        "asleepTime": "Asleep Time",
+        "bedTime": "Bed Time",
+        "targetAsleepTime": "Goal Bedtime",
+        "targetTotalSleepTime": "Goal Sleep Time",
+        "recentData": "Recent",
+        "sleepSound": "Sleep Sound",
+        "connectedDevices": "Connected Devices",
+        "addingADevice": "Adding a device",
+        "moodLight": "Mood Light",
+        "stripLed": "Strip LED",
+        "irTv": "IR TV",
+        "airConditioner": "A/C",
+        "curtain": "Curtain",
+        "plug": "Plug",
+        "settop": "Set-top"
+    },
+
+    "TAB2": {
+        "daily": "Daily",
+        "weekly": "Weekly",
+        "monthly": "Monthly",
+        "wake": "Wake",
+        "sleepStage1": "REM",
+        "sleepStage2": "Light",
+        "sleepStage3": "Deep",
+        "tossing": "Toss&Turn",
+        "sleepPattern": "Sleep Pattern",
+        "timeToFallAsleep": "Time to fall asleep",
+        "awayFromBed": "Away",
+        "averageRespiration": "Average Respiration",
+        "averageHeartRate": "Average Heartrate",
+        "feeling": "Wake Up Feeling",
+        "feelingSelect": "(Click to select)",
+
+        "advice": "Sleep Advices"
+    },
+
+    "TAB3": {
+        "title": "Devices",
+        "getDevice": "Link to HejHome",
+        "motionBed": "Motion Bed",
+        "moodLight": "Mood Light",
+        "stripLed": "Strip LED",
+        "irTv": "TV",
+        "irAir": "A/C",
+        "settopBox": "Settop Box",
+        "fan": "Fan",
+        "bulb": "Bulb",
+        "curtain": "Curtain"
+    },
+
+    "TAB4": {
+        "settings": "Settings",
+        "userLogin": "User Login",
+        "deviceRegistration": "Register the device",
+        "calibration": "Sensor Calibration",
+        "ota": "Firmware Update",
+        "hejhome": "Hejhome Account",
+        "usage": "Usage",
+        "version": "Version",
+        "language": "Language",
+        "languageAuto": "Automatic",
+        "familyShare": "Share with family",
+        "alarm": "Alarm Setting",
+        "pushNotification": "Push Notification",
+        "factory": "Factory Reset"
+    },
+
+    "LOGIN": {
+        "title": "User Authentication",
+        "loading": "Sign in..",
+        "login": "Log in",
+        "phoneNumber": "Phone number",
+        "password": "Password",
+        "verifyPassword": "Verify password",
+        "username": "Username",
+        "signUp": "Sign up",
+        "deviceRegistered": "Registered",
+        "deviceNotRegistered": "Not registered",
+        "lostPassword": "Forgot password?",
+        "resendCode": "Resend code",
+        "resendCode2": ", Resend code",
+        "invalidCode": "Invalid Code.",
+        "limit": "The code reception limit was exceeded. Please try again in a few minutes.",
+        "code": "Code",
+        "invalidUserInfo": "Please enter your information correctly.\n"
+
+    },
+
+    "CALIBRATION": {
+        "title": "Sensor Calibration",
+        "step1": "Start sensor calibration.",
+        "step2": "Do not apply any stimulus to the sensor for 30 seconds during measurement.",
+        "next": "Next",
+        "start": "Start Calibration",
+        "home": "Return to home",
+        "retry": "Retry",
+        "done": "Done",
+        "checkNetwork": "Check network status.",
+        "startCalibration": "Start sensor calibration",
+        "isCalibrating": "Calibrating... ",
+        "doneMessage": "Calibration Completed.",
+        "failureMessage1": "Check the sensor is connected to WiFi.",
+        "failureMessage2": "Do not lie down on the bed or irritate the sensor during calibration.",
+        "failureMessage3": "There is no response from the sensor."
+    },
+
+    "OTA": {
+        "ready": "Ready",
+        "failure": "Error",
+        "failureMessage": "Firmware Update Failure.",
+        "done": "Success",
+        "doneMessage": "Firmware update is completed successfully.",
+        "retry": "There was a temporary problem communicating with the device. Please try again later.",
+        "nowUpdating": "Firmware is being updated. This process takes 1 to 2 minutes. Do not turn off the device or close the app.",
+        "version": "Firmware Version",
+        "latest": "Latest Firmware",
+        "available": "Firmware update available.",
+        "checkNetwork": "Check the network status.",
+        "checking": "Checking the latest firmware",
+        "noResponse": "There is no response from the device.",
+        "ota": "Firmware Update",
+        "verifyOta": "Firmware Update",
+        "isAvailableMessage1": "New firmware is available.<br>(Ver: <strong>",
+        "isAvailableMessage2": "</strong>)<br>Are you sure you want to continue?",
+        "pleaseWait": "Preparing to update the firmware.<br>Please wait."
+    },
+
+    "DEVICE": {
+        "title": "Device Registration",
+        "title2": "WiFi Information",
+        "connect": "Start to connect",
+        "connected": "Already Connected",
+        "connectWifi": "WiFi Connection",
+        "scanned": "is detected.",
+        "sensorScanned": "Sensor is detected.",
+        "retry": "Retry",
+        "restriction": "*Only 2.4GHz WiFi is available.",
+        "selectWifi": "Choose the WiFi Name",
+        "inputWifiName": "Input WiFi Name",
+        "inputPassword": "Input WiFi password",
+        "wifiName": "WiFi Name",
+        "wifiList": "Input WiFi password",
+        "invalidInformation": "There is not enough information to connect WiFi.",
+        "pleaseWait": "Searching for WiFi,<br>Please wait..",
+        "isSelected": " is selected."
+    },
+
+    "OPTIONS": {
+        "flat": "Flatting the bed when you fall asleep",
+        "snoring": "Control the bed when you snore",
+        "apnea": "Control the bed when you have apnea",
+        "alarm": "Ascending the bed when alarm is triggered",
+        "degree": "Deg",
+        "setAlarmTime": "Set the alarm time",
+        "moodlightOn": "Turn on the moodlight when you wake up",
+        "moodlightOff": "Turn off the moodlight when you fall asleep",
+        "stripOn": "Turn on the strip LED when you get up from the bed.",
+        "stripOff": "Turn off the strip LED during you are in the bed.",
+        "irTvOff": "Turn off the TV when you fall asleep",
+        "irTvOn": "Turn on the TV when you wake up.",
+        "irTvChOn": "Turn on the TV when you wake up.",
+        "deviceOffline": "Connect the Hejhome device power.",
+        "noDevices": "Please register the device first in the Hejhome app.",
+        "sensorOffline": "Please check the WiFi connection.",
+        "outOfirTvChannel": "Please enter the TV channel correctly.",
+        "setTimer": "Set alarm time",
+        "done": "Done",
+        "timerHeader": "Timer Setting",
+        "timerSettingDoneMessage": "Timer setting is complete."
+    },
+
+    "TITLES": {
+        "motionBed": "Motion Bed Control",
+        "moodLight": "Mood Light Control",
+        "stripLed": "Strip LED Control",
+        "irTv": "TV Control",
+        "settop": "Set-top Box Control",
+        "plug": "Smart Plug",
+        "irTvSetting": "IR TV Control Setting",
+        "stripLedSetting": "Strip LED Control Setting",
+        "moodLightSetting": "Mood Light Seeting",
+        "motionBedSetting": "Motion Bed Setting",
+        "usage": "Usage",
+        "sleepSound": "Sleep Sound",
+        "timer": "Timer",
+        "codeVerification": "Code Verification",
+        "lostPassword": "Reset Password"
+    },
+
+    "GOQUAL": {
+        "title": "Hejhome Account",
+        "syncOn": "Link account",
+        "status": "Account Status",
+        "isSync": "Linked",
+        "syncOff": "Unlink",
+        "registeredDevice": "Registered device",
+        "syncOnMessage": "Linking your Hejhome account to the service. Please wait.",
+        "syncFailureMessage": "Please check your Hejhome user account or password again.",
+        "syncDoneMessage": "Hejhome user account linking is complete."
+    },
+
+    "ADVICE": {
+        "default_message1": "Let's start smart sleep life with the DIVE.",
+        "default_message2": "Sleep advice can consist of several pages.",
+        "default_message3": "We are currently updating our sleep advice. We will prepare to show you as soon as possible."
+    }
+}

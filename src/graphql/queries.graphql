@@ -1,0 +1,193 @@
+# this is an auto generated file. This will be overwritten
+query GetMySleepData($dev_id: String!, $time_stamp: String!) {
+  getMySleepData(dev_id: $dev_id, time_stamp: $time_stamp) {
+    dev_id
+    time_stamp
+    ev_type
+    value
+    sd
+    snoring
+    respiration
+    heartrate
+    impulse
+    band
+  }
+}
+query QueryMySleepData(
+  $dev_id: String!
+  $time_stamp: String
+  $time_stamp2: String
+  $ev_type: String
+) {
+  queryMySleepData(
+    dev_id: $dev_id
+    time_stamp: $time_stamp
+    time_stamp2: $time_stamp2
+    ev_type: $ev_type
+  ) {
+    items {
+      dev_id
+      time_stamp
+      ev_type
+      value
+      sd
+      snoring
+      respiration
+      heartrate
+      impulse
+      band
+    }
+    nextToken
+  }
+}
+query ListMySleepData(
+  $filter: TableMySleepDataFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  listMySleepData(filter: $filter, limit: $limit, nextToken: $nextToken) {
+    items {
+      dev_id
+      time_stamp
+      ev_type
+      value
+      sd
+      snoring
+      respiration
+      heartrate
+      impulse
+      band
+    }
+    nextToken
+  }
+}
+query GetDiveSleepData($dev_id: String!, $time_stamp: String!) {
+  getDiveSleepData(dev_id: $dev_id, time_stamp: $time_stamp) {
+    dev_id
+    time_stamp
+    mac_addr
+    data
+    feeling
+  }
+}
+query ListDiveSleepData(
+  $filter: TableDiveSleepDataFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  listDiveSleepData(filter: $filter, limit: $limit, nextToken: $nextToken) {
+    items {
+      dev_id
+      time_stamp
+      mac_addr
+      data
+      feeling
+    }
+    nextToken
+  }
+}
+query QueryDiveSleepData(
+  $dev_id: String!
+  $time_start: String!
+  $time_end: String
+) {
+  queryDiveSleepData(
+    dev_id: $dev_id
+    time_start: $time_start
+    time_end: $time_end
+  ) {
+    items {
+      dev_id
+      time_stamp
+      mac_addr
+      data
+      feeling
+    }
+    nextToken
+  }
+}
+query GetDiveSleepUserinfo($username: String!) {
+  getDiveSleepUserinfo(username: $username) {
+    username
+    dev_id
+    link_account
+    user_info
+    fcm_token
+  }
+}
+query QueryDiveSleepUserinfo($username: String!) {
+  queryDiveSleepUserinfo(username: $username) {
+    items {
+      username
+      dev_id
+      link_account
+      user_info
+      fcm_token
+    }
+    nextToken
+  }
+}
+query QueryDiveFamilyShareinfo($username: String!) {
+  queryDiveFamilyShareinfo(username: $username) {
+    items {
+      username
+      requester
+      nickname
+      status
+      token
+      enabled
+    }
+    nextToken
+  }
+}
+query ListDiveSleepUserinfos(
+  $filter: TableDiveSleepUserinfoFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  listDiveSleepUserinfos(
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+  ) {
+    items {
+      username
+      dev_id
+      link_account
+      user_info
+      fcm_token
+    }
+    nextToken
+  }
+}
+query GetDiveFamilyShareInfo($username: String!, $requester: String!) {
+  getDiveFamilyShareInfo(username: $username, requester: $requester) {
+    username
+    requester
+    nickname
+    status
+    token
+    enabled
+  }
+}
+query ListDiveFamilyShareInfos(
+  $filter: TableDiveFamilyShareInfoFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  listDiveFamilyShareInfos(
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+  ) {
+    items {
+      username
+      requester
+      nickname
+      status
+      token
+      enabled
+    }
+    nextToken
+  }
+}

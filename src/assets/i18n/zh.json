@@ -1,0 +1,282 @@
+{
+    "COMMON": {
+        "motionBed": "电动床",
+        "snoring": "打鼾",
+        "respiratory": "呼吸频率",
+        "heartrate": "心率",
+        "apnea": "呼吸暂停",
+        "device": "设备",
+        "sleepScore": "睡眠分数",
+        "sleepTime": "睡眠时长",
+        "hour": "时",
+        "hours": "小时",
+        "minute": "分",
+        "month": "月",
+        "days": "日",
+        "day": "白天",
+        "night": "晚上",
+        "score": "分",
+        "count": "回",
+        "average": "平均",
+        "sensor": "睡眠监测器",
+        "ok": "OK",
+        "confirm": "确认",
+        "cancel": "取消",
+        "goal": "目标",
+        "monday": "一",
+        "tuesday": "二",
+        "wednesday": "三",
+        "thursday": "四",
+        "friday": "五",
+        "saturday": "六",
+        "sunday": "日",
+        "connected": "连接的",
+        "scanning": "扫描.."
+    },
+
+    "sound": {
+
+    },
+
+    "COUNTRY": {
+        "ko": {
+            "lang": "한국어",
+            "name": "대한민국"
+
+        },
+        "en": {
+            "lang": "English",
+            "name": "United States"
+        },
+        "cn": {
+            "lang": "简体中文",
+            "name": "中国"
+        }
+    },
+
+    "FIRST": {
+        "one_1": "非穿戴式睡眠监测",
+        "one_2": "记录睡眠数据",
+        "two_1": "通过生成的睡眠数据",
+        "two_2": "养成健康的睡眠习惯",
+        "three_1": "不必住在一起",
+        "three_2": "随时共享家人睡眠数据",
+        "done": "注册"
+    },
+
+    "TABS": {
+        "home": "首页",
+        "analysis": "分析",
+        "devices": "设备",
+        "settings": "设置",
+        "store": "商店"
+    },
+
+    "TAB1": {
+        "asleepTime": "睡觉时间",
+        "bedTime": "上床时间",
+        "targetAsleepTime": "目标就寝时间",
+        "targetTotalSleepTime": "目标睡眠时长",
+        "recentData": "最近数据",
+        "sleepSound": "助眠专辑",
+        "connectedDevices": "已连接设备",
+        "addingADevice": "添加设备",
+        "moodLight": "床头灯",
+        "stripLed": "LED灯",
+        "irTv": "遥控器",
+        "airConditioner": "冷气机",
+        "curtain": "窗帘",
+        "plug": "插头",
+        "settop": "机顶盒"
+    },
+
+    "TAB2": {
+        "daily": "每日分析",
+        "weekly": "每周分析",
+        "monthly": "每月分析",
+        "wake": "醒来",
+        "sleepStage1": "浅睡",
+        "sleepStage2": "中睡",
+        "sleepStage3": "深睡",
+        "tossing": "翻身",
+        "sleepPattern": "睡眠规律",
+        "timeToFallAsleep": "入睡用时",
+        "awayFromBed": "离床",
+        "averageRespiration": "平均呼吸",
+        "averageHeartRate": "平均心率",
+        "feeling": "起床心情",
+        "feelingSelect": "单击选择",
+        "advice": "专家建议"
+    },
+
+    "TAB3": {
+        "title": "设备",
+        "getDevice": "同步设备",
+        "motionBed": "电动床",
+        "moodLight": "床头灯",
+        "stripLed": "LED灯",
+        "irTv": "遥控器",
+        "irAir": "冷气机",
+        "settopBox": "机顶盒",
+        "fan": "风扇",
+        "bulb": "灯泡",
+        "curtain": "窗帘",
+        "plug": "插頭"
+    },
+
+    "TAB4": {
+        "settings": "设置",
+        "userLogin": "登录",
+        "deviceRegistration": "设备连接",
+        "calibration": "读数校准",
+        "ota": "固件更新",
+        "hejhome": "Hejhome帐户关联",
+        "usage": "使用方法",
+        "version": "版本信息",
+        "language": "语言设置",
+        "languageAuto": "自动检测",
+        "familyShare": "家庭数据",
+        "alarm": "睡前/闹钟设定",
+        "pushNotification": "推送通知",
+        "factory": "恢复出厂设置"
+    },
+
+    "LOGIN": {
+        "title": "用户验证",
+        "loading": "正在登录..",
+        "login": "登录",
+        "phoneNumber": "手机号码",
+        "password": "密码",
+        "verifyPassword": "确认密码",
+        "username": "用户名",
+        "signUp": "注册",
+        "deviceRegistered": "正常连接",
+        "deviceNotRegistered": "未连接",
+        "lostPassword": "忘记密码",
+        "resendCode": "重新发送验证码",
+        "resendCode2": "秒后重新发送验证码",
+        "invalidCode": "无效验证码",
+        "limit": "超过验证码接收限制，稍后再试",
+        "code": "验证码",
+        "invalidUserInfo": "请正确输入用户信息\n"
+    },
+
+    "CALIBRATION": {
+        "title": "监测器校准",
+        "step1": "睡眠监测器校准开始",
+        "step2": "15秒内请勿按压监测器",
+        "next": "下一步",
+        "start": "开始校准",
+        "home": "返回首页",
+        "retry": "重试",
+        "done": "校准完成",
+        "checkNetwork": "请检查网络连接",
+        "startCalibration": "开始校准睡眠监测器",
+        "isCalibrating": "正在校准...",
+        "doneMessage": "睡眠监测器校准完成",
+        "failureMessage1": "请检查睡眠监测器的连接状态",
+        "failureMessage2": "在校准过程中不要躺在监测器上或按压监测器",
+        "failureMessage3": "睡眠监测器没有响应"
+    },
+
+    "OTA": {
+        "ready": "正在等待",
+        "failure": "固件更新失败",
+        "failureMessage": "固件更新失败",
+        "done": "固件更新完成",
+        "doneMessage": "固件更新完成",
+        "retry": "设备通讯出现问题，请重试",
+        "nowUpdating": "固件更新中，此过程需1到2分钟，请勿将设备断电或退出APP",
+        "version": "固件版本",
+        "latest": "已经为最新固件",
+        "available": "固件可更新",
+        "checkNetwork": "请检查网络连接",
+        "checking": "正在确认最新固件",
+        "noResponse": "设备没有响应",
+        "ota": "固件更新",
+        "verifyOta": "固件更新",
+        "isAvailableMessage1": "可以进行固件更新。<br>（版本:<strong>",
+        "isAvailableMessage2": "</strong>）<br>确定要继续吗？",
+        "pleaseWait": "正在准备固件更新 <br>请稍候"
+    },
+
+    "DEVICE": {
+        "title": "设备搜索",
+        "title2": "输入WiFi信息",
+        "connect": "连接产品",
+        "connected": "连接的",
+        "connectWifi": "WiFi连接",
+        "scanned": "已搜索",
+        "sensorScanned": "搜索到睡眠检测器",
+        "retry": "重新搜索设备",
+        "restriction": "*仅支持2.4GHz WiFi",
+        "selectWifi": "请选择WiFi",
+        "inputWifiName": "请输入WiFi名称",
+        "inputPassword": "请输入WiFi密码",
+        "wifiName": "WiFi名称",
+        "wifiList": "请输入WiFi密码",
+        "invalidInformation": "没有足够的信息来连接到WiFi",
+        "pleaseWait": "正在搜索WiFi<br>请稍候",
+        "isSelected": "已选择"
+    },
+
+    "OPTIONS": {
+        "flat": "入眠后放平电动床",
+        "snoring": "打鼾时上升背板",
+        "apnea": "呼吸暂停时上升背板",
+        "alarm": "起床时上升背板",
+        "degree": "度",
+        "setAlarmTime": "设置闹钟时间",
+        "moodlightOn": "起床时打开床头灯",
+        "moodlightOff": "入眠后关闭床头灯",
+        "stripOn": "离床时打开",
+        "stripOff": "回床时关闭",
+        "irTvOff": "入眠后关闭电视",
+        "irTvOn": "起床时打开电视",
+        "irTvChOn": "起床时打开指定频道",
+        "deviceOffline": "请连接Hejhome设备的电源",
+        "noDevices": "请先在HejhomeAPP中进行设备连接",
+        "sensorOffline": "请检查睡眠监测器的WiFi连接",
+        "outOfirTvChannel": "请正确输入电视频道",
+        "setTimer": "设置闹钟时间",
+        "done": "设置完成",
+        "timerHeader": "计时器设置",
+        "timerSettingDoneMessage": "计时器设置完成"
+    },
+
+    "TITLES": {
+        "motionBed": "电动床遥控",
+        "moodLight": "床头灯遥控",
+        "stripLed": "LED灯遥控",
+        "irTv": "电视遥控",
+        "settop": "机顶盒",
+        "plug": "智能插头",
+        "irTvSetting": "电视遥控设置",
+        "stripLedSetting": "LED灯遥控设置",
+        "moodLightSetting": "床头灯遥控设置",
+        "motionBedSetting": "电动床遥控设置",
+        "usage": "使用方法",
+        "sleepSound": "助眠专辑",
+        "timer": "计时器",
+        "codeVerification": "确认验证码",
+        "lostPassword": "重设密码"
+    },
+
+    "GOQUAL": {
+        "title": "关联Hejhome账号",
+        "syncOn": "关联帐号",
+        "status": "帐号连接状态",
+        "isSync": "已连接",
+        "syncOff": "取消连接",
+        "registeredDevice": "连接设备",
+        "syncOnMessage": "正在关联Hejhome账号，请稍候",
+        "syncFailureMessage": "请确认Hejhome账号或密码",
+        "syncDoneMessage": "Hejhome账号连接完成"
+    },
+
+    "ADVICE": {
+        "default_message1": "使用newlife开始智能睡眠",
+        "default_message2": "专家建议可能为多页",
+        "default_message3": "正在更新专家建议，将尽快展示"
+    }
+}
