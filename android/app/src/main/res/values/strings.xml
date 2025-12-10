@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">DIVE 슬립</string>
+    <string name="title_activity_main">DIVE 슬립</string>
+    <string name="package_name">kr.cnfrontier.sleep</string>
+    <string name="custom_url_scheme">kr.cnfrontier.sleep</string>
+</resources>
