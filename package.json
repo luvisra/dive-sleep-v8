@@ -58,6 +58,7 @@
     "@capacitor/screen-orientation": "8.0.0",
     "@capacitor/splash-screen": "8.0.0",
     "@capacitor/status-bar": "8.0.0",
+    "@capgo/capacitor-wifi": "^7.0.3",
     "@ionic/angular": "^8.0.0",
     "@ngx-translate/core": "^15.0.0",
     "@ngx-translate/http-loader": "^8.0.0",

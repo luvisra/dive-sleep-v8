@@ -4,10 +4,14 @@
       <div>
         <img *ngIf="deviceService.isOnline === 0" id="icon-left" src="../../assets/imgs/navibar_sensor_offline.png"
           routerLink="/device-registration" routerDirection="forward" />
-          <ion-label *ngIf="deviceService.isOnline === 0" style="margin-left: -0.7em; margin-top: 1.0em; position: absolute; font-size: 0.8rem;" color="warning">{{ 'COMMON.scanning' | translate }}</ion-label>
+        <ion-label *ngIf="deviceService.isOnline === 0"
+          style="margin-left: -0.7em; margin-top: 1.0em; position: absolute; font-size: 0.8rem;" color="warning">{{
+          'COMMON.scanning' | translate }}</ion-label>
         <img *ngIf="deviceService.isOnline > 0" id="icon-left" src="../../assets/imgs/navibar_sensor_online.png"
           routerLink="/device-registration" routerDirection="forward" />
-          <ion-label *ngIf="deviceService.isOnline > 0" style="margin-left: -0.7em; margin-top: 1.0em; position: absolute; font-size: 0.8rem;" color="warning">{{ 'COMMON.connected' | translate }}</ion-label>
+        <ion-label *ngIf="deviceService.isOnline > 0"
+          style="margin-left: -0.7em; margin-top: 1.0em; position: absolute; font-size: 0.8rem;" color="warning">{{
+          'COMMON.connected' | translate }}</ion-label>
       </div>
       <div style="margin-top: -0.5em;">
         <ion-button fill="clear">
@@ -15,16 +19,19 @@
         </ion-button>
       </div>
       <div>
-        <img *ngIf="familyShare.badgeCount > 0" routerLink="/family" routerDirection="forward" id="icon-right" style="max-width: 50%; margin-top: 0.5em" src="../../assets/imgs/icon_family.png" />
-        <img *ngIf="familyShare.badgeCount === 0" routerLink="/family" routerDirection="forward" id="icon-right" style="max-width: 70%; margin-top: 0.5em" src="../../assets/imgs/icon_family.png" />
-        <ion-badge *ngIf="familyShare.badgeCount > 0" slot="end" color="danger" style="margin-left: -0.3em">{{ familyShare.badgeCount }}</ion-badge>
+        <img *ngIf="familyShare.badgeCount > 0" routerLink="/family" routerDirection="forward" id="icon-right"
+          style="max-width: 50%; margin-top: 0.5em" src="../../assets/imgs/icon_family.png" />
+        <img *ngIf="familyShare.badgeCount === 0" routerLink="/family" routerDirection="forward" id="icon-right"
+          style="max-width: 70%; margin-top: 0.5em" src="../../assets/imgs/icon_family.png" />
+        <ion-badge *ngIf="familyShare.badgeCount > 0" slot="end" color="danger" style="margin-left: -0.3em">{{
+          familyShare.badgeCount }}</ion-badge>
       </div>
     </div>
   </ion-toolbar>
 </ion-header>
 
 <ion-content style="background-color: #1C1C1D; padding-bottom: 1.0em;">
-  <div *ngIf="deviceService.userNickname === '' || deviceService.userNickname === undefined" routerLink="/profile" routerDirection="forward" style="background-color: #FCC300; color: #0c0c0d; text-align: left; font-size: 0.8rem; padding: 0.3em; font-weight: 500;">
+  <!-- <div *ngIf="deviceService.userNickname === '' || deviceService.userNickname === undefined" routerLink="/profile" routerDirection="forward" style="background-color: #FCC300; color: #0c0c0d; text-align: left; font-size: 0.8rem; padding: 0.3em; font-weight: 500;">
     <ion-grid>
       <ion-row>
         <ion-col size="1.5">
@@ -35,7 +42,7 @@
         </ion-col>
         </ion-row>
     </ion-grid>
-  </div>
+  </div> -->
   <div>
     <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)" pullFactor="0.4" pullMin="25" pullMax="300">
       <ion-refresher-content pullingIcon="chevron-down" refreshingSpinner="crescent">
@@ -46,8 +53,8 @@
   <!-- <p class="header-text">{{ 'TAB1.recentData' | translate }}</p> -->
   <div class="container">
     <!-- 데이터가 없을 때 안내 메시지 -->
-    <div *ngIf="uiData.sleepScore === '0' && displayRecentSleepResultsUi.wakeDay === '0'" 
-         style="background-color: rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 2em; margin: 1em; text-align: center;">
+    <div *ngIf="uiData.sleepScore === '0' && displayRecentSleepResultsUi.wakeDay === '0'"
+      style="background-color: rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 2em; margin: 1em; text-align: center;">
       <ion-icon name="moon-outline" style="font-size: 3rem; color: #10dc60; margin-bottom: 0.5em;"></ion-icon>
       <h3 style="color: #ffffff; margin-bottom: 0.5em;">수면 데이터가 아직 없습니다</h3>
       <p style="color: #aaaaaa; font-size: 0.9rem; line-height: 1.5;">
@@ -70,7 +77,8 @@
           </div>
           <ion-col>
             <ion-row>
-              <ion-label class="small-header"><ion-icon style="margin-right: 0.3em; font-size: 0.8rem;" color="warning" name="ellipse"></ion-icon>{{ 'TAB1.asleepTime' | translate }}</ion-label>
+              <ion-label class="small-header"><ion-icon style="margin-right: 0.3em; font-size: 0.8rem;" color="warning"
+                  name="ellipse"></ion-icon>{{ 'TAB1.asleepTime' | translate }}</ion-label>
             </ion-row>
             <ion-row>
               <div>
@@ -84,7 +92,8 @@
 
           <ion-col>
             <ion-row style="margin-top: 1.0em">
-              <ion-label class="small-header"><ion-icon style="margin-right: 0.3em; font-size: 0.8rem;" color="warning" name="ellipse"></ion-icon>{{ 'TAB1.bedTime' | translate }}</ion-label>
+              <ion-label class="small-header"><ion-icon style="margin-right: 0.3em; font-size: 0.8rem;" color="warning"
+                  name="ellipse"></ion-icon>{{ 'TAB1.bedTime' | translate }}</ion-label>
             </ion-row>
             <ion-row>
               <div>
@@ -109,162 +118,19 @@
     </ion-grid>
   </div>
 
-  <p class="header-text" >{{ 'TAB1.sleepSound' | translate }} </p>
+  <p class="header-text">{{ 'TAB1.sleepSound' | translate }} </p>
   <div class="ion-no-padding" style="margin-top: -1.0em">
     <div #swiperContainer class="swiper">
-  <div class="swiper-wrapper">
-    <div class="swiper-slide">
-      <img src="{{ deviceService.coverImages.cover1 }}" />
+      <div class="swiper-wrapper">
+        <div class="swiper-slide">
+          <img src="{{ deviceService.coverImages.cover1 }}" />
+        </div>
+        <div class="swiper-slide">
+          <img src="{{ deviceService.coverImages.cover2 }}" />
+        </div>
+        <!-- 기타 슬라이드들 -->
+      </div>
+      <div class="swiper-pagination"></div>
     </div>
-    <div class="swiper-slide">
-      <img src="{{ deviceService.coverImages.cover2 }}" />
-    </div>
-    <!-- 기타 슬라이드들 -->
   </div>
-  <div class="swiper-pagination"></div>
-</div>
-
-  </div>
-
-  <ion-grid class="ion-no-padding">
-    <ion-row>
-      <ion-col>
-        <ion-card style="border-radius: 10px; margin-bottom: -0.5em" routerLink="/new-bedcontrol"
-          routerDirection="forward"
-          [disabled]="!deviceService.isMotionBedConnected">
-          <ion-row>
-            <ion-col class="column">
-              <img id="icon-device" src="../../assets/imgs/icon_motionbed.png">
-            </ion-col>
-            <ion-col class="column">
-              <p style="font-size: 0.8rem; color: #ffffff">{{ 'COMMON.motionBed' | translate }} </p>
-            </ion-col>
-            <ion-col size="3" class="column">
-              <img id="icon-device" src="{{ motionBedStatusImage }}">
-            </ion-col>
-          </ion-row>
-        </ion-card>
-      </ion-col>
-      <ion-col>
-        <ion-card style="border-radius: 10px; margin-bottom: -0.5em" routerLink="/hej-moodlight"
-          routerDirection="forward" [disabled]="true">
-          <ion-row>
-            <ion-col class="column">
-              <img id="icon-device" src="../../assets/imgs/device_moodlight.png">
-            </ion-col>
-            <ion-col class="column">
-              <p style="font-size: 0.8rem; color: #ffffff">{{ 'TAB1.moodLight' | translate }} </p>
-            </ion-col>
-            <ion-col size="3" class="column">
-              <img id="icon-device" src="../../assets/imgs/device_unchecked.png">
-            </ion-col>
-          </ion-row>
-        </ion-card>
-      </ion-col>
-    </ion-row>
-
-    <ion-row>
-      <ion-col>
-        <ion-card style="border-radius: 10px; margin-bottom: -0.5em" routerLink="/hej-strip" routerDirection="forward"
-          [disabled]="true">
-          <ion-row>
-            <ion-col class="column">
-              <img id="icon-device" src="../../assets/imgs/device_strip.png">
-            </ion-col>
-            <ion-col class="column">
-              <p style="font-size: 0.8rem; color: #ffffff">{{ 'TAB1.stripLed' | translate }} </p>
-            </ion-col>
-            <ion-col size="3" class="column">
-              <img id="icon-device" src="../../assets/imgs/device_unchecked.png">
-            </ion-col>
-          </ion-row>
-        </ion-card>
-      </ion-col>
-
-      <ion-col>
-        <ion-card style="border-radius: 10px; margin-bottom: -0.5em" routerLink="/ir-remocon" routerDirection="forward"
-          [disabled]="true">
-          <ion-row>
-            <ion-col class="column">
-              <img id="icon-device" src="../../assets/imgs/device_remocon.png">
-            </ion-col>
-            <ion-col class="column">
-              <p style="font-size: 0.8rem; color: #ffffff">{{ 'TAB1.irTv' | translate }} </p>
-            </ion-col>
-            <ion-col size="3" class="column">
-              <img id="icon-device" src="../../assets/imgs/device_unchecked.png">
-            </ion-col>
-          </ion-row>
-        </ion-card>
-      </ion-col>
-    </ion-row>
-
-    <ion-row>
-      <ion-col>
-        <ion-card style="border-radius: 10px; margin-bottom: -0.5em" routerLink="/air-conditioner"
-          routerDirection="forward" [disabled]="true">
-          <ion-row>
-            <ion-col class="column">
-              <img id="icon-device" src="../../assets/imgs/device_airconditioner.png">
-            </ion-col>
-            <ion-col class="column">
-              <p style="font-size: 0.8rem; color: #ffffff">{{ 'TAB1.airConditioner' | translate }}</p>
-            </ion-col>
-            <ion-col size="3" class="column">
-              <img id="icon-device" src="../../assets/imgs/device_unchecked.png">
-            </ion-col>
-          </ion-row>
-        </ion-card>
-      </ion-col>
-      <ion-col>
-        <ion-card style="border-radius: 10px; margin-bottom: -0.5em" routerLink="/curtain" routerDirection="forward"
-        [disabled]="true">
-          <ion-row>
-            <ion-col class="column">
-              <img id="icon-device" src="../../assets/imgs/device_curtain.png">
-            </ion-col>
-            <ion-col class="column">
-              <p style="font-size: 0.8rem; color: #ffffff">{{ 'TAB1.curtain' | translate }}</p>
-            </ion-col>
-            <ion-col size="3" class="column">
-              <img id="icon-device" src="../../assets/imgs/device_unchecked.png">
-            </ion-col>
-          </ion-row>
-        </ion-card>
-      </ion-col>
-    </ion-row>
-
-    <ion-row>
-      <ion-col>
-        <ion-card style="border-radius: 10px; margin-bottom: -0.5em" routerLink="/smart-plug" routerDirection="forward" [disabled]="true">
-          <ion-row>
-            <ion-col class="column">
-              <img id="icon-device" src="../../assets/imgs/device_plug.png">
-            </ion-col>
-            <ion-col class="column">
-              <p style="font-size: 0.8rem; color: #ffffff">{{ 'TAB1.plug' | translate }}</p>
-            </ion-col>
-            <ion-col size="3" class="column">
-              <img id="icon-device" src="../../assets/imgs/device_unchecked.png">
-            </ion-col>
-          </ion-row>
-        </ion-card>
-      </ion-col>
-      <ion-col>
-        <ion-card style="border-radius: 10px; margin-bottom: -0.5em" routerLink="/settop-box" routerDirection="forward" [disabled]="true">
-          <ion-row>
-            <ion-col class="column">
-              <img id="icon-device" src="../../assets/imgs/device_settop.png">
-            </ion-col>
-            <ion-col class="column">
-              <p style="font-size: 0.8rem; color: #ffffff">{{ 'TAB1.settop' | translate }}</p>
-            </ion-col>
-            <ion-col size="3" class="column">
-              <img id="icon-device" src="../../assets/imgs/device_unchecked.png">
-            </ion-col>
-          </ion-row>
-        </ion-card>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
 </ion-content>

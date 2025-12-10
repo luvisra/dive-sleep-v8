@@ -22,6 +22,7 @@ export class Tab4Page implements OnInit {
   photo: SafeResourceUrl = '../../assets/imgs/avatar.svg';
   displayUsername = '';
   pushEnabled: string | null = '';
+  private deviceCheckTimer: any;
 
   constructor(public familyShare: FamilyShareService,
               private utilService: UtilService,
@@ -37,11 +38,53 @@ export class Tab4Page implements OnInit {
               ) {
               }
 
+  ionViewDidEnter() {
+    this.checkDeviceIsAlive();
+  }
+
+  ionViewWillLeave() {
+    if (this.deviceCheckTimer) {
+      clearTimeout(this.deviceCheckTimer);
+    }
+  }
+  
+  checkDeviceIsAlive() {
+    console.log('[Check Alive] ========== checkDeviceIsAlive() 호출 ==========');
+    if (!this.authService.signedIn || !this.deviceService.devId) {
+      console.log('[Check Alive] ⚠️ devId가 없거나 로그인하지 않아서 체크 스킵');
+      return;
+    }
+
+    this.mqttService.checkNetwork().then((isConnected) => {
+      if (!isConnected) {
+        alert('네트워크 연결을 확인 해 주세요.');
+        return;
+      }
+
+      if (this.deviceCheckTimer) clearTimeout(this.deviceCheckTimer);
+      if (!this.mqttService.currentMqttSession) {
+        this.mqttService.subscribeMessages();
+      }
+      this.mqttService.sendMessageToDevice('ping');
+      this.refreshGoqualDeviceList();
+
+      this.deviceCheckTimer = setTimeout(() => {
+        if (this.deviceService.isOnline === 0) {
+          console.log('[Check Alive] ⚠️ 타임아웃: 5초 동안 응답 없음');
+        }
+      }, 5000);
+    }).catch(error => console.error('[Check Alive] 네트워크 확인 에러:', error));
+  }
+
+  refreshGoqualDeviceList() {
+    console.log('refreshGoqualDeviceList called');
+  }
+
   versionInfo() {
     this.translate.get('TAB4.version').subscribe(
       value => {
-        const versionInfo = this.deviceService.info.appVersion;
-        const buildNum = this.deviceService.info.appBuild;
+        const versionInfo = this.deviceService.info?.version || this.deviceService.info?.appVersion || '1.0.0';
+        const buildNum = this.deviceService.info?.build || this.deviceService.info?.appBuild || '1';
         this.utilService.presentAlert(value, versionInfo, 'Build: ' + buildNum);
       }
     );
@@ -95,7 +138,6 @@ export class Tab4Page implements OnInit {
 
   ionViewWillEnter() {
     console.log(this.deviceService.info);
-    // const photo = localStorage.getItem('userPhoto');
     const nickname = localStorage.getItem('userNickname');
 
     this.ngZone.run(() => {
@@ -105,32 +147,21 @@ export class Tab4Page implements OnInit {
     if (this.authService.user && this.authService.user.username !== undefined) {
       this.ngZone.run(() => {
         if (this.authService.user) {
-          this.displayUsername = this.authService.user.username;
+          const phoneNumber = localStorage.getItem('phoneNumber');
+          this.displayUsername = phoneNumber || this.authService.user.username;
         }
-        if (nickname !== null) {
-          this.deviceService.userNickname = nickname;
-        } else {
-          this.deviceService.userNickname = '';
-        }
+        this.deviceService.userNickname = nickname || '';
       });
     }
 
     if (this.authService.user) {
       this.s3Service.getUserPhotoFromS3(this.authService.user.username).then((photo) => {
-      console.log('photo', photo);
-      if (photo === undefined) {
-        this.photo = '../../assets/imgs/avatar.svg';
-      } else {
         this.ngZone.run(() => {
-          // this.photo = JSON.parse(photo);
-          this.photo = photo;
-          console.log('photo exists.', this.photo);
+          this.photo = photo || '../../assets/imgs/avatar.svg';
         });
-      }
       });
     }
 
-    this.pushEnabled = localStorage.getItem('fcmEnabled');
     this.pushEnabled = localStorage.getItem('fcmEnabled');
     this.familyShare.checkNewFamilyShareRequest();
   }
@@ -141,13 +172,11 @@ export class Tab4Page implements OnInit {
   pushConfigChanged(ev: any) {
     const checked = ev.detail.checked;
     const token = localStorage.getItem('fcmToken');
-    if (checked && token !== null && token !== undefined) {
-      // this.fcmService.addToNotificationGroup(token);
+    if (checked && token) {
       this.fcmService.subscribeTopic(GCP_FCM_INFO.TOPIC_NAME);
       localStorage.setItem('fcmEnabled', 'on');
       this.mqttService.pubMqtt(this.deviceService.devId, 'fcm_token', token);
     } else {
-      // this.fcmService.removeToNotificationGroup(token);
       this.fcmService.unsubscribeFrom(GCP_FCM_INFO.TOPIC_NAME);
       localStorage.setItem('fcmEnabled', 'off');
     }

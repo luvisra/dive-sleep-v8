@@ -49,6 +49,10 @@ const routes: Routes = [
   {
     path: 'realtime-chart',
     loadChildren: () => import('./realtime-chart/realtime-chart.module').then( m => m.RealtimeChartPageModule)
+  },
+  {
+    path: 'wificonnection',
+    loadChildren: () => import('./wificonnection/wificonnection.module').then( m => m.WificonnectionPageModule)
   }
 ];
 @NgModule({

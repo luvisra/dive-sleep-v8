@@ -77,17 +77,25 @@ export class MqttService {
 
   async attachDevToIotPolicy() {
     try {
+      console.log('[IoT Policy] ========== IoT 정책 연결 시작 ==========');
+      console.log('[IoT Policy] 시작 시각:', new Date().toISOString());
+      
       const session = await fetchAuthSession();
+      console.log('[IoT Policy] Auth session 가져오기 완료');
+      console.log('[IoT Policy] Session keys:', Object.keys(session));
       
       if (!session.credentials || !session.identityId) {
-        console.error('No credentials or identity ID available');
+        console.error('[IoT Policy] ❌ No credentials or identity ID available');
+        console.error('[IoT Policy] credentials 존재:', !!session.credentials);
+        console.error('[IoT Policy] identityId 존재:', !!session.identityId);
         return;
       }
 
       const identityId = session.identityId;
       const credentials = session.credentials;
 
-      console.log('cognitoIdentityId = ' + identityId);
+      console.log('[IoT Policy] ✅ Cognito Identity ID:', identityId);
+      console.log('[IoT Policy] Credentials keys:', Object.keys(credentials));
 
       const iotClient = new IoTClient({
         region: 'ap-northeast-2',
@@ -97,87 +105,135 @@ export class MqttService {
           sessionToken: credentials.sessionToken,
         }
       });
+      console.log('[IoT Policy] IoT Client 생성 완료');
 
       // 기존 정책 확인
+      console.log('[IoT Policy] 기존 정책 확인 중...');
       const listCommand = new ListAttachedPoliciesCommand({ target: identityId });
       const { policies } = await iotClient.send(listCommand);
 
-      console.log('Attached policies:', JSON.stringify(policies));
+      console.log('[IoT Policy] 연결된 정책 수:', policies?.length || 0);
+      console.log('[IoT Policy] 연결된 정책 목록:', JSON.stringify(policies, null, 2));
 
       // 정책이 없으면 연결
-      if (!policies?.find(policy => policy.policyName === 'cnfIoTPolicy')) {
+      const hasPolicy = policies?.find(policy => policy.policyName === 'cnfIoTPolicy');
+      console.log('[IoT Policy] cnfIoTPolicy 존재 여부:', !!hasPolicy);
+      
+      if (!hasPolicy) {
+        console.log('[IoT Policy] 정책 연결 시도...');
         const attachCommand = new AttachPolicyCommand({
           policyName: 'cnfIoTPolicy',
           target: identityId
         });
         await iotClient.send(attachCommand);
-        console.log('Policy attached successfully');
+        console.log('[IoT Policy] ✅ Policy attached successfully');
       } else {
-        console.log('Policy already attached');
+        console.log('[IoT Policy] ✅ Policy already attached');
       }
+      
+      // ⚠️ 핵심: 레거시 코드처럼 cleanSession 설정
+      console.log('[IoT Policy] PubSub cleanSession 재설정 중...');
+      try {
+        (PubSub as any).configure({ cleanSession: 1 });
+        console.log('[IoT Policy] ✅ PubSub cleanSession 설정 완료');
+      } catch (error) {
+        console.error('[IoT Policy] ⚠️ cleanSession 설정 실패:', error);
+      }
+      
+      console.log('[IoT Policy] ==========================================');
 
     } catch (err) {
-      console.error('attachIotPolicy error:', err);
+      console.error('[IoT Policy] ========== IoT 정책 연결 에러 ==========');
+      console.error('[IoT Policy] 에러:', JSON.stringify(err, null, 2));
+      console.error('[IoT Policy] ========================================');
     }
   }
 
   subscribeMessages() {
     if (!this.deviceService.devId) {
-      console.warn('No device ID available for subscription');
+      console.warn('[MQTT Subscribe] ⚠️ devId 없음, 구독 스킵');
       return;
     }
 
+    // ✅ 이미 구독 중이면 스킵 (재구독하지 않음)
     if (this.currentMqttSession) {
-      // 기존 구독이 있으면 스킵하거나 해제
+      console.log('[MQTT Subscribe] 이미 구독 중, 스킵 (재구독 안 함)');
       return;
     }
 
     const topic = `cnf_esp/pub_unicast/${this.deviceService.devId}/message`;
-    console.log('Subscribing to MQTT topic:', topic);
+    console.log('[MQTT Subscribe] ========== MQTT 구독 시작 ==========');
+    console.log('[MQTT Subscribe] Topic:', topic);
+    console.log('[MQTT Subscribe] Device ID:', this.deviceService.devId);
 
     try {
       this.currentMqttSession = PubSub.subscribe({
         topics: [topic]
       }).subscribe({
-        next: (data) => {
+        next: (data: any) => {
+          console.log('[MQTT Subscribe] ✅ 메시지 수신!');
+          console.log('[MQTT Subscribe] Raw data:', JSON.stringify(data, null, 2));
           this.ngZone.run(() => {
             this.handleMqttMessage(data);
           });
         },
-        error: (error) => {
-          console.error('MQTT subscription error:', error);
+        error: (error: any) => {
+          console.error('[MQTT Subscribe] ❌ 구독 에러:', JSON.stringify(error, null, 2));
           this.currentMqttSession = null;
         },
         complete: () => {
-          console.log('MQTT subscription complete');
+          console.log('[MQTT Subscribe] 구독 완료 (연결 종료)');
           this.currentMqttSession = null;
         }
       });
+      console.log('[MQTT Subscribe] ✅ 구독 설정 완료');
+      console.log('[MQTT Subscribe] currentMqttSession 상태:', !!this.currentMqttSession);
     } catch (error) {
-      console.error('Failed to subscribe to MQTT:', error);
+      console.error('[MQTT Subscribe] ❌ 구독 실패:', JSON.stringify(error, null, 2));
     }
   }
 
   private handleMqttMessage(data: any) {
+    console.log('[MQTT Handle] ========== 메시지 처리 시작 ==========');
+    console.log('[MQTT Handle] Original data:', JSON.stringify(data, null, 2));
+    console.log('[MQTT Handle] data type:', typeof data);
+    console.log('[MQTT Handle] data.value exists:', !!data.value);
+    
     const value = data.value || data;
+    console.log('[MQTT Handle] Parsed value:', JSON.stringify(value, null, 2));
+    console.log('[MQTT Handle] value type:', typeof value);
+
+    // ✅ 모든 MQTT 메시지 수신 시 isOnline 증가 (UI 상태 업데이트용)
+    this.deviceService.isOnline++;
+    console.log('[MQTT Handle] isOnline 상태 업데이트:', this.deviceService.isOnline);
 
     if (value.isMotionBed !== undefined) {
-      this.deviceService.isOnline++;
       this.deviceService.isMotionBedConnected = value.isMotionBed === 1;
+      console.log('[MQTT Handle] ✅ isMotionBed 처리:', value.isMotionBed, '-> isMotionBedConnected:', this.deviceService.isMotionBedConnected);
     }
 
-    if (value.username === 'USER_ID_not_initialized') {
-      this.pubMqtt(this.deviceService.devId, 'set_username', this.authService.user?.username || '');
+    if (value.username !== undefined) {
+      console.log('[MQTT Handle] username 필드 감지:', value.username);
+      if (value.username === 'USER_ID_not_initialized') {
+        // 🔑 레거시 호환성: 전화번호가 있으면 전화번호를 사용
+        const phoneNumber = localStorage.getItem('phoneNumber');
+        const userName = phoneNumber || this.authService.user?.username || '';
+        console.log('[MQTT Handle] ⚠️ USER_ID_not_initialized 감지 - 전송할 username:', userName);
+        this.pubMqtt(this.deviceService.devId, 'set_username', userName);
+      }
     }
 
     if (value.version) {
-      // 펌웨어 버전 체크 로직
+      console.log('[MQTT Handle] ✅ version 필드 감지:', value.version);
       this.checkFirmwareVersion(value.version);
     }
 
     if (value.fcmToken !== undefined) {
+      console.log('[MQTT Handle] ✅ fcmToken 필드 감지:', value.fcmToken);
       this.handleFcmToken(value.fcmToken);
     }
+    
+    console.log('[MQTT Handle] ========== 메시지 처리 완료 ==========');
   }
 
   private checkFirmwareVersion(deviceVersion: string) {
@@ -230,9 +286,11 @@ export class MqttService {
     const topic = `cnf_esp/sub_unicast/${dev}`;
 
     try {
-      await PubSub.publish({
+      // 레거시 코드와 호환: JSON 객체가 아닌 문자열 직접 전송
+      // TypeScript 타입 제약을 우회하여 문자열을 직접 전송
+      await (PubSub as any).publish({
         topics: topic,
-        message: { data: message }
+        message: message
       });
       console.log('MQTT publish:', topic, message);
       return true;

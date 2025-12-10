@@ -34,6 +34,13 @@
         "scanning": "검색중.."
     },
 
+    "PERMISSION": {
+        "ble_permission_title": "블루투스 장치 검색을 위한 권한",
+        "ble_permission_message": "이 앱은 블루투스 장치 검색을 위해 위치 권한이 필요합니다. 앱이 종료되었거나 사용 중이 아닐 때도 위치 데이터를 수집하여 블루투스 장치 검색 기능을 사용 설정합니다.\n\n이 앱은 블루투스 장치 검색 이외의 목적으로 위치 데이터를 수집하거나 활용하지 않으며 앱의 사용 허용 범위를 광고로 확장하지 않습니다.\n\n계속하시겠습니까?",
+        "permission_denied_title": "권한 필요",
+        "permission_denied_message": "블루투스 장치를 검색하려면 위치 권한이 필요합니다. 설정에서 권한을 허용해주세요."
+    },
+
     "SOUND": {
 
     },
@@ -213,10 +220,12 @@
         "inputWifiName": "WiFi 이름을 입력 해 주세요.",
         "inputPassword": "WiFi 비밀번호를 입력 해 주세요.",
         "wifiName": "WiFi 이름",
-        "wifiList": "WiFi 비밀번호를 입력 해 주세요.",
+        "wifiList": "WiFi 목록",
         "invalidInformation": "WiFi를 연결하기 위한 정보가 충분하지 않습니다.",
         "pleaseWait": "WiFi를 검색 중 입니다.<br>잠시만 기다려 주세요.",
-        "isSelected": " 가 선택되었습니다."
+        "isSelected": " 가 선택되었습니다.",
+        "wifiScanError": "WiFi 스캔에 실패했습니다. 다시 시도해주세요.",
+        "noWifiFound": "검색된 WiFi가 없습니다."
     },
 
     "OPTIONS": {

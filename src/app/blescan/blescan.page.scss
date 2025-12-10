@@ -29,3 +29,70 @@
   ion-list {
     border-radius: 10px;
   }
+
+  .wifi-list-container {
+    margin-top: 15px;
+    margin-bottom: 15px;
+    width: 100%;
+  }
+
+  .wifi-list-scroll {
+    max-height: 250px;
+    overflow-y: auto;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    margin-bottom: 10px;
+
+    ion-list {
+      background: transparent;
+      padding: 0;
+      margin: 0;
+    }
+
+    ion-item {
+      --background: rgba(255, 255, 255, 0.05);
+      --border-color: rgba(255, 255, 255, 0.1);
+      margin-bottom: 5px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover {
+        --background: rgba(255, 255, 255, 0.1);
+      }
+
+      h3 {
+        font-weight: 600;
+        font-size: 1em;
+        margin: 0 0 5px 0;
+      }
+
+      p {
+        font-size: 0.85em;
+        color: rgba(255, 255, 255, 0.6);
+        margin: 0;
+      }
+    }
+  }
+
+  .button-container {
+    margin-top: 15px;
+    padding-top: 10px;
+    width: 100%;
+
+    ion-button {
+      margin: 0;
+    }
+  }
+
+  .wifi-strong {
+    color: #2dd36f;
+  }
+
+  .wifi-medium {
+    color: #ffc409;
+  }
+
+  .wifi-weak {
+    color: #eb445a;
+  }

@@ -1,10 +1,10 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace = "kr.cnfrontier.sleep"
+    namespace = "kr.cnfrontier.sleep.dive"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "kr.cnfrontier.sleep"
+        applicationId "kr.cnfrontier.sleep.dive"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

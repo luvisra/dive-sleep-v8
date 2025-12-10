@@ -1,0 +1,210 @@
+ion-content {
+  --padding-start: 20px;
+  --padding-end: 20px;
+  --padding-top: 20px;
+  --padding-bottom: 20px;
+}
+
+// 연결 진행 중 컨테이너
+.connection-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  padding: 20px;
+}
+
+.progress-section {
+  margin-bottom: 30px;
+  display: flex;
+  justify-content: center;
+}
+
+.status-section {
+  width: 100%;
+  max-width: 400px;
+}
+
+.status-title {
+  text-align: center;
+  font-size: 1.2em;
+  font-weight: 600;
+  margin-bottom: 30px;
+  color: var(--ion-text-color);
+}
+
+.status-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.status-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  border-left: 3px solid transparent;
+  transition: all 0.3s ease;
+
+  ion-icon {
+    font-size: 24px;
+    margin-right: 12px;
+    color: var(--ion-color-medium);
+    transition: color 0.3s ease;
+  }
+
+  span {
+    font-size: 0.95em;
+    color: var(--ion-color-step-600);
+  }
+
+  &.completed {
+    border-left-color: var(--ion-color-success);
+    background: rgba(45, 211, 111, 0.1);
+
+    ion-icon {
+      color: var(--ion-color-success);
+    }
+
+    span {
+      color: var(--ion-text-color);
+      font-weight: 500;
+    }
+  }
+}
+
+// 결과 화면 컨테이너
+.result-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 70vh;
+  padding: 20px;
+
+  &.success {
+    .result-icon {
+      color: var(--ion-color-success);
+    }
+  }
+
+  &.failure {
+    .result-icon {
+      color: var(--ion-color-danger);
+    }
+  }
+}
+
+.result-content {
+  text-align: center;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 16px;
+  padding: 40px 20px;
+  margin-bottom: 20px;
+}
+
+.result-icon {
+  font-size: 80px;
+  margin-bottom: 20px;
+}
+
+.result-title {
+  font-size: 1.8em;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: var(--ion-text-color);
+}
+
+.result-description {
+  font-size: 1em;
+  line-height: 1.6;
+  margin: 5px 0;
+  color: var(--ion-color-step-600);
+}
+
+.device-illustration {
+  margin-top: 30px;
+  margin-bottom: 20px;
+
+  img {
+    max-width: 150px;
+    height: auto;
+    opacity: 0.9;
+  }
+}
+
+.action-button {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  font-weight: 600;
+  --padding-top: 16px;
+  --padding-bottom: 16px;
+}
+
+.button-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+// Legacy styles (호환성 유지)
+.swiper-slide {
+  display: block;
+}
+
+.slide-title {
+  margin-top: 1.8rem;
+}
+
+.slide-image {
+  max-height: 70%;
+  max-width: 70%;
+  margin: 15px 0;
+  pointer-events: none;
+}
+
+b {
+  font-weight: 500;
+}
+
+p {
+  padding: 0 40px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ion-color-step-600, #60646b);
+
+  b {
+    color: var(--ion-text-color, #FFC421);
+  }
+}
+
+div {
+  text-align: center;
+}
+
+.connection-result {
+  text-align: center;
+  background-color: #292929;
+  border-radius: 10px;
+  padding-top: 5.0em;
+  padding-bottom: 5.0em;
+}
+
+// 하단 고정 버튼을 위한 footer 스타일
+ion-footer {
+  &.ion-no-border {
+    --border-width: 0;
+  }
+
+  .transparent-toolbar {
+    --background: transparent;
+    --border-width: 0;
+    padding: 0 20px 20px 20px;
+  }
+
+  .fixed-bottom-button {
+    margin: 0;
+  }
+}

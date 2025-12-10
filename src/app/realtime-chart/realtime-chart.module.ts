@@ -5,6 +5,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { NgChartsModule } from 'ng2-charts';
 
 import { IonicModule } from '@ionic/angular';
+import { ScreenOrientation } from '@awesome-cordova-plugins/screen-orientation/ngx';
 
 import { RealtimeChartPage } from './realtime-chart.page';
 
@@ -23,6 +24,7 @@ const routes: Routes = [
     NgChartsModule,
     RouterModule.forChild(routes)
   ],
-  declarations: [RealtimeChartPage]
+  declarations: [RealtimeChartPage],
+  providers: [ScreenOrientation]
 })
 export class RealtimeChartPageModule {}

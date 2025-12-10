@@ -1,0 +1,108 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>WiFi 연결</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <!-- 연결 진행 중 -->
+  <div *ngIf="isConnecting" class="connection-container">
+    <div class="progress-section">
+      <circle-progress
+        [percent]="connectionStatus.progress"
+        [radius]="70"
+        [maxPercent]="100"
+        [outerStrokeWidth]="8"
+        [innerStrokeWidth]="0"
+        [outerStrokeColor]="'#7044ff'"
+        [animation]="false"
+        [animationDuration]="0"
+        [renderOnClick]="false">
+      </circle-progress>
+    </div>
+
+    <div class="status-section">
+      <h3 class="status-title">{{ statusText }}</h3>
+
+      <div class="status-list">
+        <div class="status-item" [class.completed]="connectionStatus.bleWriteSuccess">
+          <ion-icon [name]="connectionStatus.bleWriteSuccess ? 'checkmark-circle' : 'ellipse-outline'"></ion-icon>
+          <span>장치 WiFi 연결 시도</span>
+        </div>
+
+        <div class="status-item" [class.completed]="connectionStatus.deviceAlive">
+          <ion-icon [name]="connectionStatus.deviceAlive ? 'checkmark-circle' : 'ellipse-outline'"></ion-icon>
+          <span>WiFi 연결 상태 확인</span>
+        </div>
+
+        <div class="status-item" [class.completed]="connectionStatus.serverRegistered">
+          <ion-icon [name]="connectionStatus.serverRegistered ? 'checkmark-circle' : 'ellipse-outline'"></ion-icon>
+          <span>사용자 서버 등록</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 연결 성공 -->
+  <div *ngIf="isSuccess" class="result-container success">
+    <div class="result-content">
+      <ion-icon name="checkmark-circle" class="result-icon success-icon"></ion-icon>
+      <h2 class="result-title">연결 성공</h2>
+      <p class="result-description">슬립센서의 상태등이</p>
+      <p class="result-description">녹색으로 바뀝니다.</p>
+
+      <div class="device-illustration">
+        <img src="../../assets/imgs/sleepsensor_icon.png" alt="Sleep Sensor">
+      </div>
+    </div>
+  </div>
+
+  <!-- 연결 성공 - 하단 고정 버튼 -->
+  <ion-footer *ngIf="isSuccess" class="ion-no-border">
+    <ion-toolbar class="transparent-toolbar">
+      <ion-button
+        (click)="goToHomePage()"
+        color="tertiary"
+        shape="round"
+        expand="block"
+        class="action-button fixed-bottom-button">
+        완료
+      </ion-button>
+    </ion-toolbar>
+  </ion-footer>
+
+  <!-- 연결 실패 -->
+  <div *ngIf="isFailed" class="result-container failure">
+    <div class="result-content">
+      <ion-icon name="close-circle" class="result-icon failure-icon"></ion-icon>
+      <h2 class="result-title">연결 실패</h2>
+      <p class="result-description">{{ connectionStatus.errorMessage || '슬립센서가 와이파이에 연결 가능한' }}</p>
+      <p class="result-description" *ngIf="!connectionStatus.errorMessage">위치에 있는지 확인하시기 바랍니다.</p>
+
+      <div class="device-illustration">
+        <img src="../../assets/imgs/sleepsensor_icon.png" alt="Sleep Sensor">
+      </div>
+    </div>
+
+    <div class="button-group">
+      <ion-button
+        (click)="retryConnection()"
+        color="primary"
+        shape="round"
+        expand="block"
+        class="action-button">
+        다시 시도
+      </ion-button>
+
+      <ion-button
+        (click)="goBack()"
+        color="tertiary"
+        shape="round"
+        expand="block"
+        fill="outline"
+        class="action-button">
+        이전으로
+      </ion-button>
+    </div>
+  </div>
+</ion-content>

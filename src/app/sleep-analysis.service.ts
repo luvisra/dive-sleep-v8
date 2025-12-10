@@ -748,13 +748,13 @@ export class SleepAnalysisService {
             };
 
             setTimeout(() => {
-              PubSub.publish({ topics: 'cnf_esp/analyze', message: msgObj }).then((success) => {
+              PubSub.publish({ topics: 'cnf_esp/analyze', message: msgObj }).then((success: any) => {
                 console.log('request sleep analysis to server', msgObj);
                 if (i === l) {
                   resolve(true);
                 }
                 // this.dataReceiveCompletedSubject.next(2);
-              }).catch((err) => {
+              }).catch((err: any) => {
                 console.error(err);
               });
             }, i * 4000);
@@ -804,10 +804,10 @@ export class SleepAnalysisService {
         reject();
       }
 
-      PubSub.publish({ topics: 'cnf_esp/analyze2', message: msgObj }).then((success) => {
+      PubSub.publish({ topics: 'cnf_esp/analyze2', message: msgObj }).then((success: any) => {
         console.log('request sleep analysis to server', msgObj);
         resolve(true);
-      }).catch((err) => {
+      }).catch((err: any) => {
         console.error(err);
         reject();
       });

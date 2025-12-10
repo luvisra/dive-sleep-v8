@@ -86,6 +86,12 @@ export class DebugPage implements OnInit {
   selectedDevId = '';
   hiddenModeEnabled = false;
   hiddenModeEnableCount = 0;
+  
+  // MQTT 테스트용 변수
+  testDeviceId = 'DEV_8CAAB5A070D4';
+  mqttTestSubscription: any = null;
+  mqttMessageReceived = false;
+  lastMqttMessage: any = null;
   constructor(private router: Router,
               private http: HTTP,
               public deviceService: DeviceService,
@@ -136,6 +142,132 @@ export class DebugPage implements OnInit {
       console.log(items.time_stamp + ',' + items.value.temperature.toFixed(2) + ',' + items.value.humidity.toFixed(2));
       // console.log(this.results);
     });
+  }
+
+  async listDevId() {
+    try {
+      console.log('Listing all DiveSleepUserinfo entries...');
+      const result = await this.apiService.ListDiveSleepUserinfos(undefined, 50);
+      console.log('ListDiveSleepUserinfos result:', result);
+      
+      if (result.items && result.items.length > 0) {
+        const displayText = result.items.map(item =>
+          `Username: ${item?.username}\nDev ID: ${item?.dev_id || 'N/A'}\nFCM Token: ${item?.fcm_token || 'N/A'}`
+        ).join('\n\n');
+        
+        this.utilService.presentAlert(
+          'List DevID',
+          `총 ${result.items.length}개의 항목`,
+          displayText
+        );
+      } else {
+        this.utilService.presentAlert('List DevID', '결과', '등록된 항목이 없습니다.');
+      }
+    } catch (error) {
+      console.error('listDevId error:', error);
+      this.utilService.presentAlert('Error', 'List DevID 실패', JSON.stringify(error));
+    }
+  }
+
+  async putDevId() {
+    try {
+      // 테스트용 입력값 (실제로는 사용자 입력을 받을 수 있음)
+      const username = prompt('Username을 입력하세요:', this.authService.user?.username || '');
+      if (!username) {
+        this.utilService.presentAlert('Error', 'putDevId 취소', 'Username이 필요합니다.');
+        return;
+      }
+
+      const devId = prompt('Dev ID를 입력하세요:', this.deviceService.devId);
+      
+      const input = {
+        username: username,
+        dev_id: devId || undefined
+      };
+
+      console.log('Creating DiveSleepUserinfo with input:', input);
+      const result = await this.apiService.CreateDiveSleepUserinfo(input);
+      console.log('CreateDiveSleepUserinfo result:', result);
+      
+      this.utilService.presentAlert(
+        'Register DevID',
+        '성공',
+        `Username: ${result.username}\nDev ID: ${result.dev_id || 'N/A'}`
+      );
+    } catch (error) {
+      console.error('putDevId error:', error);
+      this.utilService.presentAlert('Error', 'Register DevID 실패', JSON.stringify(error));
+    }
+  }
+
+  async deleteDevId() {
+    try {
+      const username = prompt('삭제할 Username을 입력하세요:', this.authService.user?.username || '');
+      if (!username) {
+        this.utilService.presentAlert('Error', 'deleteDevId 취소', 'Username이 필요합니다.');
+        return;
+      }
+
+      const confirmDelete = confirm(`정말로 ${username} 항목을 삭제하시겠습니까?`);
+      if (!confirmDelete) {
+        this.utilService.presentAlert('Info', 'deleteDevId 취소', '삭제가 취소되었습니다.');
+        return;
+      }
+
+      const input = {
+        username: username
+      };
+
+      console.log('Deleting DiveSleepUserinfo with input:', input);
+      const result = await this.apiService.DeleteDiveSleepUserinfo(input);
+      console.log('DeleteDiveSleepUserinfo result:', result);
+      
+      this.utilService.presentAlert(
+        'Delete DevID',
+        '성공',
+        `Username: ${result.username} 항목이 삭제되었습니다.`
+      );
+    } catch (error) {
+      console.error('deleteDevId error:', error);
+      this.utilService.presentAlert('Error', 'Delete DevID 실패', JSON.stringify(error));
+    }
+  }
+
+  async updateDevId() {
+    try {
+      const username = prompt('업데이트할 Username을 입력하세요:', this.authService.user?.username || '');
+      if (!username) {
+        this.utilService.presentAlert('Error', 'updateDevId 취소', 'Username이 필요합니다.');
+        return;
+      }
+
+      const devId = prompt('새로운 Dev ID를 입력하세요 (현재값 유지하려면 취소):', this.deviceService.devId);
+      const fcmToken = prompt('새로운 FCM Token을 입력하세요 (현재값 유지하려면 취소):', '');
+
+      const input: any = {
+        username: username
+      };
+
+      if (devId) {
+        input.dev_id = devId;
+      }
+      if (fcmToken) {
+        input.fcm_token = fcmToken;
+      }
+
+      console.log('Updating DiveSleepUserinfo with input:', input);
+      const result = await this.apiService.UpdateDiveSleepUserinfo(input);
+      console.log('UpdateDiveSleepUserinfo result:', result);
+      
+      this.utilService.presentAlert(
+        'Update DevID',
+        '성공',
+        `Username: ${result.username}\nDev ID: ${result.dev_id || 'N/A'}\nFCM Token: ${result.fcm_token || 'N/A'}`
+      );
+    } catch (error) {
+      console.error('updateDevId error:', error);
+      this.utilService.presentAlert('Error', 'Update DevID 실패', JSON.stringify(error));
+    }
   }
 
   queryData() {
@@ -225,11 +357,11 @@ export class DebugPage implements OnInit {
     }
     console.log ('epochTime', epochTime);
     return new Promise((resolve, reject) => {
-      PubSub.publish({ topics: 'test/gosleep', message: { data: message } }).then((success) => {
+      PubSub.publish({ topics: 'test/gosleep', message: { data: message } }).then((success: any) => {
         // this.utilService.presentAlert('DEBUG', 'Sending Test Event Message', epochTime);
         this.utilService.presentToast('Sending Test Event Message: ' + epochTime , 1000);
         resolve(true);
-      }).catch((err) => {
+      }).catch((err: any) => {
         reject(err);
       });
     });
@@ -291,6 +423,10 @@ export class DebugPage implements OnInit {
 
   ngOnInit() {
     console.log(this.deviceService.devId);
+    
+    // MQTT 구독 설정 (메시지 수신을 위해 필요)
+    this.mqttService.subscribeMessages();
+    
     this.apiService.ListDiveSleepUserinfos(undefined, 50).then((list) => {
       console.log(list);
       list.items.forEach(item => {
@@ -312,6 +448,334 @@ export class DebugPage implements OnInit {
       this.hiddenModeEnabled = true;
     }
   }
+  
+  // ========== MQTT 디버그 테스트 메소드 ==========
+  
+  async testMqttAttachPolicy() {
+    console.log('[MQTT Test] ========== 1단계: IoT Policy 연결 테스트 ==========');
+    try {
+      await this.mqttService.attachDevToIotPolicy();
+      this.utilService.presentAlert(
+        'MQTT Test',
+        '1단계 완료',
+        'IoT Policy 연결을 확인하세요. 콘솔 로그를 확인하세요.'
+      );
+    } catch (error) {
+      console.error('[MQTT Test] Policy attach 에러:', error);
+      this.utilService.presentAlert(
+        'MQTT Test',
+        '1단계 실패',
+        JSON.stringify(error)
+      );
+    }
+  }
+  
+  testMqttSubscribe() {
+    console.log('[MQTT Test] ========== 2단계: MQTT 구독 테스트 ==========');
+    console.log('[MQTT Test] 테스트 Device ID:', this.testDeviceId);
+    console.log('[MQTT Test] PubSub 객체 타입:', typeof PubSub);
+    console.log('[MQTT Test] PubSub.subscribe 존재:', typeof (PubSub as any).subscribe === 'function');
+    
+    const topic = `cnf_esp/pub_unicast/${this.testDeviceId}/message`;
+    console.log('[MQTT Test] 구독 토픽:', topic);
+    
+    // PubSub 내부 상태 확인 (디버깅용) - JSON.stringify 사용
+    const pubsubInfo = {
+      keys: Object.keys(PubSub),
+      prototype: Object.getPrototypeOf(PubSub)?.constructor?.name,
+      constructor: (PubSub as any).constructor?.name
+    };
+    console.log('[MQTT Test] PubSub 내부 확인:', JSON.stringify(pubsubInfo, null, 2));
+
+    // ⚠️ 중요: PubSub 내부 설정 상세 확인
+    console.log('[MQTT Test] === PubSub 내부 상태 상세 확인 ===');
+    console.log('[MQTT Test] _config:', JSON.stringify((PubSub as any)._config, null, 2));
+    console.log('[MQTT Test] options:', JSON.stringify((PubSub as any).options, null, 2));
+
+    // clientsQueue 확인
+    const clientsQueue = (PubSub as any)._clientsQueue;
+    if (clientsQueue) {
+      const allClients = clientsQueue.allClients || [];
+      console.log('[MQTT Test] 현재 연결된 클라이언트 수:', allClients.length);
+      console.log('[MQTT Test] 클라이언트 목록:', JSON.stringify(allClients, null, 2));
+    } else {
+      console.log('[MQTT Test] ⚠️ clientsQueue가 없습니다');
+    }
+
+    // connectionState 확인
+    const connectionState = (PubSub as any).connectionState;
+    if (connectionState) {
+      console.log('[MQTT Test] connectionState:', JSON.stringify(connectionState, null, 2));
+    } else {
+      console.log('[MQTT Test] connectionState가 아직 없습니다 (첫 연결 전)');
+    }
+
+    // connectionStateMonitor 확인
+    const connectionStateMonitor = (PubSub as any).connectionStateMonitor;
+    if (connectionStateMonitor) {
+      console.log('[MQTT Test] connectionStateMonitor 존재:', !!connectionStateMonitor);
+    }
+    
+    try {
+      console.log('[MQTT Test] subscribe() 호출 시작...');
+      const observable = (PubSub as any).subscribe({
+        topics: topic
+      });
+      
+      console.log('[MQTT Test] Observable 생성됨:', !!observable);
+      console.log('[MQTT Test] Observable 타입:', typeof observable);
+      
+      this.mqttTestSubscription = observable.subscribe({
+        next: (data: any) => {
+          this.ngZone.run(() => {
+            console.log('[MQTT Test] ========== 메시지 수신! ==========');
+            console.log('[MQTT Test] 🎉🎉🎉 메시지가 도착했습니다!');
+            console.log('[MQTT Test] 수신 시각:', new Date().toISOString());
+            console.log('[MQTT Test] 원시 데이터:', JSON.stringify(data, null, 2));
+            console.log('[MQTT Test] 데이터 타입:', typeof data);
+            console.log('[MQTT Test] 데이터 keys:', Object.keys(data));
+            
+            this.mqttMessageReceived = true;
+            this.lastMqttMessage = data;
+            
+            this.utilService.presentAlert(
+              'MQTT Test',
+              '메시지 수신 성공!',
+              `메시지: ${JSON.stringify(data, null, 2)}`
+            );
+          });
+        },
+        error: (error: any) => {
+          console.error('[MQTT Test] ========== 구독 에러! ==========');
+          console.error('[MQTT Test] 에러 타입:', typeof error);
+          console.error('[MQTT Test] 에러 상세:', JSON.stringify(error, null, 2));
+          console.error('[MQTT Test] 에러 메시지:', error?.message);
+          console.error('[MQTT Test] 에러 스택:', error?.stack);
+          
+          this.utilService.presentAlert(
+            'MQTT Test',
+            '구독 에러',
+            JSON.stringify(error, null, 2)
+          );
+        },
+        complete: () => {
+          console.log('[MQTT Test] ========== 구독 완료 ==========');
+        }
+      });
+      
+      console.log('[MQTT Test] ✅ Subscription 객체 생성 완료!');
+      console.log('[MQTT Test] Subscription 존재:', !!this.mqttTestSubscription);
+      console.log('[MQTT Test] Subscription 타입:', typeof this.mqttTestSubscription);
+      console.log('[MQTT Test] Subscription closed:', (this.mqttTestSubscription as any)?.closed);
+      
+      // 5초 후 연결 상태 재확인
+      setTimeout(() => {
+        console.log('[MQTT Test] ===== 5초 후 상태 확인 =====');
+        console.log('[MQTT Test] Subscription 여전히 활성:', !!this.mqttTestSubscription);
+        console.log('[MQTT Test] Subscription closed:', (this.mqttTestSubscription as any)?.closed);
+        console.log('[MQTT Test] 메시지 수신 여부:', this.mqttMessageReceived);
+
+        // PubSub 연결 상태 재확인
+        const newClientsQueue = (PubSub as any)._clientsQueue;
+        if (newClientsQueue) {
+          const allClients = newClientsQueue.allClients || [];
+          console.log('[MQTT Test] 5초 후 연결된 클라이언트 수:', allClients.length);
+          if (allClients.length > 0) {
+            console.log('[MQTT Test] 5초 후 클라이언트 목록:', JSON.stringify(allClients, null, 2));
+          }
+        }
+
+        // connectionState 재확인
+        const newConnectionState = (PubSub as any).connectionState;
+        if (newConnectionState) {
+          console.log('[MQTT Test] 5초 후 connectionState:', JSON.stringify(newConnectionState, null, 2));
+        } else {
+          console.log('[MQTT Test] ⚠️ 5초 후에도 connectionState가 없습니다!');
+        }
+
+        // topicObservers 확인
+        const topicObservers = (PubSub as any)._topicObservers;
+        if (topicObservers && topicObservers instanceof Map) {
+          console.log('[MQTT Test] 구독된 토픽 수:', topicObservers.size);
+          if (topicObservers.size > 0) {
+            const topics = Array.from(topicObservers.keys());
+            console.log('[MQTT Test] 구독된 토픽 목록:', JSON.stringify(topics, null, 2));
+          }
+        }
+      }, 5000);
+      
+      this.utilService.presentAlert(
+        'MQTT Test',
+        '2단계 완료',
+        `토픽 ${topic} 구독 완료!\n\n⚠️ 중요: 이제 Device에서 메시지를 보내거나 AWS IoT Core 테스트 클라이언트에서 이 토픽으로 메시지를 발행하세요.\n\n5초 후 연결 상태를 콘솔에서 확인하세요.`
+      );
+      
+    } catch (error) {
+      console.error('[MQTT Test] ========== 구독 생성 에러! ==========');
+      console.error('[MQTT Test] 에러:', error);
+      console.error('[MQTT Test] 에러 JSON:', JSON.stringify(error, null, 2));
+      
+      this.utilService.presentAlert(
+        'MQTT Test',
+        '2단계 실패',
+        `에러: ${JSON.stringify(error, null, 2)}`
+      );
+    }
+  }
+  
+  async testMqttPublish() {
+    console.log('[MQTT Test] ========== 3단계: MQTT 발행 테스트 ==========');
+    console.log('[MQTT Test] 발행 Device ID:', this.testDeviceId);
+    
+    try {
+      const success = await this.mqttService.pubMqtt(
+        this.testDeviceId,
+        'ping',
+        null
+      );
+      
+      console.log('[MQTT Test] 발행 결과:', success);
+      
+      if (success) {
+        this.utilService.presentAlert(
+          'MQTT Test',
+          '3단계 완료',
+          `Device ${this.testDeviceId}에 ping 메시지 발행 성공!\n콘솔에서 발행 로그를 확인하세요.`
+        );
+      } else {
+        this.utilService.presentAlert(
+          'MQTT Test',
+          '3단계 실패',
+          'MQTT 발행 실패'
+        );
+      }
+    } catch (error) {
+      console.error('[MQTT Test] 발행 에러:', error);
+      this.utilService.presentAlert(
+        'MQTT Test',
+        '3단계 실패',
+        JSON.stringify(error)
+      );
+    }
+  }
+  
+  testMqttUnsubscribe() {
+    console.log('[MQTT Test] ========== 4단계: MQTT 구독 해제 ==========');
+    
+    if (this.mqttTestSubscription) {
+      this.mqttTestSubscription.unsubscribe();
+      this.mqttTestSubscription = null;
+      
+      console.log('[MQTT Test] ✅ 구독 해제 완료');
+      
+      this.utilService.presentAlert(
+        'MQTT Test',
+        '4단계 완료',
+        `구독 해제 완료!\n수신 여부: ${this.mqttMessageReceived}\n마지막 메시지: ${JSON.stringify(this.lastMqttMessage, null, 2)}`
+      );
+      
+      // 상태 초기화
+      this.mqttMessageReceived = false;
+      this.lastMqttMessage = null;
+    } else {
+      this.utilService.presentAlert(
+        'MQTT Test',
+        '구독 없음',
+        '활성 구독이 없습니다. 먼저 2단계(구독)를 실행하세요.'
+      );
+    }
+  }
+  
+  testMqttStatus() {
+    const status = {
+      '테스트 Device ID': this.testDeviceId,
+      '구독 활성': !!this.mqttTestSubscription,
+      '메시지 수신 여부': this.mqttMessageReceived,
+      '마지막 메시지': this.lastMqttMessage
+    };
+
+    console.log('[MQTT Test] 현재 상태:', status);
+
+    this.utilService.presentAlert(
+      'MQTT Test',
+      '현재 상태',
+      JSON.stringify(status, null, 2)
+    );
+  }
+
+  // ========== 추가 테스트: 다양한 토픽 패턴 구독 ==========
+
+  testMqttSubscribeAllTopics() {
+    console.log('[MQTT Test] ========== 모든 토픽 패턴 구독 테스트 ==========');
+
+    const topics = [
+      `cnf_esp/pub_unicast/${this.testDeviceId}`,
+      `cnf_esp/pub_unicast/${this.testDeviceId}/message`,
+      `cnf_esp/pub_unicast/${this.testDeviceId}/#`,  // pub_unicast 하위 모든 메시지
+      `cnf_esp/sub_unicast/${this.testDeviceId}`,
+      `cnf_esp/sub_unicast/${this.testDeviceId}/message`,
+      `cnf_esp/+/${this.testDeviceId}`,  // 중간 경로 와일드카드
+      `cnf_esp/+/${this.testDeviceId}/#`, // 중간 경로 + 하위 모든 메시지
+    ];
+
+    console.log('[MQTT Test] 구독할 토픽들:', JSON.stringify(topics, null, 2));
+    console.log('[MQTT Test] 참고: AWS IoT MQTT는 다음 와일드카드를 지원합니다:');
+    console.log('[MQTT Test]   + = 단일 레벨 와일드카드 (예: cnf_esp/+/DEV_xxx)');
+    console.log('[MQTT Test]   # = 멀티 레벨 와일드카드 (예: cnf_esp/pub_unicast/DEV_xxx/#)');
+
+    try {
+      this.mqttTestSubscription = (PubSub as any).subscribe({
+        topics: topics
+      }).subscribe({
+        next: (data: any) => {
+          this.ngZone.run(() => {
+            console.log('[MQTT Test] ========== 🎉 메시지 수신! ==========');
+            console.log('[MQTT Test] 수신 시각:', new Date().toISOString());
+            console.log('[MQTT Test] 원시 데이터:', JSON.stringify(data, null, 2));
+
+            // 수신한 토픽 확인 (중요!)
+            const receivedTopic = (data as any).topic || 'unknown';
+            console.log('[MQTT Test] ⭐ 수신 토픽:', receivedTopic);
+
+            // 데이터 내용 확인
+            if (data.value) {
+              console.log('[MQTT Test] value:', JSON.stringify(data.value, null, 2));
+            }
+
+            this.mqttMessageReceived = true;
+            this.lastMqttMessage = data;
+
+            this.utilService.presentAlert(
+              'MQTT Test',
+              '메시지 수신!',
+              `토픽: ${receivedTopic}\n\n메시지: ${JSON.stringify(data, null, 2)}`
+            );
+          });
+        },
+        error: (error: any) => {
+          console.error('[MQTT Test] 구독 에러:', JSON.stringify(error, null, 2));
+        },
+        complete: () => {
+          console.log('[MQTT Test] 구독 완료');
+        }
+      });
+
+      this.utilService.presentAlert(
+        'MQTT Test',
+        '다중 토픽 구독',
+        `${topics.length}개의 토픽 패턴을 구독했습니다.\n\n이제 AWS IoT Console이나 Device에서 메시지를 보내보세요.`
+      );
+
+    } catch (error) {
+      console.error('[MQTT Test] 다중 토픽 구독 에러:', JSON.stringify(error, null, 2));
+      this.utilService.presentAlert(
+        'MQTT Test',
+        '에러',
+        JSON.stringify(error, null, 2)
+      );
+    }
+  }
+  
   /*
   googleSignIn() {
     GooglePlus.login({

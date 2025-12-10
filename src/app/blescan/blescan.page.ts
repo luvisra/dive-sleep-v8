@@ -3,7 +3,7 @@ import { Router, NavigationExtras} from '@angular/router';
 import { NgForm } from '@angular/forms';
 import { Platform } from '@ionic/angular';
 import { UtilService } from '../util.service';
-import { BehaviorSubject, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { BleService } from '../ble.service';
 import { AlertController } from '@ionic/angular';
 import { MqttService } from '../mqtt.service';
@@ -11,14 +11,8 @@ import { OpenNativeSettings } from '@awesome-cordova-plugins/open-native-setting
 import { DeviceService } from '../device.service';
 import { App, AppState } from '@capacitor/app';
 import { TranslateService } from '@ngx-translate/core';
-import { Geolocation } from '@capacitor/geolocation';
-declare var WifiWizard2: any;
-
-interface WifiNetwork {
-  SSID: string;
-  frequency: number;
-  [key: string]: any;
-}
+import { PermissionService } from '../permission.service';
+import { WifiService, WifiNetwork } from '../wifi.service';
 
 @Component({
   selector: 'app-blescan',
@@ -36,7 +30,6 @@ export class BlescanPage implements OnInit {
   results: WifiNetwork[] = [];
   foundBleDev: any;
   foundBleDevId = '';
-  ssidSubject = new BehaviorSubject<WifiNetwork[]>(this.results);
 
   navigationExtras: NavigationExtras = {
     state: {
@@ -53,7 +46,9 @@ export class BlescanPage implements OnInit {
               private ngZone: NgZone,
               public deviceService: DeviceService,
               private openNativeSettings: OpenNativeSettings,
-              private translate: TranslateService
+              private translate: TranslateService,
+              private permissionService: PermissionService,
+              private wifiService: WifiService
               ) {
 
 
@@ -67,33 +62,36 @@ export class BlescanPage implements OnInit {
               }
 
   subscribeMessages() {
-    let s = this.ssidSubject.subscribe(data => {
-        if (data != null && data.length !== 0) {
-          this.utilService.dismissLoading();
-          console.log(data);
-          data.forEach((obj: WifiNetwork) => {
-            if (obj.frequency < 5000 && this.results.length < 5 && obj.SSID !== '') {
-              this.results.push(obj);
-            } else {
-              // console.log('frequency is ' + obj.frequency);
-            }
-          });
-          this.currentSSID = this.results[0].SSID;
-        }
-      });
-    this.sub.push(s);
-
-    s = this.bleService.bleScanResultSubject.subscribe ((res) => {
-
-        if (res.length !== 0) {
-          this.ngZone.run (() => {
-            this.foundBleDev = this.findMaxRssi(this.bleService.results);
-            this.foundBleDevId = this.foundBleDev.id;
-          });
-        }
-
+    // WiFi 네트워크 구독
+    const wifiSub = this.wifiService.wifiNetworks$.subscribe((networks) => {
+      if (networks && networks.length > 0) {
+        this.ngZone.run(() => {
+          this.results = networks;
+          this.currentSSID = networks[0].SSID;
+          console.log('WiFi networks updated:', networks);
+        });
+      }
     });
-    this.sub.push(s);
+    this.sub.push(wifiSub);
+
+    // WiFi 스캔 상태 구독
+    const scanningSub = this.wifiService.scanning$.subscribe((scanning) => {
+      if (!scanning) {
+        this.utilService.dismissLoading();
+      }
+    });
+    this.sub.push(scanningSub);
+
+    // BLE 스캔 결과 구독
+    const bleSub = this.bleService.bleScanResultSubject.subscribe((res) => {
+      if (res.length !== 0) {
+        this.ngZone.run(() => {
+          this.foundBleDev = this.findMaxRssi(this.bleService.results);
+          this.foundBleDevId = this.foundBleDev.id;
+        });
+      }
+    });
+    this.sub.push(bleSub);
   }
 
   findMaxRssi(arr: string | any[]) {
@@ -135,34 +133,34 @@ export class BlescanPage implements OnInit {
   async getNetworks() {
     this.translate.get('DEVICE.pleaseWait').subscribe(
       value => {
-        this.utilService.presentLoading(value, 5000);
+        this.utilService.presentLoading(value, 10000);
       }
     );
     try {
-      const res = await WifiWizard2.scan();
-      this.ssidSubject.next(res);
-
+      await this.wifiService.startWifiScan();
     } catch (error) {
-      console.log(error);
+      console.error('WiFi scan error:', error);
+      this.utilService.dismissLoading();
+      this.translate.get('DEVICE.wifiScanError').subscribe(
+        value => {
+          this.utilService.presentToast(value || 'WiFi 스캔에 실패했습니다.', 2000);
+        },
+        () => {
+          this.utilService.presentToast('WiFi 스캔에 실패했습니다.', 2000);
+        }
+      );
     }
   }
 
   async getCurrentSSIDiOS() {
     try {
-      Geolocation.getCurrentPosition().then((pos) => {
-        console.log(pos);
-        WifiWizard2.getConnectedSSID().then((ssid: string) => {
-          this.ngZone.run(() => {
-            this.currentSSID = ssid;
-          });
-          console.log(ssid);
-        });
+      const ssid = await this.wifiService.getCurrentSSID();
+      this.ngZone.run(() => {
+        this.currentSSID = ssid;
+        console.log('Current SSID (iOS):', ssid);
       });
-
-      console.log(this.currentSSID);
-
     } catch (error) {
-      console.log(error);
+      console.error('Get current SSID error:', error);
     }
   }
   rescanBle() {
@@ -215,11 +213,22 @@ export class BlescanPage implements OnInit {
       s.unsubscribe();
     });
     this.results = [];
+    this.wifiService.clearNetworks();
+    this.wifiService.stopWifiScan();
   }
 
-  ionViewWillEnter() {
+  async ionViewWillEnter() {
     this.passwordText = '';
     this.subscribeMessages();
+    
+    // Check BLE permissions before starting scan
+    const hasPermission = await this.permissionService.checkBlePermissions();
+    
+    if (!hasPermission) {
+      console.log('BLE permissions not granted, scanning may not work');
+      // Permission will be requested when needed, but log for debugging
+    }
+    
     if (this.deviceService.isAndroid) {
       this.getNetworks();
     } else {

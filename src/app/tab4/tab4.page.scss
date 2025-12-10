@@ -26,3 +26,9 @@
     justify-content: space-between;
     margin: 10px auto;
 }
+
+// ion-select 팝업의 글자색을 white로 설정
+ion-select {
+    --placeholder-color: white;
+    --placeholder-opacity: 0.8;
+}

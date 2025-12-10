@@ -36,11 +36,6 @@
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 // @import "@ionic/angular/css/palettes/dark.system.css";
 
-/* Swiper styles - moved from component to reduce bundle size */
-@import 'swiper/scss';
-@import 'swiper/scss/effect-coverflow';
-@import 'swiper/scss/pagination';
-
 body {
   background-color: #313131;
   color: #f0f0f0;
@@ -70,5 +65,25 @@ body {
       background-color: rgba(52, 120, 245, 0.2);
       color: #3478F5 !important;
     }
+  }
+}
+
+/* ion-select 팝업 (alert/action-sheet) 글자색 white 설정 */
+.alert-wrapper,
+.action-sheet-wrapper {
+  .alert-radio-label,
+  .alert-checkbox-label,
+  .action-sheet-button-inner {
+    color: #ffffff !important;
+  }
+  
+  .alert-title,
+  .action-sheet-title {
+    color: #ffffff !important;
+  }
+  
+  .alert-sub-title,
+  .action-sheet-sub-title {
+    color: #aaaaaa !important;
   }
 }

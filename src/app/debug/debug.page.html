@@ -27,17 +27,37 @@
   <ion-label>테스트 모드 설정</ion-label>
   <!-- <ion-button expand="block" (click)="getVersionInfo()">Get Version Information</ion-button>
 <ion-button expand="block" (click)="generateRandomUuid()">Generate Random UUID</ion-button> -->
-  <!-- <ion-button (click)="listDevId()">List devID</ion-button>
-<ion-button (click)="putDevId()">Register devID</ion-button> -->
-  <!-- <ion-button (click)="queryData()">Query Data</ion-button> -->
-  <!-- <ion-button (click)="deleteDevId()">Delete devID</ion-button>
+  <ion-button (click)="listDevId()">List devID</ion-button>
+  <ion-button (click)="putDevId()">Register devID</ion-button>
+  <ion-button (click)="queryData()">Query Data</ion-button>
+  <ion-button (click)="deleteDevId()">Delete devID</ion-button>
 <ion-button (click)="updateDevId()">Update devID</ion-button>
-<ion-button (click)="httpGetTest()">HTTP Get Test</ion-button> -->
+<!-- <ion-button (click)="httpGetTest()">HTTP Get Test</ion-button> -->
   <!-- <ion-button expand="block" (click)="putDevId()">Register devID</ion-button> -->
   <ion-button expand="block" (click)="showRawData(1)">Raw 데이터 신호 출력 On</ion-button>
   <ion-button expand="block" (click)="showRawData(0)">Raw 데이터 신호 출력 Off</ion-button>
   <ion-button expand="block" *ngIf="hiddenModeEnabled" (click)="testSleep(1)">수면 시뮬레이션 On</ion-button>
 <ion-button expand="block" *ngIf="hiddenModeEnabled" (click)="testSleep(0)">수면 시뮬레이션 Off</ion-button>
+
+  <ion-label>MQTT 연결 테스트 (DEV_8CAAB5A070D4)</ion-label>
+  <ion-button expand="block" color="primary" (click)="testMqttAttachPolicy()">
+    1단계: IoT Policy 연결 테스트
+  </ion-button>
+  <ion-button expand="block" color="secondary" (click)="testMqttSubscribe()">
+    2단계: MQTT 구독 테스트
+  </ion-button>
+  <ion-button expand="block" color="tertiary" (click)="testMqttPublish()">
+    3단계: MQTT 발행 테스트 (ping)
+  </ion-button>
+  <ion-button expand="block" color="warning" (click)="testMqttUnsubscribe()">
+    4단계: MQTT 구독 해제
+  </ion-button>
+  <ion-button expand="block" color="medium" (click)="testMqttStatus()">
+    MQTT 테스트 상태 확인
+  </ion-button>
+  <ion-button expand="block" color="success" (click)="testMqttSubscribeAllTopics()">
+    🔍 다중 토픽 구독 테스트
+  </ion-button>
 
   <ion-label>서버 & 앱 테스트</ion-label>
   <ion-button expand="block" (click)="testFCM()">푸시 알림 전송</ion-button>

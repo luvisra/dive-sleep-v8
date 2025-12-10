@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "218065386824",
+    "firebase_url": "https://dive-sleep.firebaseio.com",
+    "project_id": "dive-sleep",
+    "storage_bucket": "dive-sleep.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:218065386824:android:7e376f9fe26ccc71a8477d",
+        "android_client_info": {
+          "package_name": "kr.cnfrontier.sleep.dive"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "218065386824-a4cngrag962benqoss20e57jfttg3uo1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCFAkK3Z3RFUtCiAaWKXIVeJwUNxV_0kTU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "218065386824-a4cngrag962benqoss20e57jfttg3uo1.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "218065386824-rq4u98c1o54dm4k375akebuqkhuscvdd.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "kr.cnfrontier.sleep.dive"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
