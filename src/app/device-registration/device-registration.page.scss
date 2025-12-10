@@ -1,0 +1,40 @@
+// ion-toolbar {
+//     // TODO test transparent and fullscreen
+//     --background: transparent;
+//     --border-color: transparent;
+//   }
+ion-title {
+  text-align: center;
+}
+
+div {
+  margin: 10px 10px 10px 10px;
+  text-align: center;
+}
+
+h2 {
+  margin-top: 60;
+  margin-bottom: 30px;
+}
+
+.rcorners1 {
+  border-radius: 25px;
+  background: #292929;
+  padding: 20px;
+  width: 95%;
+  height: 80%;
+}
+
+ion-button {
+  margin: 10px 0px 10px 0px;
+}
+
+p {
+  margin: 25px 0px 25px 0px;
+}
+
+#main-image {
+  max-height: 25.0rem;
+  max-width: auto;
+  text-align: center;
+}

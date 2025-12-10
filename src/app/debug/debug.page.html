@@ -1,0 +1,71 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start"><ion-back-button style="position: absolute;"></ion-back-button></ion-buttons>
+    <ion-title (click)="enableHiddenMode()">디버그 모드</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding" style="text-align: center;">
+  <div style="margin-bottom: 1.0em">
+    <ion-label>{{ deviceService.devId }}</ion-label>
+  </div>
+  <!-- <ion-button (click)="testGetDb()">testGetDb</ion-button>
+  <ion-button (click)="displayValues()">displayValues</ion-button> -->
+  <ion-label *ngIf="hiddenModeEnabled">사용자 변경 모드</ion-label>
+  <ion-button *ngIf="hiddenModeEnabled" color="warning" expand="block">현재 사용자:
+    <ion-select [value]=" selectedDevId " (ionChange)="impersonateChanged($event)">
+      <ion-select-option *ngFor="let u of userList" [value]=" u?.dev_id ">{{ u?.username }}</ion-select-option>
+    </ion-select>
+  </ion-button>
+  <ion-button *ngIf="hiddenModeEnabled" expand="block" (click)="exitImpersonatedMode()">사용자 변경 모드 종료</ion-button>
+
+  <ion-label>실시간 데이터</ion-label>
+  <ion-button expand="block" routerLink="/event-list" routerDirection="forward">이벤트 모니터 도구</ion-button>
+  <ion-button expand="block" routerLink="/realtime-chart" routerDirection="forward">실시간 그래프</ion-button>
+  <ion-button expand="block" routerLink="/pressure-sensor" routerDirection="forward">압력센서 테스트</ion-button>
+  <!-- <ion-button expand="block" routerLink="/calibration" routerDirection="forward">Calibration</ion-button> -->
+  <ion-label>테스트 모드 설정</ion-label>
+  <!-- <ion-button expand="block" (click)="getVersionInfo()">Get Version Information</ion-button>
+<ion-button expand="block" (click)="generateRandomUuid()">Generate Random UUID</ion-button> -->
+  <!-- <ion-button (click)="listDevId()">List devID</ion-button>
+<ion-button (click)="putDevId()">Register devID</ion-button> -->
+  <!-- <ion-button (click)="queryData()">Query Data</ion-button> -->
+  <!-- <ion-button (click)="deleteDevId()">Delete devID</ion-button>
+<ion-button (click)="updateDevId()">Update devID</ion-button>
+<ion-button (click)="httpGetTest()">HTTP Get Test</ion-button> -->
+  <!-- <ion-button expand="block" (click)="putDevId()">Register devID</ion-button> -->
+  <ion-button expand="block" (click)="showRawData(1)">Raw 데이터 신호 출력 On</ion-button>
+  <ion-button expand="block" (click)="showRawData(0)">Raw 데이터 신호 출력 Off</ion-button>
+  <ion-button expand="block" *ngIf="hiddenModeEnabled" (click)="testSleep(1)">수면 시뮬레이션 On</ion-button>
+<ion-button expand="block" *ngIf="hiddenModeEnabled" (click)="testSleep(0)">수면 시뮬레이션 Off</ion-button>
+
+  <ion-label>서버 & 앱 테스트</ion-label>
+  <ion-button expand="block" (click)="testFCM()">푸시 알림 전송</ion-button>
+  <ion-button expand="block" (click)="sendingTestEventMessage()">테스트 이벤트 메시지 전송</ion-button>
+
+  <ion-label>IoT / 슬립센서 제어</ion-label>
+  <ion-button expand="block" (click)="iotMorning()">IoT 기상 모드</ion-button>
+  <ion-button expand="block" (click)="iotNight()">IoT 취침 모드</ion-button>
+  <ion-button expand="block" (click)="snoringTest()">코골이 침대 제어 테스트</ion-button>
+  <!-- <ion-button expand="block" (click)="updateSleepData()">Update DB</ion-button> -->
+  <!-- <ion-button expand="block" (click)="subscribeMqtt()">Subscribe Mqtt</ion-button>
+<ion-button expand="block" (click)="unSubscribeMqtt()">Unsubscribe Mqtt</ion-button> -->
+  <ion-button expand="block" (click)="sendMessageToDevice('ping')">Ping</ion-button>
+  <ion-button expand="block" color="danger" (click)="sendMessageToDevice('nvs_reset')">사용자 데이터 초기화</ion-button>
+  <ion-button expand="block" color="danger" (click)="sendMessageToDevice('factory')">공장 데이터 초기화</ion-button>
+  <ion-button expand="block" color="warning" *ngIf="hiddenModeEnabled" (click)="sendMessageToDevice('ota')">Force OTA (Stable)</ion-button>
+  <ion-button expand="block" color="warning" *ngIf="hiddenModeEnabled" (click)="sendMessageToDevice('beta_ota')">Force OTA (Beta)</ion-button>
+  <ion-button expand="block" color="warning" (click)="sendMessageToDevice('reboot')">슬립센서 재기동</ion-button>
+
+  <!-- <ion-button expand="block" (click)="controlBySpeech()">음성 제어 테스트</ion-button> -->
+  <!-- <ion-button expand="block" (click)="subscribeToFCMTopic()">FCM Topic 테스트</ion-button>
+  <ion-button expand="block" (click)="changeUserName('+821096482220')">사용자 이름 변경</ion-button> -->
+  <!-- <ion-label>Page Test</ion-label>
+<ion-button expand="block" routerLink="/first" routerDirection="forward">First Page</ion-button> -->
+  <!-- <ion-label>{{ 'DEBUG.text' | translate }}</ion-label> -->
+
+  <!-- <ion-button [color]="respButtonColor">RESP: {{ uiData.respiratory }} </ion-button>
+<ion-button [color]="hrButtonColor">HR: {{ uiData.heartrate }} </ion-button>
+<ion-button [color]="impulseButtonColor">IMPULSE: {{ uiData.impulse }} </ion-button>
+<ion-button [color]="bedStatusButtonColor">IN BED:{{ uiData.bed_status }} </ion-button> -->
+</ion-content>

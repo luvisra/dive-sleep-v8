@@ -1,0 +1,47 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <!-- <ion-title>인증번호 입력</ion-title> -->
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <div class="validate-logo">
+    <!-- <img src="assets/imgs/koala.png" alt="Ionic logo"> -->
+    <h1>{{ 'TITLES.codeVerification' | translate }}</h1>
+  </div>
+
+  <form #validateForm="ngForm" novalidate>
+    <ion-list lines="none">
+      <ion-item>
+        <ion-label position="stacked" color="dark">{{ 'LOGIN.code' | translate }}</ion-label>
+        <ion-input [(ngModel)]="codeText" name="code" type="text" #code="ngModel" required>
+        </ion-input>
+      </ion-item>
+      <ion-text color="danger">
+        <p [hidden]="code.valid|| submitted == false" class="ion-padding-start">
+          Code is required.
+        </p>
+      </ion-text>
+    </ion-list>
+
+    <div class="ion-padding">
+
+
+      <ion-row>
+        <ion-col>
+          <ion-button *ngIf="!disableButton" shape="round" (click)="resendCode()" expand="block" [disabled]="disableButton">{{ 'LOGIN.resendCode' | translate }}</ion-button>
+          <ion-button *ngIf="disableButton" shape="round" (click)="resendCode()" expand="block" [disabled]="disableButton">{{ timerValue }}{{ 'LOGIN.resendCode2' | translate }}</ion-button>
+        </ion-col>
+        <ion-col>
+          <ion-button color="warning" shape="round" (click)="onValidate(validateForm)" type="submit" expand="block">{{ 'COMMON.confirm' | translate }}</ion-button>
+  
+        </ion-col>
+      </ion-row>
+    </div>
+  </form>
+
+</ion-content>

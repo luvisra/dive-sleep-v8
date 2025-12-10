@@ -1,4 +1,4 @@
-import { Injectable, NgZone } from '@angular/core';
+import { Injectable, NgZone, Injector } from '@angular/core';
 import { fetchAuthSession } from 'aws-amplify/auth';
 import { list } from 'aws-amplify/storage';
 import { PubSub } from './pubsub.instance';
@@ -13,7 +13,6 @@ import { AuthService } from './auth.service';
 import { Platform } from '@ionic/angular';
 import { FamilyShareService } from './family-share.service';
 import { UtilService } from './util.service';
-import { FcmService } from './fcm.service';
 import { GLOBAL } from './static_config';
 import { Network } from '@capacitor/network';
 
@@ -32,7 +31,7 @@ export class MqttService {
     private platform: Platform,
     public utilService: UtilService,
     public familyShare: FamilyShareService,
-    private fcmService: FcmService,
+    private injector: Injector,
     private ngZone: NgZone
   ) {
     console.log('mqttService: starting service.');

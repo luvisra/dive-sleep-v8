@@ -17,6 +17,38 @@ const routes: Routes = [
   {
     path: 'userlogin',
     loadChildren: () => import('./userlogin/userlogin.module').then( m => m.UserloginPageModule)
+  },
+  {
+    path: 'device-registration',
+    loadChildren: () => import('./device-registration/device-registration.module').then( m => m.DeviceRegistrationPageModule)
+  },
+  {
+    path: 'blescan',
+    loadChildren: () => import('./blescan/blescan.module').then( m => m.BlescanPageModule)
+  },
+  {
+    path: 'signup',
+    loadChildren: () => import('./signup/signup.module').then( m => m.SignupPageModule)
+  },
+  {
+    path: 'usage',
+    loadChildren: () => import('./usage/usage.module').then( m => m.UsagePageModule)
+  },
+  {
+    path: 'validate-sign',
+    loadChildren: () => import('./validate-sign/validate-sign.module').then( m => m.ValidateSignPageModule)
+  },
+  {
+    path: 'change-password',
+    loadChildren: () => import('./change-password/change-password.module').then( m => m.ChangePasswordPageModule)
+  },
+  {
+    path: 'debug',
+    loadChildren: () => import('./debug/debug.module').then( m => m.DebugPageModule)
+  },
+  {
+    path: 'realtime-chart',
+    loadChildren: () => import('./realtime-chart/realtime-chart.module').then( m => m.RealtimeChartPageModule)
   }
 ];
 @NgModule({

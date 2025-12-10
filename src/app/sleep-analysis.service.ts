@@ -9,7 +9,7 @@ import { UtilService } from './util.service';
 import { BehaviorSubject } from 'rxjs';
 import { SLEEP_SCORE } from './static_config';
 import { PubSub } from './pubsub.instance';
-import moment from 'moment';
+import * as moment from 'moment';
 
 @Injectable({
   providedIn: 'root'

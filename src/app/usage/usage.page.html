@@ -1,0 +1,40 @@
+<ion-header no-border>
+  <ion-toolbar>
+    <div style="text-align: center; margin-left: 3.0em;">
+      <ion-label>{{ 'TITLES.usage' | translate }}</ion-label>
+    </div>
+    <ion-buttons slot="end">
+      <!-- <ion-button color='secondary' routerLink="/tabs/tab4" routerDirection="back" [hidden]="!showSkip">Skip</ion-button> -->
+      <ion-button color='secondary' routerLink="/tabs/tab4" routerDirection="back" [hidden]="showSkip">닫기</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content fullscreen>
+  <swiper-container #swiperRef pagination="true" (slidechange)="onSlideChange()">
+    <swiper-slide class="ion-padding">
+      <img src="assets/imgs/setting_usage_01.png" class="slide-image" />
+      <!-- <div><ion-button (click)="next">다음</ion-button></div> -->
+    </swiper-slide>
+    <swiper-slide class="ion-padding">
+      <img src="assets/imgs/setting_usage_02.png" class="slide-image" />
+      <!-- <div><ion-button (click)="next">다음</ion-button></div> -->
+    </swiper-slide>
+    <swiper-slide class="ion-padding">
+      <img src="assets/imgs/setting_usage_03.png" class="slide-image" />
+      <!-- <div><ion-button (click)="next">다음</ion-button></div> -->
+    </swiper-slide>
+    <swiper-slide class="ion-padding">
+      <img src="assets/imgs/setting_usage_04.png" class="slide-image" />
+      <!-- <div><ion-button (click)="next">다음</ion-button></div> -->
+    </swiper-slide>
+    <swiper-slide class="ion-padding">
+      <img src="assets/imgs/setting_usage_05.png" class="slide-image" />
+      <!-- <div><ion-button (click)="next">다음</ion-button></div> -->
+    </swiper-slide>
+    <swiper-slide class="ion-padding">
+      <img src="assets/imgs/setting_usage_06.png" class="slide-image" />
+      <!-- <div><ion-button (click)="next">다음</ion-button></div> -->
+    </swiper-slide>
+  </swiper-container>
+</ion-content>

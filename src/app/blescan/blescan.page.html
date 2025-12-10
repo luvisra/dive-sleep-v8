@@ -1,0 +1,64 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start"><ion-back-button style="position: absolute;"></ion-back-button></ion-buttons>
+    <ion-title *ngIf="deviceService.isDebugMode" (click)="forceOta()">{{ 'DEVICE.title2' | translate }}</ion-title>
+    <ion-title *ngIf="!deviceService.isDebugMode">{{ 'DEVICE.title2' | translate }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="rcorners1" slot>
+    <h2>{{ 'DEVICE.connectWifi' | translate }}</h2>
+    <ion-label color="success" *ngIf="foundBleDev != null && foundBleDev != undefined && foundBleDevId !== null && deviceService.isAndroid">
+      {{ foundBleDevId }} {{ 'DEVICE.scanned' | translate }}</ion-label>
+    <ion-label color="success" *ngIf="foundBleDev != null && foundBleDev != undefined && foundBleDevId !== null && !deviceService.isAndroid">
+      {{ 'DEVICE.sensorScanned' | translate }}</ion-label>
+    <ion-button color="danger" *ngIf="foundBleDev == null || foundBleDev == undefined" (click)="rescanBle()">
+      <ion-icon name="refresh" style="margin-right: 5px;"></ion-icon>{{ 'DEVICE.retry' | translate }}
+    </ion-button>
+    <h6>{{ 'DEVICE.restriction' | translate }}</h6>
+    <form #wifiForm="ngForm" novalidate style="margin-top: 5px;">
+      <ion-list>
+        <ion-item>
+          <ion-label position="stacked" color="dark">{{ 'DEVICE.wifiName' | translate }}</ion-label>
+
+          <ion-input placeholder="WiFi Name (SSID)" [(ngModel)]="currentSSID" name="ssid" type="text" #ssid="ngModel"
+            spellcheck="false" autocapitalize="off" color="dark" required>
+          </ion-input>
+
+          <ion-button *ngIf="deviceService.isAndroid" color="dark" item-end slot="end" style="margin-top:2.0em; margin-right:0;" fill="clear"
+            (click)="getNetworks()">
+            <ion-icon name="refresh" style="font-size: 1.5rem;"></ion-icon>
+          </ion-button>
+          <ion-button *ngIf="!deviceService.isAndroid" color="dark" item-end slot="end" style="margin-top:2.0em; margin-right:0;" fill="clear"
+            (click)="openWifiSettingsIos()">
+            <ion-icon name="wifi" style="font-size: 1.5rem;"></ion-icon>
+          </ion-button>
+        </ion-item>
+
+        <ion-item>
+          <ion-label placeholder="PASSWORD" position="stacked" color="dark">{{ 'LOGIN.password' | translate }}</ion-label>
+          <ion-input [(ngModel)]="passwordText" name="password" #password="ngModel"></ion-input>
+        </ion-item>
+        <ion-text color="danger">
+          <p [hidden]="password.valid || submitted == false" class="ion-padding-start">
+            Password is required
+          </p>
+        </ion-text>
+      </ion-list>
+    </form>
+    <br>
+    <ion-list *ngIf="deviceService.isAndroid">
+      {{ 'DEVICE.wifiList' | translate }} (2.4GHz)
+      <ion-item *ngFor="let r of results" (click)="ssidSelected(r.SSID)">
+        {{ r.SSID }}
+      </ion-item>
+    </ion-list>
+  </div>
+  <p>
+    <ion-button (click)="onConnectToWiFi(wifiForm)" type="submit" color="warning"
+      shape="round" expand="block">
+      {{ 'DEVICE.connectWifi' | translate }}
+    </ion-button>
+  </p>
+</ion-content>

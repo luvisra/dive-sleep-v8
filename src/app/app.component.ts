@@ -54,7 +54,7 @@ export class AppComponent {
   first_loading_check() {
     const did = localStorage.getItem('ion_did_tutorial');
     if (did === 'true') {
-      this.utilService.presentLoading('로그인 정보를 확인 중입니다. 잠시만 기다려 주세요.', 2000);
+      // this.utilService.presentLoading('로그인 정보를 확인 중입니다. 잠시만 기다려 주세요.', 2000);
       this.router.navigateByUrl('/intro');
     } else {
       this.router.navigateByUrl('/first', { replaceUrl: false });

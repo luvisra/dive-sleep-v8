@@ -2,7 +2,7 @@ import { DeviceService } from './device.service';
 import { Injectable } from '@angular/core';
 import { UtilService } from './util.service';
 import { TranslateService } from '@ngx-translate/core';
-import moment from 'moment';
+import * as moment from 'moment';
 import Lodash from 'lodash';
 import seedrandom from 'seedrandom';
 @Injectable({

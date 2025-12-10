@@ -1,0 +1,29 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start"><ion-back-button style="position: absolute;"></ion-back-button></ion-buttons>
+    <ion-title>실시간 그래프</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding">
+  <div class="chart">
+    <canvas baseChart width="400" height="200" [data]="sleepStatusChartData"
+      [options]="sleepStatusChartOptions"  [legend]="sleepStatusChartLegend" [type]="sleepStatusChartType"
+      [plugins]="sleepStatusChartPlugins"></canvas>
+  </div>
+  <div>
+    <ion-grid>
+      <ion-row>
+        <ion-col>
+          <ion-label>Band Data: </ion-label><ion-label style="font-weight: bold; color: '#ffce00'">{{ currentMeanValue }}</ion-label>
+        </ion-col>
+        <ion-col>
+          <ion-label>표준편차: </ion-label><ion-label style="font-weight: bold; color: '#3880ff'">{{ currentSdValue }}</ion-label>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+  <!-- <div>
+    <ion-button expand="block" (click)="startChart()">START</ion-button>
+    <ion-button expand="block" (click)="stopChart()">STOP</ion-button>
+  </div> -->
+</ion-content>

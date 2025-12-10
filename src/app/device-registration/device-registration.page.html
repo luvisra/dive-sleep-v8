@@ -1,0 +1,19 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start" style="position: absolute;">
+      <ion-back-button style="position: absolute;"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ 'DEVICE.title' | translate }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+<div class="rcorners1">
+  <h2 class="slide-title">{{ 'COMMON.sensor' | translate }}<br><br><img id="main-image" src="assets/imgs/sleepsensor_icon.png" style="max-width: 50%;"></h2>
+  <ion-button fill="clear" (click)="usagePage()">연결방법/주의사항 보기</ion-button>
+</div>
+<p>
+<ion-button *ngIf="deviceService.isMotionBedConnected" [disabled]="disableButton" color="warning" shape="round" (click)="startScan()" expand="block">{{ 'DEVICE.connected' | translate }}</ion-button>
+<ion-button *ngIf="!deviceService.isMotionBedConnected" [disabled]="disableButton" color="warning" shape="round" (click)="startScan()" expand="block">{{ 'DEVICE.connect' | translate }}</ion-button>
+</ion-content>
+  

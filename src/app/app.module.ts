@@ -10,8 +10,8 @@ import { HttpClientModule, HttpClient, provideHttpClient, withInterceptorsFromDi
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { TranslateConfigService } from './translate-config.service';
-
-// Note: @awesome-cordova-plugins removed - use Capacitor plugins directly
+import { HTTP } from '@awesome-cordova-plugins/http/ngx';
+import { AndroidPermissions } from '@awesome-cordova-plugins/android-permissions/ngx';
 
 export function createTranslateLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
@@ -35,6 +35,8 @@ export function createTranslateLoader(http: HttpClient) {
   providers: [
     // Services
     TranslateConfigService,
+    HTTP,
+    AndroidPermissions,
     // Ionic Route Strategy
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
   ],

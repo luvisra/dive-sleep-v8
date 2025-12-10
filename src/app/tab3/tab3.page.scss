@@ -1,0 +1,67 @@
+#icon-middle {
+  margin-top: 0.5em;
+  max-height: 1.2rem;
+  max-width: auto;
+}
+
+#icon-left {
+  max-width: auto;
+  max-height: 2.0rem;
+  margin-left: 0.5em;
+}
+
+#icon-right {
+  max-width: auto;
+  max-height: 2.0rem;
+}
+
+.parent {
+  display: flex;
+  justify-content: space-between;
+  margin: 10px auto;
+}
+
+#icon-device {
+  max-width: 1.8rem;
+  max-height: 1.8rem;
+  margin-left: 1.8em;
+  margin-right: auto;
+  margin-top: 0.5em;
+}
+
+#icon-status {
+  max-width: 1.5rem;
+  max-height: 1.5rem;
+  margin-left: auto;
+  margin-right: 0.5em;
+  margin-top: 0.5em;
+}
+
+ion-col {
+  background-color: #282828;
+  border-radius: 10px;
+  margin: 3px;
+  padding-top: 0.2em;
+  padding-bottom: 0.5em;
+}
+
+#div-image {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1.0em;
+}
+
+#div-label {
+  padding-left: 1.2em;
+}
+
+ion-label {
+  font-weight: 500;
+  color: #ffffff;
+}
+
+ion-card {
+  box-shadow: none;
+  background-color: #282828;
+  max-height: 5.0rem;
+}

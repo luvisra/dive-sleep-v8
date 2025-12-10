@@ -32,6 +32,43 @@
  * https://ionicframework.com/docs/theming/dark-mode
  */
 
-/* @import "@ionic/angular/css/palettes/dark.always.css"; */
+@import "@ionic/angular/css/palettes/dark.always.css";
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
-@import "@ionic/angular/css/palettes/dark.system.css";
+// @import "@ionic/angular/css/palettes/dark.system.css";
+
+/* Swiper styles - moved from component to reduce bundle size */
+@import 'swiper/scss';
+@import 'swiper/scss/effect-coverflow';
+@import 'swiper/scss/pagination';
+
+body {
+  background-color: #313131;
+  color: #f0f0f0;
+}
+
+/* Alert 다크 모드 스타일 */
+.dark-alert {
+  --background: #1C1C1D;
+  --color: #ffffff;
+  
+  .alert-head {
+    color: #ffffff;
+  }
+  
+  .alert-message {
+    color: #aaaaaa;
+  }
+  
+  .alert-button-confirm {
+    color: #3478F5 !important;
+
+    &:hover {
+      background-color: rgba(52, 120, 245, 0.1);
+    }
+
+    &:active, &.ion-activated {
+      background-color: rgba(52, 120, 245, 0.2);
+      color: #3478F5 !important;
+    }
+  }
+}

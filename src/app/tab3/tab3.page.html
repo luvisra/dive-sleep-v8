@@ -1,17 +1,167 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>
-      Tab 3
-    </ion-title>
+<ion-header>
+  <ion-toolbar class="ion-no-padding">
+    <div class="parent">
+      <div>
+        <img *ngIf="deviceService.isOnline === 0"
+        id="icon-left"
+        src="../../assets/imgs/navibar_sensor_offline.png"
+        routerLink="/device-registration"
+        routerDirection="forward"/>
+        <ion-label *ngIf="deviceService.isOnline === 0" style="margin-left: -0.7em; margin-top: 1.0em; position: absolute; font-size: 0.8rem;font-weight: normal;" color="warning">{{ 'COMMON.scanning' | translate }}</ion-label>
+
+      <img *ngIf="deviceService.isOnline > 0"
+      id="icon-left"
+      src="../../assets/imgs/navibar_sensor_online.png"
+      routerLink="/device-registration"
+      routerDirection="forward"/>
+      <ion-label *ngIf="deviceService.isOnline > 0" style="margin-left: -0.7em; margin-top: 1.0em; position: absolute; font-size: 0.8rem;font-weight: normal;" color="warning">{{ 'COMMON.connected' | translate }}</ion-label>
+      </div>
+      <div id="icon-middle">
+        <!-- <ion-label *ngIf="deviceService.isDebugMode" routerLink="/iot-demo" routerDirection="forward">{{ 'TAB3.title' | translate}}</ion-label> -->
+        <ion-label>{{ 'TAB3.title' | translate}}</ion-label>
+      </div>
+      <div>
+        <img *ngIf="familyShare.badgeCount > 0" routerLink="/family" routerDirection="forward" id="icon-right" style="max-width: 50%; margin-top: 0.5em" src="../../assets/imgs/icon_family.png" />
+        <img *ngIf="familyShare.badgeCount === 0" routerLink="/family" routerDirection="forward" id="icon-right" style="max-width: 70%; margin-top: 0.5em" src="../../assets/imgs/icon_family.png" />
+        <ion-badge *ngIf="familyShare.badgeCount > 0" slot="end" color="danger" style="margin-left: -0.3em">{{ familyShare.badgeCount }}</ion-badge>
+      </div>
+    </div>
   </ion-toolbar>
+
+
+
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Tab 3</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content>
+<div class="ion-padding">
+  <!-- <img src="../../assets/imgs/tab3_demo_header1.png"> -->
+  <!-- <img *ngIf="deviceService.selectedLanguage === 'ko'"  src="../../assets/imgs/tab3_demo_main.png"> -->
+  <!-- <img *ngIf="deviceService.selectedLanguage !== 'ko'"  src="../../assets/imgs/tab3_demo_main_eng.png"> -->
 
-  <app-explore-container name="Tab 3 page"></app-explore-container>
+  <ion-grid>
+    <ion-row>
+      <ion-col>
+        <ion-card [disabled]="!deviceService.isMotionBedConnected" routerLink="/new-bedcontrol" routerDirection="forward">
+          <div id="div-image">
+            <img id="icon-device" src="../../assets/imgs/transparent_motionbed.png">
+            <img id="icon-status" src="../../assets/imgs/icon_device_online.png">
+          </div>
+          <div id="div-label">
+            <ion-label>{{ 'TAB3.motionBed' | translate }}</ion-label>
+          </div>
+        </ion-card>
+      </ion-col>
+      <ion-col>
+        <ion-card [disabled]="true" routerLink="/hej-moodlight" routerDirection="forward">
+          <div id="div-image">
+            <img id="icon-device" src="../../assets/imgs/transparent_moodlight.png">
+            <img id="icon-status" src="../../assets/imgs/icon_device_linked.png">
+          </div>
+          <div id="div-label">
+            <ion-label>{{ 'TAB3.moodLight' | translate }}</ion-label>
+          </div>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+    <ion-col>
+      <ion-card [disabled]="true" routerLink="/hej-strip" routerDirection="forward">
+        <div id="div-image">
+          <img id="icon-device" src="../../assets/imgs/transparent_stripled.png">
+          <img id="icon-status" src="../../assets/imgs/icon_device_linked.png">
+        </div>
+        <div id="div-label">
+          <ion-label>{{ 'TAB3.stripLed' | translate }}</ion-label>
+        </div>
+      </ion-card>
+    </ion-col>
+    <ion-col>
+      <ion-card [disabled]="true" routerLink="/ir-remocon" routerDirection="forward">
+        <div id="div-image">
+          <img id="icon-device" src="../../assets/imgs/transparent_irtv.png">
+          <img id="icon-status" src="../../assets/imgs/icon_device_linked.png">
+        </div>
+        <div id="div-label">
+          <ion-label style="margin-left: 0.7em">{{ 'TAB3.irTv' | translate }}</ion-label>
+        </div>
+      </ion-card>
+    </ion-col>
+  </ion-row>
+  <ion-row>
+    <ion-col>
+      <ion-card [disabled]="true" routerLink="/air-conditioner" routerDirection="forward">
+        <div id="div-image">
+          <img id="icon-device" src="../../assets/imgs/transparent_irair.png">
+          <img id="icon-status" src="../../assets/imgs/icon_device_linked.png">
+        </div>
+        <div id="div-label">
+          <ion-label>{{ 'TAB3.irAir' | translate }}</ion-label>
+        </div>
+      </ion-card>
+    </ion-col>
+    <ion-col>
+      <ion-card [disabled]="true" routerLink="/settop-box" routerDirection="forward">
+        <div id="div-image">
+          <img id="icon-device" src="../../assets/imgs/transparent_settopbox.png">
+          <img id="icon-status" src="../../assets/imgs/icon_device_linked.png">
+        </div>
+        <div id="div-label">
+          <ion-label>{{ 'TAB3.settopBox' | translate }}</ion-label>
+        </div>
+      </ion-card>
+    </ion-col>
+  </ion-row>
+  <ion-row>
+    <ion-col>
+      <ion-card [disabled]="true">
+        <div id="div-image">
+          <img id="icon-device" src="../../assets/imgs/transparent_fan.png">
+          <img id="icon-status" src="../../assets/imgs/icon_device_linked.png">
+        </div>
+        <div id="div-label">
+          <ion-label>{{ 'TAB3.fan' | translate }}</ion-label>
+        </div>
+      </ion-card>
+    </ion-col>
+    <ion-col>
+      <ion-card [disabled]="true">
+        <div id="div-image">
+          <img id="icon-device" src="../../assets/imgs/transparent_bulb.png">
+          <img id="icon-status" src="../../assets/imgs/icon_device_linked.png">
+        </div>
+        <div id="div-label">
+          <ion-label style="margin-left: 0.7em">{{ 'TAB3.bulb' | translate }}</ion-label>
+        </div>
+      </ion-card>
+    </ion-col>
+  </ion-row>
+  <ion-row>
+    <ion-col>
+      <ion-card [disabled]="true" routerLink="/curtain" routerDirection="forward">
+        <div id="div-image">
+          <img id="icon-device" src="../../assets/imgs/transparent_curtain.png">
+          <img id="icon-status" src="../../assets/imgs/icon_device_linked.png">
+        </div>
+        <div id="div-label">
+          <ion-label>{{ 'TAB3.curtain' | translate }}</ion-label>
+        </div>
+      </ion-card>
+    </ion-col>
+    <ion-col>
+      <ion-card [disabled]="true">
+        <div id="div-image">
+          <img id="icon-device" src="../../assets/imgs/device_plug.svg">
+          <img id="icon-status" src="../../assets/imgs/icon_device_linked.png">
+        </div>
+        <div id="div-label">
+          <ion-label>{{ 'TAB1.plug' | translate }}</ion-label>
+        </div>
+      </ion-card>
+    </ion-col>
+  </ion-row>
+  </ion-grid>
+</div>
+<div>
+  <ion-button routerLink="/third-party-manual" routerDirection="forward" class="ion-padding" shape="round" fill="outline" expand="block" color="tertiary">{{ 'TAB3.getDevice' | translate }}</ion-button>
+</div>
 </ion-content>

@@ -1,7 +1,7 @@
 import { Router } from '@angular/router';
 import { Injectable } from '@angular/core';
 import { ToastController, LoadingController, AlertController } from '@ionic/angular';
-import moment from 'moment';
+import * as moment from 'moment';
 
 @Injectable({
   providedIn: 'root'
@@ -118,10 +118,11 @@ export class UtilService {
     const alert = await this.alertController.create({
       header: headerMsg,
       message: bodyMessage,
+      cssClass: 'dark-alert', // 다크 모드 스타일 적용
       buttons: [
         {
           text: 'OK',
-          cssClass: 'primary',
+          cssClass: 'alert-button-confirm',
           handler: () => {
             this.router.navigateByUrl(pageUrl);
           }

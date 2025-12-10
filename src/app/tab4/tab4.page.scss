@@ -1,0 +1,28 @@
+.menuItem {
+    color: #ffce00;
+    margin-top: 1.0em;
+    margin-bottom: 0.5em;
+}
+
+#icon-middle {
+    margin-top: 0.5em;
+    max-height: 1.2rem;
+    max-width: auto;
+}
+
+#icon-left {
+    max-width: auto;
+    max-height: 2.0rem;
+    margin-left: 0.5em;
+}
+
+#icon-right {
+    max-width: auto;
+    max-height: 2.0rem;
+}
+
+.parent {
+    display: flex;
+    justify-content: space-between;
+    margin: 10px auto;
+}

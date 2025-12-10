@@ -9,7 +9,7 @@ import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { TranslateConfigService } from './translate-config.service';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import moment from 'moment';
+import * as moment from 'moment';
 import { LocalNotifications } from '@capacitor/local-notifications';
 import { Device } from '@capacitor/device';
 

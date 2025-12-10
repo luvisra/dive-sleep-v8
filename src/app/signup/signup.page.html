@@ -1,0 +1,71 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <!-- <ion-title>회원가입</ion-title> -->
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <div class="signup-logo">
+    <!-- <img src="assets/imgs/koala.png" alt="Ionic logo"> -->
+    <h1><ion-label position="stacked" color="dark">{{ 'LOGIN.signUp' | translate }}</ion-label></h1>
+  </div>
+
+  <form #signupForm="ngForm" novalidate>
+    <ion-list lines="none">
+      <ion-item>
+        <ion-label position="stacked" color="dark">{{ 'LOGIN.phoneNumber' | translate }}</ion-label>
+        <ion-select [value]=" selectedCountryCode " (ionChange)="countryCodeSelected($event)">
+          <ion-select-option value="+82">{{ 'COUNTRY.ko.name' | translate }}(+82)</ion-select-option>
+          <ion-select-option value="+1">{{ 'COUNTRY.en.name' | translate }}(+1)</ion-select-option>
+          <ion-select-option value="+86">{{ 'COUNTRY.cn.name' | translate }}(+86)</ion-select-option>
+        </ion-select>
+        <ion-input minlength="9" maxlength="11" [(ngModel)]="signup.username" name="username" type="text" #username="ngModel" required>
+        </ion-input>
+      </ion-item>
+      <ion-text color="danger">
+        <p [hidden]="username.valid || submitted == false" class="ion-padding-start">
+          Phone Number is required
+        </p>
+      </ion-text>
+
+      <ion-item>
+        <ion-label position="stacked" color="dark">{{ 'LOGIN.password' | translate }}</ion-label>
+        <ion-input [(ngModel)]="signup.password" name="password" type="password" #password="ngModel" required>
+        </ion-input>
+      </ion-item>
+      <ion-text color="danger">
+        <p [hidden]="password.valid || submitted == false" class="ion-padding-start">
+          Password is required
+        </p>
+      </ion-text>
+
+      <ion-item>
+        <ion-label position="stacked" color="dark">{{ 'LOGIN.verifyPassword' | translate }}</ion-label>
+        <ion-input [(ngModel)]="verifyPasswordText" name="verifyPassword" type="password" #verifyPassword="ngModel" required>
+        </ion-input>
+      </ion-item>
+      <ion-text color="danger">
+        <p [hidden]="password.valid || submitted == false" class="ion-padding-start">
+          Verify Password is required
+        </p>
+        <p *ngIf="!matchedPassword" class="ion-padding-start">
+          Verify Password is mismatched.
+        </p>
+        
+      </ion-text>
+    </ion-list>
+
+    <div class="ion-padding">
+      <ion-button color="warning" shape="round" (click)="onSignup(signupForm)" type="submit" expand="block" [disabled]="disableConfirmButton">{{ 'COMMON.confirm' | translate }}</ion-button>
+    </div>
+
+    <div style="text-align: center;">
+      <ion-checkbox (ionChange)="onCheckBoxChanged($event)" style="margin-right: 0.5em"></ion-checkbox><ion-label class="agree-label">동의</ion-label><ion-label class="agree-label" color="tertiary" style="margin-left: 1.0em" routerLink="/terms-conditions" routerDirection="forward">서비스 이용약관</ion-label><ion-label class="agree-label"> 및 </ion-label><ion-label color="tertiary" class="agree-label" routerLink="/privacy-policy" routerDirection="forward">개인정보처리방침</ion-label>
+    </div>
+  </form>
+
+</ion-content>
