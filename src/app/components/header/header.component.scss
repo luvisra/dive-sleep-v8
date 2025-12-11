@@ -1,0 +1,53 @@
+ion-toolbar {
+  padding-top: 0.6em;
+  padding-bottom: 0.6em;
+}
+
+.parent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.start-slot, .end-slot {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.device-status-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  margin-left: 0.5em;
+}
+
+.status-label {
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.middle-slot {
+  flex: 2;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#icon-middle {
+  max-height: 1.2rem;
+  max-width: auto;
+  margin-top: 0.12em;
+}
+
+#icon-left {
+  max-width: auto;
+  max-height: 2.0rem;
+}
+
+#icon-right {
+  max-width: auto;
+  max-height: 2.0rem;
+}

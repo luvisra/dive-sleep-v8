@@ -28,6 +28,7 @@ import { GLOBAL } from './static_config';
 export class AuthService implements OnDestroy {
   signedIn = false;
   user: AuthUser | null = null;
+  phoneNumber: string | null = null;
   greeting: string = '';
   public signedInSubject = new BehaviorSubject<boolean>(this.signedIn);
 
@@ -115,7 +116,8 @@ export class AuthService implements OnDestroy {
       console.log('[Auth] Attributes 전체: ' + JSON.stringify(attributes, null, 2));
 
       phoneNumber = attributes.phone_number || null;
-      console.log('[Auth] 전화번호 (phone_number): ' + (phoneNumber || '없음'));
+      this.phoneNumber = phoneNumber;
+      console.log('[Auth] 전화번호 (phone_number): ' + (this.phoneNumber || '없음'));
       console.log('[Auth] 이메일 (email): ' + (attributes.email || '없음'));
       console.log('[Auth] ==========================================');
 

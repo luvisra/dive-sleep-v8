@@ -1,8 +1,8 @@
 export const GLOBAL = {
     DEBUG_MODE: true,
-    S3_FIRMWARE_PATH: 'esp32/cnf_esp.bin',
+    S3_FIRMWARE_PATH: 'public/esp32/cnf_esp.bin',
     S3_USER_PHOTO_BUCKET_NAME: 'dive-user-photo',
-    S3_BETA_FIRMWARE_PATH: 'esp32/cnf_esp_beta.bin',
+    S3_BETA_FIRMWARE_PATH: 'public/esp32/cnf_esp_beta.bin',
     openWeatherApiKey: '27a5ab9ce3ea9270ff24d93b56cd1a8e',
     START_PAGE: '/tabs/tab1'
     // START_PAGE: '/iot-demo'

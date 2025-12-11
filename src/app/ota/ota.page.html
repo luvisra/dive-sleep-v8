@@ -1,0 +1,39 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start"><ion-back-button></ion-back-button></ion-buttons>
+    <ion-title *ngIf="deviceService.isDebugMode" (click)="enableBetaVersion()" style="color: #ffffff; text-align: center; cursor: pointer;">{{ 'OTA.ota' | translate }}</ion-title>
+    <ion-title *ngIf="!deviceService.isDebugMode" style="color: #ffffff; text-align: center;">{{ 'OTA.ota' | translate }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+<div>
+  <p><ion-label><h2>{{ progressMessage }}</h2></ion-label></p>
+  <p *ngIf="isBetaEnabled"><ion-label color="warning"><h2>OTA 모드: BETA</h2></ion-label></p>
+</div>
+<div class="round-chart">
+  <circle-progress
+  [maxPercent]="100"
+  [percent]="percentValue"
+  [radius]="70"
+  [innerStrokeWidth]="0"
+  [outerStrokeWidth]="8"
+  [outerStrokeColor]="'#7044ff'"
+  [animation]="false"
+  [animationDuration]="300"
+></circle-progress>
+</div>
+
+ 
+<div>
+  <ion-button [disabled]="disableButton" color="warning" (click)="startOta()">{{ 'OTA.verifyOta' | translate }}</ion-button>
+</div>
+  
+<!-- Colorize Progressbar -->
+<!-- <ion-progress-bar color="primary" value="0.5"></ion-progress-bar> -->
+<!-- <ion-progress-bar color="secondary" value="0.5"></ion-progress-bar> -->
+
+<!-- Other types -->
+<!-- <ion-progress-bar value="0.25" buffer="0.5"></ion-progress-bar> -->
+<!-- <ion-progress-bar type="indeterminate" reversed="true"></ion-progress-bar> -->
+</ion-content>

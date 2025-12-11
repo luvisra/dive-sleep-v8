@@ -119,3 +119,55 @@ ion-input[color="dark"] {
   --color: #f4f5f8 !important;
   color: #f4f5f8 !important;
 }
+
+/* ion-back-button과 ion-title 겹침 방지 */
+ion-toolbar {
+  ion-title {
+    padding-left: 50px;
+    padding-right: 50px;
+  }
+
+  ion-buttons[slot="start"] + ion-title {
+    padding-left: 50px;
+  }
+
+  ion-buttons[slot="end"] + ion-title,
+  ion-title:has(+ ion-buttons[slot="end"]) {
+    padding-right: 50px;
+  }
+}
+
+ion-header {
+  ion-toolbar {
+    --min-height: auto;
+    --padding-top: env(safe-area-inset-top);
+    --padding-bottom: 0;
+    --padding-start: 0;
+    --padding-end: 0;
+  }
+}
+
+ion-content {
+  --padding-top: 0;
+  --padding-bottom: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+ion-footer {
+  ion-toolbar {
+    --min-height: auto;
+    --padding-top: 0;
+    --padding-bottom: env(safe-area-inset-bottom);
+    --padding-start: 0;
+    --padding-end: 0;
+  }
+}
+
+ion-tab-bar {
+  --padding-top: 0;
+  --padding-bottom: env(safe-area-inset-bottom);
+  padding-top: 0 !important;
+  margin-top: 0;
+  margin-bottom: 0;
+}

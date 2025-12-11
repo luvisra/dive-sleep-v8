@@ -1,6 +1,6 @@
 <ion-header>
   <ion-toolbar>
-    <ion-buttons slot="start"><ion-back-button style="position: absolute;"></ion-back-button></ion-buttons>
+    <ion-buttons slot="start"><ion-back-button></ion-back-button></ion-buttons>
     <ion-title *ngIf="deviceService.isDebugMode" (click)="forceOta()">{{ 'DEVICE.title2' | translate }}</ion-title>
     <ion-title *ngIf="!deviceService.isDebugMode">{{ 'DEVICE.title2' | translate }}</ion-title>
   </ion-toolbar>

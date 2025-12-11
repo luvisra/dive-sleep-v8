@@ -8,6 +8,7 @@ import { DeviceRegistrationPageRoutingModule } from './device-registration-routi
 
 import { DeviceRegistrationPage } from './device-registration.page';
 import { TranslateModule } from '@ngx-translate/core';
+import { HeaderComponentModule } from '../components/header/header.module';
 
 @NgModule({
   imports: [
@@ -15,7 +16,8 @@ import { TranslateModule } from '@ngx-translate/core';
     FormsModule,
     IonicModule,
     DeviceRegistrationPageRoutingModule,
-    TranslateModule
+    TranslateModule,
+    HeaderComponentModule
   ],
   declarations: [DeviceRegistrationPage]
 })

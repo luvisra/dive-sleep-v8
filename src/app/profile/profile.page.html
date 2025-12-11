@@ -1,0 +1,63 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start"><ion-back-button></ion-back-button></ion-buttons>
+    <ion-title>사용자 프로필</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <ion-item style="background-color: #1c1c1d">
+      <ion-card style="box-shadow:none !important; padding: 1.0em">
+        <ion-card-title color="light">
+        나의 ID
+        </ion-card-title>
+        <ion-card-title style="font-weight: bold; font-size: 1.2rem; color: white;">
+          {{ deviceService.userNickname }}
+        </ion-card-title>
+      </ion-card>
+      <ion-avatar slot="end" (click)="cameraClicked()" style="width: 5.5rem; height: 5.5rem">
+        <!-- <img src="../../assets/imgs/avatar.svg"> -->
+        <img [src]="photo">
+        <!-- <ion-label color="warning" style="font-size: 0.8rem; font-weight: bold; text-align: center;">
+          편집
+        </ion-label> -->
+      </ion-avatar>
+    </ion-item>
+
+    <ion-row style="height: 1.0em"></ion-row>
+
+    <ion-item style="padding-left: 1.0em" (click)="enterNickname()" detail>
+      <ion-label slot="start">이름</ion-label>
+      <ion-label slot="end" [style.color]="userNickname ? '' : 'gray'">{{ userNickname || '이름을 입력하세요' }}</ion-label>
+    </ion-item>
+
+    <ion-item style="padding-left: 1.0em" detail>
+      <ion-label slot="start">성별</ion-label>
+      <ion-select style="max-width: 9.0rem" slot="end" placeholder="성별을 선택하세요" [(ngModel)]="userGender" (ionChange)="userGenderChanged($event)">
+        <ion-select-option value="male">남자</ion-select-option>
+        <ion-select-option value="female">여자</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item style="padding-left: 1.0em" (click)="enterAge()" detail>
+      <ion-label slot="start">연령</ion-label>
+      <ion-label slot="end" [style.color]="userAge ? '' : 'gray'">{{ userAge || '나이를 입력하세요' }}</ion-label>
+
+    </ion-item>
+
+    <ion-item style="padding-left: 1.0em" (click)="enterHeight()" detail>
+      <ion-label slot="start">신장</ion-label>
+      <ion-label slot="end" [style.color]="userHeight ? '' : 'gray'">{{ userHeight || '키를 입력하세요' }}</ion-label>
+
+    </ion-item>
+
+    <ion-item style="padding-left: 1.0em" (click)="enterWeight()" detail>
+      <ion-label slot="start">몸무게</ion-label>
+      <ion-label slot="end" [style.color]="userWeight ? '' : 'gray'">{{ userWeight || '몸무게를 입력하세요' }}</ion-label>
+    </ion-item>
+</ion-list>
+
+<ion-button (click)="onSignOut()" *ngIf="authService.signedIn" color="danger" shape="round" expand="block">로그아웃
+</ion-button>
+</ion-content>

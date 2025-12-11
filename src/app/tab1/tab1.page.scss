@@ -118,11 +118,13 @@ div {
 .parent {
   display: flex;
   justify-content: space-between;
-  margin: 10px auto;
+  margin: 0 auto;
+  padding: 0;
+  align-items: center;
+  height: 28px;
 }
 
 #icon-middle {
-  margin-top: 0.5em;
   max-height: 1.2rem;
   max-width: auto;
 }
@@ -222,16 +224,4 @@ ion-refresher-content {
   width: 100%;
   height: auto;
   border-radius: 10px;
-}
-
-ion-header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 10;
-}
-
-ion-content {
-  --padding-top: 3.2rem; /* ion-toolbar height */
 }

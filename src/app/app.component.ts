@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { TranslateConfigService } from './translate-config.service';
 import { UtilService } from './util.service';
 import { AuthService } from './auth.service';
-import { StatusBar, Style } from '@capacitor/status-bar';
+import { StatusBar } from '@capacitor/status-bar';
 import { ScreenOrientation } from '@capacitor/screen-orientation';
 @Component({
   selector: 'app-root',
@@ -28,8 +28,12 @@ export class AppComponent {
     this.initializeApp();
   }
 
-  initStatusBar() {
-    StatusBar.setStyle({ style: Style.Dark });
+  async initStatusBar() {
+    try {
+      await StatusBar.hide();
+    } catch (error) {
+      console.log('StatusBar hide error:', error);
+    }
   }
 
   async initializeApp() {

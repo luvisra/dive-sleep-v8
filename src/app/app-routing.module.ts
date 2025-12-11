@@ -53,6 +53,22 @@ const routes: Routes = [
   {
     path: 'wificonnection',
     loadChildren: () => import('./wificonnection/wificonnection.module').then( m => m.WificonnectionPageModule)
+  },
+  {
+    path: 'terms-conditions',
+    loadChildren: () => import('./terms-conditions/terms-conditions.module').then( m => m.TermsConditionsPageModule)
+  },
+  {
+    path: 'ota',
+    loadChildren: () => import('./ota/ota.module').then( m => m.OtaPageModule)
+  },
+  {
+    path: 'profile',
+    loadChildren: () => import('./profile/profile.module').then( m => m.ProfilePageModule)
+  },
+  {
+    path: 'privacy-policy',
+    loadChildren: () => import('./privacy-policy/privacy-policy.module').then( m => m.PrivacyPolicyPageModule)
   }
 ];
 @NgModule({

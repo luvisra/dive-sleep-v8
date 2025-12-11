@@ -1,7 +1,7 @@
 <ion-header>
   <ion-toolbar>
-    <ion-buttons slot="start" style="position: absolute;">
-      <ion-back-button style="position: absolute;"></ion-back-button>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
     </ion-buttons>
     <ion-title>{{ 'DEVICE.title' | translate }}</ion-title>
   </ion-toolbar>
@@ -16,4 +16,3 @@
 <ion-button *ngIf="deviceService.isMotionBedConnected" [disabled]="disableButton" color="warning" shape="round" (click)="startScan()" expand="block">{{ 'DEVICE.connected' | translate }}</ion-button>
 <ion-button *ngIf="!deviceService.isMotionBedConnected" [disabled]="disableButton" color="warning" shape="round" (click)="startScan()" expand="block">{{ 'DEVICE.connect' | translate }}</ion-button>
 </ion-content>
-  

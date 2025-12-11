@@ -1,5 +1,6 @@
 .menuItem {
-    color: #ffce00;
+    padding-right: 0.7em;
+    color: #f3f2f2;
     margin-top: 1.0em;
     margin-bottom: 0.5em;
 }
@@ -24,12 +25,5 @@
 .parent {
     display: flex;
     justify-content: space-between;
-    margin: 0 auto;
-    align-items: center;
-}
-
-// ion-select 팝업의 글자색을 white로 설정
-ion-select {
-    --placeholder-color: white;
-    --placeholder-opacity: 0.8;
+    margin: 10px auto;
 }

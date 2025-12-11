@@ -147,7 +147,7 @@ export class Tab4Page implements OnInit {
       this.ngZone.run(() => {
         if (this.authService.user) {
           const phoneNumber = localStorage.getItem('phoneNumber');
-          this.displayUsername = phoneNumber || this.authService.user.username;
+          this.displayUsername = this.formatPhoneNumber(phoneNumber) || this.authService.user.username;
         }
         this.deviceService.userNickname = nickname || '';
       });
@@ -166,6 +166,21 @@ export class Tab4Page implements OnInit {
   }
 
   ngOnInit() {
+  }
+
+  formatPhoneNumber(phoneNumber: string | null): string {
+    if (!phoneNumber) {
+      return '';
+    }
+
+    const cleaned = phoneNumber.replace('+82', '0');
+    const match = cleaned.match(/^(\d{3})(\d{4})(\d{4})$/);
+
+    if (match) {
+      return `${match[1]}-${match[2]}-${match[3]}`;
+    }
+
+    return cleaned;
   }
 
   pushConfigChanged(ev: any) {

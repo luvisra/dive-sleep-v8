@@ -1,32 +1,4 @@
-<ion-header>
-  <ion-toolbar class="ion-no-padding">
-    <div class="parent">
-      <div>
-        <img *ngIf="deviceService.isOnline === 0"
-        id="icon-left"
-        src="../../assets/imgs/navibar_sensor_offline.png"
-        routerLink="/device-registration"
-        routerDirection="forward"/>
-        <ion-label *ngIf="deviceService.isOnline === 0" style="margin-left: -0.7em; margin-top: 1.0em; position: absolute; font-size: 0.8rem;" color="warning">{{ 'COMMON.scanning' | translate }}</ion-label>
-      <img *ngIf="deviceService.isOnline > 0"
-      id="icon-left"
-      src="../../assets/imgs/navibar_sensor_online.png"
-      routerLink="/device-registration"
-      routerDirection="forward"/>
-      <ion-label *ngIf="deviceService.isOnline > 0" style="margin-left: -0.7em; margin-top: 1.0em; position: absolute; font-size: 0.8rem;" color="warning">{{ 'COMMON.connected' | translate }}</ion-label>
-      </div>
-      <div id="icon-middle">
-        <ion-label *ngIf="deviceService.isDebugMode" routerLink="/debug" routerDirection="forward">{{ 'TAB4.settings' | translate }}</ion-label>
-        <ion-label *ngIf="!deviceService.isDebugMode">{{ 'TAB4.settings' | translate }}</ion-label>
-      </div>
-      <div>
-        <img *ngIf="familyShare.badgeCount > 0" routerLink="/family" routerDirection="forward" id="icon-right" style="max-width: 50%; margin-top: 0.5em" src="../../assets/imgs/icon_family.png" />
-        <img *ngIf="familyShare.badgeCount === 0" routerLink="/family" routerDirection="forward" id="icon-right" style="max-width: 70%; margin-top: 0.5em" src="../../assets/imgs/icon_family.png" />
-        <ion-badge *ngIf="familyShare.badgeCount > 0" slot="end" color="danger" style="margin-left: -0.3em">{{ familyShare.badgeCount }}</ion-badge>
-      </div>
-    </div>
-  </ion-toolbar>
-</ion-header>
+<app-header [title]="'TAB4.settings' | translate"></app-header>
 
 <ion-content>
   <ion-list>

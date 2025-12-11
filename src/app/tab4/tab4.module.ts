@@ -6,6 +6,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { IonicModule } from '@ionic/angular';
 
 import { Tab4Page } from './tab4.page';
+import { HeaderComponentModule } from '../components/header/header.module';
 
 const routes: Routes = [
   {
@@ -20,6 +21,7 @@ const routes: Routes = [
     FormsModule,
     IonicModule,
     TranslateModule,
+    HeaderComponentModule,
     RouterModule.forChild(routes)
   ],
   declarations: [Tab4Page]

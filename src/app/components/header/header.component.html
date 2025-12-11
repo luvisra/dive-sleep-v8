@@ -1,0 +1,35 @@
+<ion-header [translucent]="false" class="ion-no-border">
+  <ion-toolbar class="ion-no-padding">
+    <div class="parent">
+      <div class="start-slot">
+        <ion-buttons slot="start">
+          <ion-back-button *ngIf="showBackButton"></ion-back-button>
+        </ion-buttons>
+        <div *ngIf="deviceService.isOnline === 0 && showDeviceStatus" class="device-status-container">
+          <img id="icon-left" src="../../assets/imgs/navibar_sensor_offline.png"
+            routerLink="/device-registration" routerDirection="forward" />
+          <ion-label class="status-label" color="warning">{{
+            'COMMON.scanning' | translate }}</ion-label>
+        </div>
+        <div *ngIf="deviceService.isOnline > 0 && showDeviceStatus" class="device-status-container">
+          <img id="icon-left" src="../../assets/imgs/navibar_sensor_online.png"
+            routerLink="/device-registration" routerDirection="forward" />
+          <ion-label class="status-label" color="warning">{{
+            'COMMON.connected' | translate }}</ion-label>
+        </div>
+      </div>
+      <div class="middle-slot">
+        <img *ngIf="showLogo" id="icon-middle" src="../../assets/imgs/dive_logo_small.png" />
+        <ion-label *ngIf="!showLogo">{{ title }}</ion-label>
+      </div>
+      <div class="end-slot">
+        <!-- <img *ngIf="familyShare.badgeCount > 0 && showFamilyIcon" routerLink="/family" routerDirection="forward" id="icon-right"
+          style="max-width: 50%;" src="../../assets/imgs/icon_family.png" />
+        <img *ngIf="familyShare.badgeCount === 0 && showFamilyIcon" routerLink="/family" routerDirection="forward" id="icon-right"
+          style="max-width: 70%;" src="../../assets/imgs/icon_family.png" />
+        <ion-badge *ngIf="familyShare.badgeCount > 0 && showFamilyIcon" slot="end" color="danger" style="margin-left: -0.3em">{{
+          familyShare.badgeCount }}</ion-badge> -->
+      </div>
+    </div>
+  </ion-toolbar>
+</ion-header>

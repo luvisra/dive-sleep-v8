@@ -1,23 +1,28 @@
-import { IonicModule } from '@ionic/angular';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Tab1Page } from './tab1.page';
-import { ExploreContainerComponentModule } from '../explore-container/explore-container.module';
+import { Routes, RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
-import { Tab1PageRoutingModule } from './tab1-routing.module';
+import { IonicModule } from '@ionic/angular';
+
+import { OtaPage } from './ota.page';
+
+// Import ng-circle-progress
 import { NgCircleProgressModule } from 'ng-circle-progress';
-import { HeaderComponentModule } from '../components/header/header.module';
+const routes: Routes = [
+  {
+    path: '',
+    component: OtaPage
+  }
+];
 
 @NgModule({
   imports: [
-    IonicModule,
     CommonModule,
     FormsModule,
+    IonicModule,
     TranslateModule,
-    ExploreContainerComponentModule,
-    Tab1PageRoutingModule,
-    HeaderComponentModule,
+    RouterModule.forChild(routes),
     NgCircleProgressModule.forRoot({
       // these are default values if not defined
       radius: 100,
@@ -29,9 +34,9 @@ import { HeaderComponentModule } from '../components/header/header.module';
       animation: true,
       responsive: true,
       renderOnClick: false,
-      // lazy : falseC
-    }),
+      // lazy : false
+    })
   ],
-  declarations: [Tab1Page]
+  declarations: [OtaPage]
 })
-export class Tab1PageModule {}
+export class OtaPageModule {}

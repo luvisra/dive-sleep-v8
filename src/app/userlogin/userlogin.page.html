@@ -1,6 +1,6 @@
 <ion-header>
   <ion-toolbar>
-    <ion-buttons *ngIf="!authService.signedIn" slot="start"><ion-back-button style="position: absolute;"></ion-back-button></ion-buttons>
+    <ion-buttons *ngIf="!authService.signedIn" slot="start"><ion-back-button></ion-back-button></ion-buttons>
     <ion-title *ngIf="!authService.signedIn">{{ 'LOGIN.title' | translate }}</ion-title>
   </ion-toolbar>
 </ion-header>
