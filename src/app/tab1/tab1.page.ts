@@ -261,13 +261,9 @@ export class Tab1Page implements OnInit, AfterViewInit {
         clearTimeout(this.deviceCheckTimer);
       }
 
-      // ✅ 구독이 없으면 구독 시작 (이미 있으면 스킵)
-      if (!this.mqttService.currentMqttSession) {
-        console.log('[Check Alive] MQTT 구독 시작...');
-        this.mqttService.subscribeMessages();
-      } else {
-        console.log('[Check Alive] MQTT 이미 구독 중, 스킵');
-      }
+      // ✅ 구독 상태 확인 및 자동 복구
+      console.log('[Check Alive] MQTT 구독 상태 확인 중...');
+      this.mqttService.ensureSubscription();
 
       // ✅ Ping만 전송 (구독은 유지)
       console.log('[Check Alive] Ping 전송...');
@@ -376,9 +372,8 @@ export class Tab1Page implements OnInit, AfterViewInit {
   }
 
   ionViewDidLeave() {
-    if (this.mqttService.currentMqttSession !== undefined) {
-      this.mqttService.currentMqttSession.unsubscribe();
-    }
+    // ✅ MQTT 구독은 유지 - 탭 이동 중에도 메시지 수신 가능
+    // MQTT 구독은 앱 전체에서 하나만 유지되며, 로그아웃 시에만 해제됨
   }
 
   refreshGoqualDeviceList() {

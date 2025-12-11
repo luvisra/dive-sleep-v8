@@ -223,3 +223,15 @@ ion-refresher-content {
   height: auto;
   border-radius: 10px;
 }
+
+ion-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+}
+
+ion-content {
+  --padding-top: 3.2rem; /* ion-toolbar height */
+}

@@ -76,14 +76,46 @@ body {
   .action-sheet-button-inner {
     color: #ffffff !important;
   }
-  
+
   .alert-title,
   .action-sheet-title {
     color: #ffffff !important;
   }
-  
+
   .alert-sub-title,
   .action-sheet-sub-title {
     color: #aaaaaa !important;
   }
+}
+
+/* 모든 알림창의 텍스트를 흰색으로 강제 설정 */
+ion-alert {
+  --color: #ffffff;
+
+  .alert-wrapper {
+    --color: #ffffff;
+    color: #ffffff !important;
+  }
+
+  .alert-head h2,
+  .alert-title,
+  .alert-message,
+  .alert-input,
+  .alert-button {
+    color: #ffffff !important;
+  }
+}
+
+/* ion-label의 color="dark" 속성이 실제로는 밝은 색상으로 표시되도록 강제 */
+ion-label[color="dark"],
+ion-card-subtitle[color="dark"],
+ion-card-title[color="dark"] {
+  --color: #f4f5f8 !important;
+  color: #f4f5f8 !important;
+}
+
+/* ion-input의 색상도 밝게 설정 */
+ion-input[color="dark"] {
+  --color: #f4f5f8 !important;
+  color: #f4f5f8 !important;
 }

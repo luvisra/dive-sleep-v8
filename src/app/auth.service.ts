@@ -88,9 +88,9 @@ export class AuthService implements OnDestroy {
   }
 
   private async handleSignIn(user: AuthUser) {
+    // ⚠️ signedInSubject는 devId 로드 후에 emit - 레이스 컨디션 방지
     this.signedIn = true;
     this.user = user;
-    this.signedInSubject.next(this.signedIn);
     this.greeting = 'Hello ' + user.username;
 
     if (this.isManualLogin) {
@@ -195,6 +195,10 @@ export class AuthService implements OnDestroy {
         this.deviceService.devIdSubject.next('');
       }
 
+      // ✅ devId 로드 완료 후 signedInSubject emit (레이스 컨디션 방지)
+      console.log('[Auth] ✅ 사용자 정보 로드 완료, signedInSubject emit');
+      this.signedInSubject.next(this.signedIn);
+
       console.log('[Auth] 메인 페이지로 이동: ' + GLOBAL.START_PAGE);
       console.log('[Auth] ==========================================');
       this.router.navigateByUrl(GLOBAL.START_PAGE, this.navigationExtras);
@@ -207,6 +211,11 @@ export class AuthService implements OnDestroy {
       // 에러가 발생해도 메인 페이지로 이동 (devId는 빈 문자열)
       this.deviceService.devId = '';
       this.deviceService.devIdSubject.next('');
+
+      // ✅ 에러 발생 시에도 signedInSubject emit (MQTT 구독 트리거)
+      console.log('[Auth] ⚠️ 에러 발생, devId 없이 signedInSubject emit');
+      this.signedInSubject.next(this.signedIn);
+
       this.router.navigateByUrl(GLOBAL.START_PAGE, this.navigationExtras);
     }
   }

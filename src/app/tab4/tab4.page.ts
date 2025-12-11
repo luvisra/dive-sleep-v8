@@ -62,9 +62,8 @@ export class Tab4Page implements OnInit {
       }
 
       if (this.deviceCheckTimer) clearTimeout(this.deviceCheckTimer);
-      if (!this.mqttService.currentMqttSession) {
-        this.mqttService.subscribeMessages();
-      }
+      // ✅ 구독 상태 확인 및 자동 복구
+      this.mqttService.ensureSubscription();
       this.mqttService.sendMessageToDevice('ping');
       this.refreshGoqualDeviceList();
 

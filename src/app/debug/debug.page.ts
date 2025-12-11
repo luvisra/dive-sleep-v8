@@ -423,10 +423,10 @@ export class DebugPage implements OnInit {
 
   ngOnInit() {
     console.log(this.deviceService.devId);
-    
-    // MQTT 구독 설정 (메시지 수신을 위해 필요)
-    this.mqttService.subscribeMessages();
-    
+
+    // ✅ MQTT 구독 상태 확인 및 자동 복구
+    this.mqttService.ensureSubscription();
+
     this.apiService.ListDiveSleepUserinfos(undefined, 50).then((list) => {
       console.log(list);
       list.items.forEach(item => {

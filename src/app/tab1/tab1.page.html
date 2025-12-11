@@ -43,12 +43,10 @@
         </ion-row>
     </ion-grid>
   </div> -->
-  <div>
-    <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)" pullFactor="0.4" pullMin="25" pullMax="300">
-      <ion-refresher-content pullingIcon="chevron-down" refreshingSpinner="crescent">
-      </ion-refresher-content>
-    </ion-refresher>
-  </div>
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)" pullFactor="0.4" pullMin="25" pullMax="300">
+    <ion-refresher-content pullingIcon="chevron-down" refreshingSpinner="crescent">
+    </ion-refresher-content>
+  </ion-refresher>
 
   <!-- <p class="header-text">{{ 'TAB1.recentData' | translate }}</p> -->
   <div class="container">

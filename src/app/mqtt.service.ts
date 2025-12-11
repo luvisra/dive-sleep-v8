@@ -24,6 +24,10 @@ export class MqttService {
   currentMqttSession: any;
   firmwareVersionDate: Date | null = null;
   private pubsub: typeof PubSub = PubSub;
+  private reconnectAttempts = 0;
+  private maxReconnectAttempts = 5;
+  private reconnectTimeout: any = null;
+  private isReconnecting = false;
 
   constructor(
     private deviceService: DeviceService,
@@ -173,6 +177,8 @@ export class MqttService {
         next: (data: any) => {
           console.log('[MQTT Subscribe] ✅ 메시지 수신!');
           console.log('[MQTT Subscribe] Raw data:', JSON.stringify(data, null, 2));
+          // 메시지 수신 성공 시 재연결 카운터 리셋
+          this.reconnectAttempts = 0;
           this.ngZone.run(() => {
             this.handleMqttMessage(data);
           });
@@ -180,16 +186,74 @@ export class MqttService {
         error: (error: any) => {
           console.error('[MQTT Subscribe] ❌ 구독 에러:', JSON.stringify(error, null, 2));
           this.currentMqttSession = null;
+          // 자동 재연결 시도
+          this.attemptReconnect();
         },
         complete: () => {
           console.log('[MQTT Subscribe] 구독 완료 (연결 종료)');
           this.currentMqttSession = null;
+          // 자동 재연결 시도
+          this.attemptReconnect();
         }
       });
       console.log('[MQTT Subscribe] ✅ 구독 설정 완료');
       console.log('[MQTT Subscribe] currentMqttSession 상태:', !!this.currentMqttSession);
+      // 구독 성공 시 재연결 카운터 리셋
+      this.reconnectAttempts = 0;
     } catch (error) {
       console.error('[MQTT Subscribe] ❌ 구독 실패:', JSON.stringify(error, null, 2));
+      // 자동 재연결 시도
+      this.attemptReconnect();
+    }
+  }
+
+  private attemptReconnect() {
+    // 이미 재연결 중이거나 최대 시도 횟수를 초과한 경우
+    if (this.isReconnecting || this.reconnectAttempts >= this.maxReconnectAttempts) {
+      if (this.reconnectAttempts >= this.maxReconnectAttempts) {
+        console.error('[MQTT Reconnect] ❌ 최대 재연결 시도 횟수 초과');
+      }
+      return;
+    }
+
+    // 로그인되어 있고 devId가 있는 경우에만 재연결
+    if (!this.authService.signedIn || !this.deviceService.devId) {
+      console.warn('[MQTT Reconnect] ⚠️ 재연결 조건 미충족 (signedIn:', this.authService.signedIn, ', devId:', this.deviceService.devId, ')');
+      return;
+    }
+
+    this.isReconnecting = true;
+    this.reconnectAttempts++;
+
+    // Exponential backoff: 2초, 4초, 8초, 16초, 32초
+    const delay = Math.min(2000 * Math.pow(2, this.reconnectAttempts - 1), 32000);
+    console.log(`[MQTT Reconnect] ${this.reconnectAttempts}/${this.maxReconnectAttempts}번째 재연결 시도 (${delay}ms 후)`);
+
+    this.reconnectTimeout = setTimeout(() => {
+      this.isReconnecting = false;
+      console.log('[MQTT Reconnect] 재연결 시도 중...');
+      this.subscribeMessages();
+    }, delay);
+  }
+
+  ensureSubscription() {
+    // 페이지 진입 시 구독 상태 확인 및 복구 메서드
+    console.log('[MQTT Ensure] ========== 구독 상태 확인 ==========');
+    console.log('[MQTT Ensure] signedIn:', this.authService.signedIn);
+    console.log('[MQTT Ensure] devId:', this.deviceService.devId);
+    console.log('[MQTT Ensure] currentMqttSession:', !!this.currentMqttSession);
+
+    if (!this.authService.signedIn || !this.deviceService.devId) {
+      console.log('[MQTT Ensure] ⚠️ 구독 불가능 상태');
+      return;
+    }
+
+    if (!this.currentMqttSession) {
+      console.log('[MQTT Ensure] 🔄 구독이 없음, 새로 시작');
+      this.reconnectAttempts = 0; // 수동 호출 시 재연결 카운터 리셋
+      this.subscribeMessages();
+    } else {
+      console.log('[MQTT Ensure] ✅ 구독 활성 상태');
     }
   }
 

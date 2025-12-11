@@ -91,6 +91,7 @@ export class UtilService {
       header: head,
       subHeader: sub,
       message: msg,
+      cssClass: 'dark-alert',
       buttons: ['OK']
     });
 
@@ -101,10 +102,11 @@ export class UtilService {
     const alert = await this.alertController.create({
       header: headerMsg,
       message: bodyMessage,
+      cssClass: 'dark-alert',
       buttons: [
         {
           text: 'OK',
-          cssClass: 'primary',
+          cssClass: 'alert-button-confirm',
           handler: () => {
           }
         }
