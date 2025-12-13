@@ -1,45 +1,4 @@
-<ion-header style="margin-bottom: 0px; background-color: #1C1C1D;">
-  <ion-toolbar class="ion-no-padding">
-    <div class="parent" style="background-color: transparent;">
-      <div>
-        <img *ngIf="deviceService.isOnline === 0" id="icon-left" src="../../assets/imgs/navibar_sensor_offline.png"
-        routerLink="/device-registration" routerDirection="forward"/>
-        <ion-label *ngIf="deviceService.isOnline === 0" style="margin-left: -0.7em; margin-top: 1.0em; position: absolute; font-size: 0.8rem;" color="warning">{{ 'COMMON.scanning' | translate }}</ion-label>
-        <img *ngIf="deviceService.isOnline > 0" id="icon-left" src="../../assets/imgs/navibar_sensor_online.png"
-        routerLink="/device-registration" routerDirection="forward"/><ion-label *ngIf="deviceService.isOnline > 0" style="margin-left: -0.7em; margin-top: 1.0em; position: absolute; font-size: 0.8rem;" color="warning">{{ 'COMMON.connected' | translate }}</ion-label>
-      </div>
-      <div id="icon-middle" *ngIf="tab2ModeSelected === 'daily'">
-        <ion-button fill="clear" strong>{{ selectedDate }}</ion-button>
-        <!-- <ion-input [clearInput]="false" readonly id="current-date" [(ngModel)]="selectedDate" (ionChange)="onChangeDate()" [liIonic4Datepicker]="datePickerObj"></ion-input> -->
-      </div>
-      <div id="icon-middle" *ngIf="tab2ModeSelected === 'weekly'">
-        <ion-button fill="clear">{{ 'TAB2.weekly' | translate }}</ion-button>
-      </div>
-      <div id="icon-middle" *ngIf="tab2ModeSelected === 'monthly'">
-        <ion-button fill="clear">{{ 'TAB2.monthly' | translate }}</ion-button>
-      </div>
-      <div>
-        <!-- <img *ngIf="familyShare.badgeCount > 0" routerLink="/family" routerDirection="forward" id="icon-right" style="max-width: 50%; margin-top: 0.5em" src="../../assets/imgs/icon_family.png" />
-        <img *ngIf="familyShare.badgeCount === 0" routerLink="/family" routerDirection="forward" id="icon-right" style="max-width: 70%; margin-top: 0.5em" src="../../assets/imgs/icon_family.png" />
-        <ion-badge *ngIf="familyShare.badgeCount > 0" slot="end" color="danger" style="margin-left: -0.3em">{{ familyShare.badgeCount }}</ion-badge> -->
-      </div>
-    </div>
-  </ion-toolbar>
-<!-- 
-  <div class="parent">
-    <ion-segment color="warning" (ionChange)="tab2ResultType($event)" [value]="tab2ModeSelected" style="margin-left: 0.2em; margin-right: 0.2em;">
-      <ion-segment-button value="daily" mode="md">
-        <ion-label>{{ 'TAB2.daily' | translate }}</ion-label>
-      </ion-segment-button>
-      <ion-segment-button value="weekly" mode="md">
-        <ion-label>{{ 'TAB2.weekly' | translate }}</ion-label>
-      </ion-segment-button>
-      <ion-segment-button value="monthly" mode="md">
-        <ion-label>{{ 'TAB2.monthly' | translate }}</ion-label>
-      </ion-segment-button>
-    </ion-segment>
-  </div> -->
-</ion-header>
+<app-header [showLogo]="true"></app-header>
 
 <ion-content *ngIf="tab2ModeSelected === 'daily'">
   <div>

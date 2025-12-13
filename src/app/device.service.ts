@@ -20,7 +20,8 @@ export class DeviceService {
   devId = '';
   userNickname: string = '';
   userPhoto: SafeResourceUrl | null = null;
-  isOnline = 0;
+  private isOnlineSubject = new BehaviorSubject<boolean>(false);
+  public isOnline$ = this.isOnlineSubject.asObservable();
   isMotionBedConnected = false;
   isAndroid = this.platform.is('android');
   devIdSubject = new BehaviorSubject<string>(this.devId);
@@ -180,6 +181,15 @@ export class DeviceService {
 
   getCurrentDevId(): Observable<string> {
     return this.devIdSubject.asObservable();
+  }
+
+  get isOnline(): boolean {
+    return this.isOnlineSubject.value;
+  }
+
+  setOnline(status: boolean) {
+    console.log('[DeviceService] setOnline:', status);
+    this.isOnlineSubject.next(status);
   }
 
   async initNotifications() {

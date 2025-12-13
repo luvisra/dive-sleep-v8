@@ -267,9 +267,9 @@ export class MqttService {
     console.log('[MQTT Handle] Parsed value:', JSON.stringify(value, null, 2));
     console.log('[MQTT Handle] value type:', typeof value);
 
-    // ✅ 모든 MQTT 메시지 수신 시 isOnline 증가 (UI 상태 업데이트용)
-    this.deviceService.isOnline++;
-    console.log('[MQTT Handle] isOnline 상태 업데이트:', this.deviceService.isOnline);
+    // ✅ 모든 MQTT 메시지 수신 시 온라인 상태를 true로 설정
+    this.deviceService.setOnline(true);
+    console.log('[MQTT Handle] 온라인 상태 업데이트: true');
 
     if (value.isMotionBed !== undefined) {
       this.deviceService.isMotionBedConnected = value.isMotionBed === 1;

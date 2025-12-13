@@ -211,9 +211,9 @@ export class Tab1Page implements OnInit, AfterViewInit {
   doRefresh(event: any) {
     console.log('[Refresh] ========== doRefresh() 호출 ==========');
 
-    // ✅ isOnline을 0으로 설정하여 UI 갱신 (응답 받으면 자동으로 증가)
-    this.deviceService.isOnline = 0;
-    console.log('[Refresh] isOnline을 0으로 초기화');
+    // ✅ 먼저 오프라인으로 설정 (ping 응답 받으면 자동으로 온라인으로 변경됨)
+    this.deviceService.setOnline(false);
+    console.log('[Refresh] 온라인 상태를 false로 초기화');
 
     // ✅ IoT Policy 재연결
     this.mqttService.attachDevToIotPolicy();
@@ -300,10 +300,11 @@ export class Tab1Page implements OnInit, AfterViewInit {
       console.log('[Check Alive] refreshGoqualDeviceList() 호출');
       this.refreshGoqualDeviceList();
 
-      // ✅ 타임아웃 설정: 5초 후에도 응답 없으면 로그 출력
+      // ✅ 타임아웃 설정: 5초 후에도 응답 없으면 오프라인으로 설정
       this.deviceCheckTimer = setTimeout(() => {
-        if (this.deviceService.isOnline === 0) {
-          console.log('[Check Alive] ⚠️ 타임아웃: 5초 동안 응답 없음');
+        if (!this.deviceService.isOnline) {
+          console.log('[Check Alive] ⚠️ 타임아웃: 5초 동안 응답 없음 - 디바이스 오프라인');
+          this.deviceService.setOnline(false);
         }
       }, 5000);
 

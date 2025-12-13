@@ -9,6 +9,7 @@ import { ReactiveFormsModule} from '@angular/forms';
 import { NgCircleProgressModule } from 'ng-circle-progress';
 import { TranslateModule } from '@ngx-translate/core';
 import { SleepStageChartComponent } from '../components/sleep-stage-chart/sleep-stage-chart.component';
+import { HeaderComponentModule } from '../components/header/header.module';
 
 @NgModule({
   imports: [
@@ -18,7 +19,7 @@ import { SleepStageChartComponent } from '../components/sleep-stage-chart/sleep-
     TranslateModule,
     NgChartsModule,
     ReactiveFormsModule,
-
+    HeaderComponentModule,
     NgCircleProgressModule.forRoot({
       // these are default values if not defined
       radius: 100,

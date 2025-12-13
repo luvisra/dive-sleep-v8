@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { DeviceService } from '../../device.service';
 import { FamilyShareService } from '../../family-share.service';
 
@@ -6,6 +6,7 @@ import { FamilyShareService } from '../../family-share.service';
   selector: 'app-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: false
 })
 export class HeaderComponent {

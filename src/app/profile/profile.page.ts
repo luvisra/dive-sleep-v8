@@ -312,7 +312,7 @@ export class ProfilePage implements OnInit {
       this.sleepService.initFamilyShareSleepResults();
       this.sleepService.sleepDayResultArray = [];
       this.deviceService.devId = '';
-      this.deviceService.isOnline = 0;
+      this.deviceService.setOnline(false);
       this.deviceService.userPhoto = null;
       this.deviceService.isMotionBedConnected = false;
       this.deviceService.userNickname = '';

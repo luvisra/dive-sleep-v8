@@ -68,9 +68,11 @@ export class Tab4Page implements OnInit {
       this.mqttService.sendMessageToDevice('ping');
       this.refreshGoqualDeviceList();
 
+      // ✅ 타임아웃 설정: 5초 후에도 응답 없으면 오프라인으로 설정
       this.deviceCheckTimer = setTimeout(() => {
-        if (this.deviceService.isOnline === 0) {
-          console.log('[Check Alive] ⚠️ 타임아웃: 5초 동안 응답 없음');
+        if (!this.deviceService.isOnline) {
+          console.log('[Check Alive] ⚠️ 타임아웃: 5초 동안 응답 없음 - 디바이스 오프라인');
+          this.deviceService.setOnline(false);
         }
       }, 5000);
     }).catch(error => console.error('[Check Alive] 네트워크 확인 에러:', error));
@@ -99,7 +101,7 @@ export class Tab4Page implements OnInit {
           text: 'OK',
           cssClass: 'primary',
           handler: () => {
-            if (this.deviceService.isOnline === 1) {
+            if (this.deviceService.isOnline) {
               console.log('do factoryReset.');
               this.mqttService.sendMessageToDevice('factory');
               this.utilService.presentLoadingWithOptions('초기화를 진행중입니다. 잠시만 기다려주세요..', 10000);

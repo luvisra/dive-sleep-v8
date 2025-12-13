@@ -37,9 +37,20 @@ ion-toolbar {
 }
 
 #icon-middle {
-  max-height: 1.2rem;
+  max-height: 1.44rem;
   max-width: auto;
   margin-top: 0.12em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  img {
+    max-height: 1.44rem;
+    max-width: 100%;
+    height: auto;
+    width: auto;
+    object-fit: contain;
+  }
 }
 
 #icon-left {
