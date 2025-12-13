@@ -95,25 +95,11 @@
       </ion-select>
     </ion-button>
   </div>
-  <!-- <div style="position: absolute; margin-top: 0.5em;">
-    <p class="chart-label-left" style="margin-top: 0.5em;">{{ 'TAB2.wake' | translate }}</p>
-    <p class="chart-label-left">{{ 'TAB2.sleepStage1' | translate }}</p>
-    <p class="chart-label-left">{{ 'TAB2.sleepStage2' | translate }}</p>
-    <p class="chart-label-left2">{{ 'TAB2.sleepStage3' | translate }}</p>
-    <p class="chart-label-left2">{{ 'TAB2.tossing' | translate }}</p>
-  </div> -->
-  
-  <div class="chart">
-    <canvas baseChart width="400" height="250" [data]="sleepStatusChartData" [labels]="sleepStatusChartLabels"
-      [options]="sleepStatusChartOptions"  [legend]="sleepStatusChartLegend" [type]="sleepStatusChartType"
-      [plugins]="sleepStatusChartPlugins"></canvas>
-  </div>
-
-  <div style="width: 80%; margin-left: 3.0em;">
-    <canvas baseChart style="display: flex; margin-top: -3.2em;" height="28rem" [data]="impulseChartData" [labels]="impulseChartLabels" [options]="impulseChartOptions"
-      [plugins]="impulseChartPlugins" [legend]="impulseChartLegend" [type]="impulseChartType" >
-    </canvas>
-  </div>
+  <!-- Sleep Stage Chart Component -->
+  <app-sleep-stage-chart
+    [sleepData]="sleepAnalysis.sleepDayResult.sleep || []"
+    [impulseData]="sleepAnalysis.sleepDayResult.impulse || []">
+  </app-sleep-stage-chart>
   <!-- four grids 1 -->
   <div id="four-column-grids">
     <ion-grid>

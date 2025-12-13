@@ -69,6 +69,10 @@ export class Tab2Page implements OnInit, AfterViewInit {
   customForm!: FormGroup;
 
   uiData = new Tab2DayUiSleepData();
+
+  // Weekly/Monthly 차트에서 사용하는 플러그인 (datalabels 없이)
+  public sleepStatusChartPlugins: any[] = [];
+
   uiStatData = {
     /* 주간 */
     weekAvgScore: '0',
@@ -92,59 +96,6 @@ export class Tab2Page implements OnInit, AfterViewInit {
     monthAvgFeeling: '0',
   };
 
-  public sleepStatusChartData: ChartConfiguration['data'] = {
-    datasets: [
-      {
-        data: [],
-        label: 'Sleep',
-        type: 'bar',
-        borderColor: '#3478F5',
-        backgroundColor: 'rgba(52, 120, 245, 0.2)',
-      },
-      {
-        data: [],
-        label: 'Away',
-        type: 'line',
-        borderColor: '#3478F5',
-        backgroundColor: 'rgba(52, 120, 245, 0.2)',
-      }
-    ],
-    labels: []
-  };
-  public sleepStatusChartLabels: string[] = [];
-  public sleepStatusChartType: ChartType = 'bar';
-  public sleepStatusChartLegend = false;
-  public sleepStatusChartPlugins = [ChartDataLabels];
-
-  public sleepStatusChartOptions: any = {
-    responsive: true,
-    scales: {
-      x: {
-        ticks: {
-          color: '#3c3c3d',
-        },
-        grid: {
-          display: false,
-        },
-      },
-      y: {
-        ticks: {
-          color: '#3c3c3d',
-        },
-        grid: {
-          display: false,
-        },
-      },
-    },
-    plugins: {
-      legend: {
-        display: false,
-      },
-      tooltip: {
-        enabled: false,
-      },
-    },
-  };
 
   public respiratoryChartData: ChartConfiguration['data'] = {
     datasets: [
@@ -370,28 +321,24 @@ export class Tab2Page implements OnInit, AfterViewInit {
 
   initCharts() {
     this.ngZone.run(() => {
-      this.sleepStatusChartData.datasets.forEach(dataset => {
+      this.respiratoryChartData.datasets.forEach((dataset: any) => {
         dataset.data = [];
       });
-      this.respiratoryChartData.datasets.forEach(dataset => {
+      this.heartrateChartData.datasets.forEach((dataset: any) => {
         dataset.data = [];
       });
-      this.heartrateChartData.datasets.forEach(dataset => {
+      this.snoringChartData.datasets.forEach((dataset: any) => {
         dataset.data = [];
       });
-      this.snoringChartData.datasets.forEach(dataset => {
+      this.apneaChartData.datasets.forEach((dataset: any) => {
         dataset.data = [];
       });
-      this.apneaChartData.datasets.forEach(dataset => {
+      this.motionBedChartData.datasets.forEach((dataset: any) => {
         dataset.data = [];
       });
-      this.motionBedChartData.datasets.forEach(dataset => {
+      this.impulseChartData.datasets.forEach((dataset: any) => {
         dataset.data = [];
       });
-      this.impulseChartData.datasets.forEach(dataset => {
-        dataset.data = [];
-      });
-      this.sleepStatusChartData.labels = [];
       this.respiratoryChartData.labels = [];
       this.heartrateChartData.labels = [];
       this.snoringChartData.labels = [];
@@ -687,17 +634,10 @@ export class Tab2Page implements OnInit, AfterViewInit {
       this.uiData.apneaArray = result.apnea?.map((item: any) => item.apnea || 0) ?? [];
       this.uiData.motionBedArray = result.motionBed?.map((item: any) => item.motionBed || 0) ?? [];
       
-      // ✅ 차트 데이터 실제 할당
+      // ✅ 차트 데이터 실제 할당 (sleep chart는 컴포넌트에서 처리)
       if (sArray.length > 0) {
         console.log('[Tab2] 📈 차트 데이터 할당 시작');
-        
-        // sleepStatusChart에 데이터 할당
-        if (this.sleepStatusChartData.datasets[0]) {
-          this.sleepStatusChartData.datasets[0].data = sArray;
-        }
-        this.sleepStatusChartLabels = tArray.map((t: string) => t.substring(11, 16)); // HH:MM 형식
-        console.log('[Tab2] sleepStatusChart 데이터 길이:', sArray.length);
-        
+
         // impulseChart에 데이터 할당
         if (result.impulse && result.impulse.length > 0) {
           const impulseData = result.impulse.map((item: any) => item.impulse || 0);
@@ -708,7 +648,7 @@ export class Tab2Page implements OnInit, AfterViewInit {
           this.impulseChartLabels = impulseLabels;
           console.log('[Tab2] impulseChart 데이터 길이:', impulseData.length);
         }
-        
+
         // respiratoryChart는 숫자 배열이므로 tArray를 labels로 사용
         if (rArray.length > 0) {
           if (this.respiratoryChartData.datasets[0]) {
@@ -718,7 +658,7 @@ export class Tab2Page implements OnInit, AfterViewInit {
           this.respiratoryChartLabels = tArray.map((t: string) => t.substring(11, 16)).slice(0, rArray.length);
           console.log('[Tab2] respiratoryChart 데이터 길이:', rArray.length);
         }
-        
+
         // heartrateChart도 숫자 배열이므로 tArray를 labels로 사용
         if (hArray.length > 0) {
           if (this.heartrateChartData.datasets[0]) {
@@ -728,7 +668,7 @@ export class Tab2Page implements OnInit, AfterViewInit {
           this.heartrateChartLabels = tArray.map((t: string) => t.substring(11, 16)).slice(0, hArray.length);
           console.log('[Tab2] heartrateChart 데이터 길이:', hArray.length);
         }
-        
+
         console.log('[Tab2] ✅ 차트 데이터 할당 완료');
       } else {
         console.log('[Tab2] ⚠️ sleep 데이터가 비어있어 차트를 그릴 수 없습니다');

@@ -7,8 +7,8 @@ import { Tab2Page } from './tab2.page';
 import { NgChartsModule } from 'ng2-charts';
 import { ReactiveFormsModule} from '@angular/forms';
 import { NgCircleProgressModule } from 'ng-circle-progress';
-// REMOVED: 
 import { TranslateModule } from '@ngx-translate/core';
+import { SleepStageChartComponent } from '../components/sleep-stage-chart/sleep-stage-chart.component';
 
 @NgModule({
   imports: [
@@ -18,7 +18,7 @@ import { TranslateModule } from '@ngx-translate/core';
     TranslateModule,
     NgChartsModule,
     ReactiveFormsModule,
-    
+
     NgCircleProgressModule.forRoot({
       // these are default values if not defined
       radius: 100,
@@ -34,6 +34,6 @@ import { TranslateModule } from '@ngx-translate/core';
     }),
     RouterModule.forChild([{ path: '', component: Tab2Page }])
   ],
-  declarations: [Tab2Page]
+  declarations: [Tab2Page, SleepStageChartComponent]
 })
 export class Tab2PageModule {}
