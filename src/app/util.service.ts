@@ -136,9 +136,13 @@ export class UtilService {
   }
 
   dateUtcToKst(utcDate: Date): string {
-    const dateInKst = new Date(utcDate.getTime() - (utcDate.getTimezoneOffset() * 60 * 1000));
-    const dateInKstIso = dateInKst.toISOString();
-    return dateInKstIso;
+    // UTC 시간에 9시간(KST offset)을 더함
+    const kstTime = new Date(utcDate.getTime() + (9 * 60 * 60 * 1000));
+
+    // ISO 포맷으로 변환 후 밀리초와 Z 제거
+    // 예: "2021-12-01T15:29:19.000Z" -> "2021-12-01T15:29:19"
+    const isoString = kstTime.toISOString();
+    return isoString.substring(0, 19); // YYYY-MM-DDTHH:mm:ss 포맷
   }
 
   cloneObject(obj: any) {

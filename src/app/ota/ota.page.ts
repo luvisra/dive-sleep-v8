@@ -4,8 +4,8 @@ import { getProperties } from 'aws-amplify/storage';
 import { MqttService } from '../mqtt.service';
 import { UtilService } from '../util.service';
 import { DeviceService } from '../device.service';
-import { AlertController } from '@ionic/angular';
-import { timer } from 'rxjs';
+import { AlertController, IonicSafeString } from '@ionic/angular';
+import { timer, firstValueFrom } from 'rxjs';
 import { GLOBAL } from '../static_config';
 import { TranslateService } from '@ngx-translate/core';
 
@@ -203,16 +203,9 @@ export class OtaPage implements OnInit {
         return;
       }
 
-      // UTC 시간을 KST로 변환
+      // UTC 시간을 KST로 변환 (이미 YYYY-MM-DDTHH:mm:ss 포맷으로 반환됨)
       this.serverVersionString = this.utilService.dateUtcToKst(serverVersionDate);
       console.log('Server version (KST):', this.serverVersionString);
-
-      // 마지막 4자리 제거 (초 단위 제거)
-      this.serverVersionString = this.serverVersionString.substring(
-        0,
-        this.serverVersionString.length - 4
-      );
-      console.log('Server version (trimmed):', this.serverVersionString);
 
       // MQTT에서 받은 디바이스 버전과 서버 버전의 시간 차이 계산 (초 단위)
       const diff = this.utilService.timeDiff(
@@ -220,8 +213,8 @@ export class OtaPage implements OnInit {
         this.serverVersionString
       );
 
-      // 버전 표시용 문자열 (날짜 부분만)
-      const targetVersion = this.serverVersionString.substring(0, this.serverVersionString.length - 10);
+      // 버전 표시용 문자열 (날짜 부분만 - YYYY-MM-DD)
+      const targetVersion = this.serverVersionString.substring(0, 10);
       console.log('Target version (display):', targetVersion);
       console.log('Firmware version time diff (seconds):', diff);
 
@@ -357,24 +350,37 @@ export class OtaPage implements OnInit {
   }
 
   async checkBrandNewFirmwareIsAvailable(ver: any) {
+    console.log('checkBrandNewFirmwareIsAvailable called with ver:', ver);
+    
+    // ver가 undefined이거나 비어있으면 기본값 사용
+    const version = ver || '알 수 없음';
+    
+    // 먼저 메시지 문자열을 완성
+    const messageText = '펌웨어 업데이트가 가능합니다. (버전: ' + version + ') 계속 하시겠습니까?';
+    console.log('Message text:', messageText);
+    
     const alert = await this.alertController.create({
-      header: this.otaText,
-      message: this.isAvailableMessage1Text + ver + this.isAvailableMessage2Text,
+      header: '펌웨어 업데이트',
+      message: messageText,
+      cssClass: 'ota-alert',
       buttons: [
         {
-          text: this.cancelText,
+          text: '취소',
           role: 'cancel',
-          cssClass: 'light',
+          cssClass: 'alert-button-cancel',
           handler: blah => {
             this.clearEvents();
           }
         },
         {
-          text: this.okText,
-          cssClass: 'light',
+          text: '확인',
+          cssClass: 'alert-button-confirm',
           handler: () => {
             console.log('Confirm Okay');
-            this.utilService.presentLoadingWithOptions(this.pleaseWaitText, 12000);
+            this.utilService.presentLoadingWithOptions(
+              '펌웨어 업데이트를 준비 중입니다. 잠시만 기다려 주세요.',
+              12000
+            );
             this.mqttService.pubMqtt(this.deviceService.devId, 'ota', null);
             this.percentValue = 0;
           }
@@ -382,21 +388,29 @@ export class OtaPage implements OnInit {
       ]
     });
 
+    console.log('Alert object:', alert);
     await alert.present();
   }
 
   async checkBrandNewBetaFirmwareIsAvailable(ver: any) {
+    console.log('checkBrandNewBetaFirmwareIsAvailable called with ver:', ver);
+    
+    // ver가 undefined이거나 비어있으면 기본값 사용
+    const version = ver || '알 수 없음';
+    
+    // 먼저 메시지 문자열을 완성
+    const messageText = 'BETA 펌웨어 업데이트가 가능합니다.<br>(버전: <strong>' + version + '</strong>)<br>계속 하시겠습니까?';
+    console.log('Beta message text:', messageText);
+    
     const alert = await this.alertController.create({
       header: 'BETA 펌웨어 업데이트',
-      message:
-        'BETA 펌웨어 업데이트가 가능합니다.<br>(버전: <strong>' +
-        ver +
-        '</strong>)<br>계속 하시겠습니까?',
+      message: messageText,
+      cssClass: 'ota-alert',
       buttons: [
         {
           text: '취소',
           role: 'cancel',
-          cssClass: 'light',
+          cssClass: 'alert-button-cancel',
           handler: blah => {
             console.log('Confirm Cancel: blah');
             this.clearEvents();
@@ -404,11 +418,11 @@ export class OtaPage implements OnInit {
         },
         {
           text: '확인',
-          cssClass: 'light',
+          cssClass: 'alert-button-confirm',
           handler: () => {
             console.log('Confirm Okay');
             this.utilService.presentLoadingWithOptions(
-              'BETA 펌웨어 업데이트를 준비 중입니다.<br>잠시만 기다려 주세요.',
+              'BETA 펌웨어 업데이트를 준비 중입니다. 잠시만 기다려 주세요.',
               12000
             );
             this.mqttService.pubMqtt(this.deviceService.devId, 'beta_ota', null);

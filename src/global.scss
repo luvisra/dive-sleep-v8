@@ -68,6 +68,58 @@ body {
   }
 }
 
+/* OTA Alert 스타일 */
+.ota-alert {
+  --background: #1C1C1D;
+  --color: #ffffff;
+  
+  .alert-wrapper {
+    --background: #1C1C1D;
+  }
+  
+  .alert-head,
+  .alert-title {
+    color: #ffffff !important;
+  }
+  
+  .alert-message {
+    color: #aaaaaa !important;
+    
+    strong {
+      color: #ffffff !important;
+      font-weight: bold;
+    }
+  }
+  
+  .alert-button-cancel {
+    color: #aaaaaa !important;
+
+    &:hover, &.ion-focused {
+      background-color: rgba(170, 170, 170, 0.1);
+      color: #ffffff !important;
+    }
+
+    &:active, &.ion-activated {
+      background-color: rgba(170, 170, 170, 0.2);
+      color: #ffffff !important;
+    }
+  }
+  
+  .alert-button-confirm {
+    color: #3478F5 !important;
+
+    &:hover, &.ion-focused {
+      background-color: rgba(52, 120, 245, 0.1);
+      color: #ffffff !important;
+    }
+
+    &:active, &.ion-activated {
+      background-color: rgba(52, 120, 245, 0.2);
+      color: #ffffff !important;
+    }
+  }
+}
+
 /* ion-select 팝업 (alert/action-sheet) 글자색 white 설정 */
 .alert-wrapper,
 .action-sheet-wrapper {
