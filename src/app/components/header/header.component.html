@@ -2,21 +2,13 @@
   <ion-toolbar class="ion-no-padding">
     <div class="parent">
       <div class="start-slot">
-        <ion-buttons slot="start">
-          <ion-back-button *ngIf="showBackButton"></ion-back-button>
-        </ion-buttons>
-        <div *ngIf="deviceService.isOnline === 0 && showDeviceStatus" class="device-status-container">
-          <img id="icon-left" src="../../assets/imgs/navibar_sensor_offline.png"
-            routerLink="/device-registration" routerDirection="forward" />
-          <ion-label class="status-label" color="warning">{{
-            'COMMON.scanning' | translate }}</ion-label>
-        </div>
-        <div *ngIf="deviceService.isOnline > 0 && showDeviceStatus" class="device-status-container">
-          <img id="icon-left" src="../../assets/imgs/navibar_sensor_online.png"
-            routerLink="/device-registration" routerDirection="forward" />
-          <ion-label class="status-label" color="warning">{{
-            'COMMON.connected' | translate }}</ion-label>
-        </div>
+      <div>
+        <img *ngIf="deviceService.isOnline === 0" id="icon-left" src="../../assets/imgs/navibar_sensor_offline.png"
+        routerLink="/device-registration" routerDirection="forward"/>
+        <ion-label *ngIf="deviceService.isOnline === 0" style="margin-left: -0.7em; margin-top: 1.0em; position: absolute; font-size: 0.8rem;" color="warning">{{ 'COMMON.scanning' | translate }}</ion-label>
+        <img *ngIf="deviceService.isOnline > 0" id="icon-left" src="../../assets/imgs/navibar_sensor_online.png"
+        routerLink="/device-registration" routerDirection="forward"/><ion-label *ngIf="deviceService.isOnline > 0" style="margin-left: -0.7em; margin-top: 1.0em; position: absolute; font-size: 0.8rem;" color="warning">{{ 'COMMON.connected' | translate }}</ion-label>
+      </div>
       </div>
       <div class="middle-slot">
         <img *ngIf="showLogo" id="icon-middle" src="../../assets/imgs/dive_logo_small.png" />

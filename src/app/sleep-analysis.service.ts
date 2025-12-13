@@ -447,9 +447,41 @@ export class SleepAnalysisService {
     return res;
   }
 
-  updateSleepFeeling(value: number) {
+  async updateSleepFeeling(value: number) {
     this.feeling = value;
-    this.apiService.UpdateDiveSleepData({ dev_id: this.authService.user?.username || '',
+
+    // Use phoneNumber from authService (전화번호)
+    let dev_id = this.authService.phoneNumber;
+    console.log('[DEBUG] updateSleepFeeling - phoneNumber from authService:', dev_id);
+
+    // If phoneNumber not available yet, try localStorage
+    if (!dev_id) {
+      dev_id = localStorage.getItem('phoneNumber');
+      console.log('[DEBUG] updateSleepFeeling - phoneNumber from localStorage:', dev_id);
+    }
+
+    // If still no phoneNumber, query dive-sleep-userinfo table
+    if (!dev_id && this.authService.user?.username) {
+      console.log('[DEBUG] updateSleepFeeling - No phoneNumber, querying DB...');
+      const userInfo = await this.apiService.GetDiveSleepUserinfo(this.authService.user.username);
+      console.log('[DEBUG] updateSleepFeeling - userInfo from DB:', userInfo);
+
+      if (userInfo && userInfo.dev_id) {
+        dev_id = userInfo.dev_id;
+        console.log('[DEBUG] updateSleepFeeling - Using dev_id from DB:', dev_id);
+        this.authService.phoneNumber = dev_id;
+        localStorage.setItem('phoneNumber', dev_id);
+      }
+    }
+
+    if (!dev_id) {
+      console.log('[DEBUG] updateSleepFeeling - No dev_id available');
+      return;
+    }
+
+    console.log('[DEBUG] updateSleepFeeling - Final dev_id to use:', dev_id);
+
+    this.apiService.UpdateDiveSleepData({ dev_id: dev_id,
       time_stamp: this.sleepDayResult.wakeTime || '',
       mac_addr: this.deviceService.devId,
       feeling: value
@@ -468,7 +500,12 @@ export class SleepAnalysisService {
 
 
   async findDiveSleepResultsByDate(date: string) {
+    console.log('[DEBUG] findDiveSleepResultsByDate - input date:', date);
+    console.log('[DEBUG] findDiveSleepResultsByDate - sleepDayResultArray:', this.sleepDayResultArray);
+    console.log('[DEBUG] findDiveSleepResultsByDate - sleepDayResultArray length:', this.sleepDayResultArray?.length);
+
     if (date === '' || this.sleepDayResultArray === undefined) {
+      console.log('[DEBUG] findDiveSleepResultsByDate - early return: date empty or array undefined');
       return;
     }
 
@@ -477,7 +514,9 @@ export class SleepAnalysisService {
     let retValue = 0;
     console.log(this.sleepDayResultArray);
     this.sleepDayResultArray.forEach((dayInfo, index) => {
+      console.log('[DEBUG] checking dayInfo.time_stamp:', dayInfo.time_stamp, 'against date:', date);
       if (dayInfo.time_stamp.includes(date)) {
+        console.log('[DEBUG] MATCH FOUND! dayInfo:', dayInfo);
         sleepData = JSON.parse(this.sleepDayResultArray[index].data);
         this.sleepDayList.push(sleepData);
         if (this.sleepDayResultArray[index].hasOwnProperty('feeling')) {
@@ -489,10 +528,10 @@ export class SleepAnalysisService {
 
     if (retValue > 0) {
       this.sleepDayResult = sleepData;
-      console.log('data found, draw the ui.', this.sleepDayResult);
+      console.log('[DEBUG] data found, draw the ui.', this.sleepDayResult);
       this.dataReceiveCompletedSubject.next(2);
     } else if (retValue === 0) {
-      console.log('data not found.');
+      console.log('[DEBUG] data not found for date:', date);
       this.tab2DayUiSubject.next(false);
     }
 
@@ -651,16 +690,52 @@ export class SleepAnalysisService {
     return sleepScore;
   }
   async querySleepDataMonth(username: string, year: number, month: number, flag: boolean) {
+    console.log('[DEBUG] querySleepDataMonth - username:', username, 'year:', year, 'month:', month, 'flag:', flag);
+
     if (username === undefined || username === null) {
+      console.log('[DEBUG] querySleepDataMonth - username is undefined or null, returning');
       return;
     }
+
+    // Use phoneNumber from authService (전화번호) instead of username (UUID)
+    let dev_id = this.authService.phoneNumber;
+    console.log('[DEBUG] querySleepDataMonth - phoneNumber from authService:', dev_id);
+
+    // If phoneNumber not available yet, try localStorage
+    if (!dev_id) {
+      dev_id = localStorage.getItem('phoneNumber');
+      console.log('[DEBUG] querySleepDataMonth - phoneNumber from localStorage:', dev_id);
+    }
+
+    // If still no phoneNumber, query dive-sleep-userinfo table
+    if (!dev_id) {
+      console.log('[DEBUG] querySleepDataMonth - No phoneNumber in authService or localStorage, querying DB...');
+      const userInfo = await this.apiService.GetDiveSleepUserinfo(username);
+      console.log('[DEBUG] querySleepDataMonth - userInfo from DB:', userInfo);
+
+      if (userInfo && userInfo.dev_id) {
+        dev_id = userInfo.dev_id;
+        console.log('[DEBUG] querySleepDataMonth - Using dev_id from DB:', dev_id);
+        // Update authService and localStorage for future use
+        this.authService.phoneNumber = dev_id;
+        localStorage.setItem('phoneNumber', dev_id);
+      } else {
+        console.log('[DEBUG] querySleepDataMonth - No dev_id found in DB for username:', username);
+        return;
+      }
+    }
+
+    console.log('[DEBUG] querySleepDataMonth - Final dev_id to use:', dev_id);
+
     // const startDate = moment().subtract(1, 'day').format('YYYY-MM-DD');
     // const endDate = moment().add(1, 'day').format('YYYY-MM-DD');
     const targetDate = year + this.utilService.pad(month, 2) + '01';
     const startDate = moment(targetDate, 'YYYYMMDD').subtract(0, 'month').format('YYYY-MM-DD');
     const endDate = moment(targetDate, 'YYYYMMDD').add(1, 'month').format('YYYY-MM-DD');
 
-    const res = await this.apiService.QueryDiveSleepData(username, startDate, endDate);
+    console.log('[DEBUG] querySleepDataMonth - querying from', startDate, 'to', endDate);
+    const res = await this.apiService.QueryDiveSleepData(dev_id, startDate, endDate);
+    console.log('[DEBUG] querySleepDataMonth - received', res.items?.length || 0, 'items');
     console.log('querySleepDataMonth', year, month, startDate, endDate, res.items);
 
     if (!flag) {
@@ -681,6 +756,7 @@ export class SleepAnalysisService {
       this.sleepDayResultArray = res.items;
     }
 
+    console.log('[DEBUG] querySleepDataMonth - sleepDayResultArray now has', this.sleepDayResultArray?.length || 0, 'items');
     return res;
   }
 
@@ -691,13 +767,42 @@ export class SleepAnalysisService {
       console.log('username', username);
     }
 
+    // Use phoneNumber from authService (전화번호) instead of username (UUID)
+    let dev_id = this.authService.phoneNumber;
+    console.log('[DEBUG] queryFamilyShareSleepDataMonth - phoneNumber from authService:', dev_id);
+
+    // If phoneNumber not available yet, try localStorage
+    if (!dev_id) {
+      dev_id = localStorage.getItem('phoneNumber');
+      console.log('[DEBUG] queryFamilyShareSleepDataMonth - phoneNumber from localStorage:', dev_id);
+    }
+
+    // If still no phoneNumber, query dive-sleep-userinfo table
+    if (!dev_id) {
+      console.log('[DEBUG] queryFamilyShareSleepDataMonth - No phoneNumber, querying DB...');
+      const userInfo = await this.apiService.GetDiveSleepUserinfo(username);
+      console.log('[DEBUG] queryFamilyShareSleepDataMonth - userInfo from DB:', userInfo);
+
+      if (userInfo && userInfo.dev_id) {
+        dev_id = userInfo.dev_id;
+        console.log('[DEBUG] queryFamilyShareSleepDataMonth - Using dev_id from DB:', dev_id);
+        this.authService.phoneNumber = dev_id;
+        localStorage.setItem('phoneNumber', dev_id);
+      } else {
+        console.log('[DEBUG] queryFamilyShareSleepDataMonth - No dev_id found in DB');
+        return;
+      }
+    }
+
+    console.log('[DEBUG] queryFamilyShareSleepDataMonth - Final dev_id to use:', dev_id);
+
     // const startDate = moment().subtract(1, 'day').format('YYYY-MM-DD');
     // const endDate = moment().add(1, 'day').format('YYYY-MM-DD');
     const targetDate = year + this.utilService.pad(month, 2) + '01';
     const startDate = moment(targetDate, 'YYYYMMDD').subtract(0, 'month').format('YYYY-MM-DD');
     const endDate = moment(targetDate, 'YYYYMMDD').add(1, 'month').format('YYYY-MM-DD');
 
-    const res = await this.apiService.QueryDiveSleepData(username, startDate, endDate);
+    const res = await this.apiService.QueryDiveSleepData(dev_id, startDate, endDate);
     console.log('queryFamilyShareSleepDataMonth', year, month, startDate, endDate, res.items);
 
     if (!flag) {

@@ -210,20 +210,48 @@ export class Tab1Page implements OnInit, AfterViewInit {
 
   doRefresh(event: any) {
     console.log('[Refresh] ========== doRefresh() 호출 ==========');
-    
+
     // ✅ isOnline을 0으로 설정하여 UI 갱신 (응답 받으면 자동으로 증가)
     this.deviceService.isOnline = 0;
     console.log('[Refresh] isOnline을 0으로 초기화');
-    
+
     // ✅ IoT Policy 재연결
     this.mqttService.attachDevToIotPolicy();
-    
+
     // ✅ Device 상태 체크 (구독은 유지, ping만 전송)
     this.checkDeviceIsAlive();
 
     if (this.authService.user && this.authService.user.username) {
-      this.sleepAnalysis.querySleepDataMonth(this.authService.user.username, moment().year(), moment().month() + 1, false).then(() => {
-        this.sleepAnalysis.dataReceiveCompletedSubject.next(1);
+      this.sleepAnalysis.querySleepDataMonth(this.authService.user.username, moment().year(), moment().month() + 1, false).then((res) => {
+        console.log('[Refresh] querySleepDataMonth completed, res:', res);
+
+        // findDiveSleepResultsByDate는 Tab2용이므로 호출
+        this.sleepAnalysis.findDiveSleepResultsByDate(moment().format('YYYY-MM-DD'));
+
+        // Tab1 UI는 sleepDayResultArray에서 가장 최근 데이터를 찾아서 업데이트
+        if (this.sleepAnalysis.sleepDayResultArray && this.sleepAnalysis.sleepDayResultArray.length > 0) {
+          console.log('[Refresh] sleepDayResultArray has', this.sleepAnalysis.sleepDayResultArray.length, 'items');
+
+          // 배열을 역순으로 순회하여 가장 최근 유효한 데이터 찾기
+          for (let i = this.sleepAnalysis.sleepDayResultArray.length - 1; i >= 0; i--) {
+            const item = this.sleepAnalysis.sleepDayResultArray[i];
+            if (item && item.data) {
+              const parsedData = JSON.parse(item.data);
+              console.log('[Refresh] Found recent data at index', i, 'time_stamp:', item.time_stamp);
+              console.log('[Refresh] Processing data:', parsedData);
+              // Tab1 UI 업데이트
+              this.ngZone.run(() => {
+                this.processRecentSleepUi(parsedData);
+              });
+              break;
+            }
+          }
+        } else {
+          console.log('[Refresh] No data in sleepDayResultArray');
+        }
+
+        // Tab1 UI 업데이트 Subject 트리거
+        this.sleepAnalysis.tab1UiSubject.next(true);
       });
     }
 
@@ -335,14 +363,35 @@ export class Tab1Page implements OnInit, AfterViewInit {
 
     if (this.authService.user !== null && this.authService.user !== undefined) {
       this.sleepAnalysis.querySleepDataMonth(this.authService.user.username, thisDate.year(), thisDate.month() + 1, false).then((res) => {
-        if (res && res.items && res.items.length > 0) {
-          const lastItem = res.items[res.items.length - 1];
-          if (lastItem && lastItem.data) {
-            this.sleepAnalysis.sleepDayResult = JSON.parse(lastItem.data);
-          }
-        }
+        console.log('[Tab1 ionViewWillEnter] querySleepDataMonth completed, res:', res);
+
+        // findDiveSleepResultsByDate는 Tab2용이므로 호출
         this.sleepAnalysis.findDiveSleepResultsByDate(thisDate.format('YYYY-MM-DD'));
-        this.sleepAnalysis.dataReceiveCompletedSubject.next(1);
+
+        // Tab1 UI는 sleepDayResultArray에서 가장 최근 데이터를 찾아서 업데이트
+        if (this.sleepAnalysis.sleepDayResultArray && this.sleepAnalysis.sleepDayResultArray.length > 0) {
+          console.log('[Tab1 ionViewWillEnter] sleepDayResultArray has', this.sleepAnalysis.sleepDayResultArray.length, 'items');
+
+          // 배열을 역순으로 순회하여 가장 최근 유효한 데이터 찾기
+          for (let i = this.sleepAnalysis.sleepDayResultArray.length - 1; i >= 0; i--) {
+            const item = this.sleepAnalysis.sleepDayResultArray[i];
+            if (item && item.data) {
+              const parsedData = JSON.parse(item.data);
+              console.log('[Tab1 ionViewWillEnter] Found recent data at index', i, 'time_stamp:', item.time_stamp);
+              console.log('[Tab1 ionViewWillEnter] Processing data:', parsedData);
+              // Tab1 UI 업데이트
+              this.ngZone.run(() => {
+                this.processRecentSleepUi(parsedData);
+              });
+              break;
+            }
+          }
+        } else {
+          console.log('[Tab1 ionViewWillEnter] No data in sleepDayResultArray');
+        }
+
+        // Tab1 UI 업데이트 Subject 트리거
+        this.sleepAnalysis.tab1UiSubject.next(true);
       });
     }
     this.familyShare.checkNewFamilyShareRequest();
@@ -398,15 +447,28 @@ export class Tab1Page implements OnInit, AfterViewInit {
     });
 
     this.sleepAnalysis.tab1UiSubject.subscribe(data => {
-      this.initUiData();
+      console.log('[Tab1 UI Subscribe] tab1UiSubject triggered, data:', data);
       if (data) {
-        for (let i = this.sleepAnalysis.sleepDayResultArray.length - 1; i >= 0; i--) {
-          if (this.sleepAnalysis.sleepDayResultArray[i].hasOwnProperty('data')) {
-            const res = JSON.parse(this.sleepAnalysis.sleepDayResultArray[i].data);
-            this.processRecentSleepUi(res);
-            break;
+        // sleepDayResultArray에서 가장 최근 유효한 데이터 찾기
+        if (this.sleepAnalysis.sleepDayResultArray && this.sleepAnalysis.sleepDayResultArray.length > 0) {
+          console.log('[Tab1 UI Subscribe] sleepDayResultArray has', this.sleepAnalysis.sleepDayResultArray.length, 'items');
+          // 배열을 역순으로 순회하여 가장 최근 데이터 찾기
+          for (let i = this.sleepAnalysis.sleepDayResultArray.length - 1; i >= 0; i--) {
+            const item = this.sleepAnalysis.sleepDayResultArray[i];
+            if (item && item.hasOwnProperty('data') && item.data) {
+              const parsedData = JSON.parse(item.data);
+              console.log('[Tab1 UI Subscribe] Found recent data at index', i, ':', parsedData);
+              this.processRecentSleepUi(parsedData);
+              break;
+            }
           }
+        } else {
+          console.log('[Tab1 UI Subscribe] No data in sleepDayResultArray, initializing UI');
+          this.initUiData();
         }
+      } else {
+        console.log('[Tab1 UI Subscribe] data is false, initializing UI');
+        this.initUiData();
       }
     });
 

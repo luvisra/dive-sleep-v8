@@ -1,7 +1,7 @@
 ion-content{text-align:center}
 ion-card-subtitle{text-align:center}
-#current-date{color:primary}
 .ion-badge{margin-bottom:5px}
+.white-text {--color: white;}
 ion-card-title{text-align:center;font-size:30px}
 div{text-align:center;vertical-align:middle}
 .header-text{margin-left:21px;margin-bottom:2px}
@@ -13,7 +13,7 @@ div{text-align:center;vertical-align:middle}
 .rcorners1.div2{display:flex;justify-content:space-between}
 #connected-device{margin:20px 0}
 .parent{display:flex;justify-content:space-between;margin:10px auto;background-color:#1C1C1D}
-#icon-middle{margin-top:0;max-height:1.2rem;max-width:auto;padding-top:0}
+#icon-middle{margin-top:0;max-height:1.2rem;max-width:auto;padding-top:0; margin-left: -2.0em}
 #icon-left{max-width:auto;max-height:2rem;margin-left:.5em}
 #icon-right{max-width:auto;max-height:2rem}
 .icon-sun{max-width:1.6rem;margin-right:5px;max-height:auto}

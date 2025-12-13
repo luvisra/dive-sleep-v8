@@ -293,6 +293,7 @@ export class APIService {
   }
 
   async QueryDiveSleepData(dev_id: string, time_start: string, time_end?: string): Promise<DiveSleepDataConnection> {
+    console.log('[DEBUG API] QueryDiveSleepData called with:', { dev_id, time_start, time_end });
     const statement = `query QueryDiveSleepData($dev_id: String!, $time_start: String!, $time_end: String) {
         queryDiveSleepData(dev_id: $dev_id, time_start: $time_start, time_end: $time_end) {
           items {
@@ -302,6 +303,7 @@ export class APIService {
         }
       }`;
     const response = await client.graphql({ query: statement, variables: { dev_id, time_start, time_end } }) as any;
+    console.log('[DEBUG API] QueryDiveSleepData response:', response.data.queryDiveSleepData);
     return response.data.queryDiveSleepData;
   }
 

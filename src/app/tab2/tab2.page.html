@@ -9,23 +9,23 @@
         routerLink="/device-registration" routerDirection="forward"/><ion-label *ngIf="deviceService.isOnline > 0" style="margin-left: -0.7em; margin-top: 1.0em; position: absolute; font-size: 0.8rem;" color="warning">{{ 'COMMON.connected' | translate }}</ion-label>
       </div>
       <div id="icon-middle" *ngIf="tab2ModeSelected === 'daily'">
-        <ion-button color="dark" fill="clear" strong id="current-date">{{ selectedDate }}</ion-button>
+        <ion-button fill="clear" strong>{{ selectedDate }}</ion-button>
         <!-- <ion-input [clearInput]="false" readonly id="current-date" [(ngModel)]="selectedDate" (ionChange)="onChangeDate()" [liIonic4Datepicker]="datePickerObj"></ion-input> -->
       </div>
       <div id="icon-middle" *ngIf="tab2ModeSelected === 'weekly'">
-        <ion-button color="dark" fill="clear">{{ 'TAB2.weekly' | translate }}</ion-button>
+        <ion-button fill="clear">{{ 'TAB2.weekly' | translate }}</ion-button>
       </div>
       <div id="icon-middle" *ngIf="tab2ModeSelected === 'monthly'">
-        <ion-button color="dark" fill="clear">{{ 'TAB2.monthly' | translate }}</ion-button>
+        <ion-button fill="clear">{{ 'TAB2.monthly' | translate }}</ion-button>
       </div>
       <div>
-        <img *ngIf="familyShare.badgeCount > 0" routerLink="/family" routerDirection="forward" id="icon-right" style="max-width: 50%; margin-top: 0.5em" src="../../assets/imgs/icon_family.png" />
+        <!-- <img *ngIf="familyShare.badgeCount > 0" routerLink="/family" routerDirection="forward" id="icon-right" style="max-width: 50%; margin-top: 0.5em" src="../../assets/imgs/icon_family.png" />
         <img *ngIf="familyShare.badgeCount === 0" routerLink="/family" routerDirection="forward" id="icon-right" style="max-width: 70%; margin-top: 0.5em" src="../../assets/imgs/icon_family.png" />
-        <ion-badge *ngIf="familyShare.badgeCount > 0" slot="end" color="danger" style="margin-left: -0.3em">{{ familyShare.badgeCount }}</ion-badge>
+        <ion-badge *ngIf="familyShare.badgeCount > 0" slot="end" color="danger" style="margin-left: -0.3em">{{ familyShare.badgeCount }}</ion-badge> -->
       </div>
     </div>
   </ion-toolbar>
-
+<!-- 
   <div class="parent">
     <ion-segment color="warning" (ionChange)="tab2ResultType($event)" [value]="tab2ModeSelected" style="margin-left: 0.2em; margin-right: 0.2em;">
       <ion-segment-button value="daily" mode="md">
@@ -38,7 +38,7 @@
         <ion-label>{{ 'TAB2.monthly' | translate }}</ion-label>
       </ion-segment-button>
     </ion-segment>
-  </div>
+  </div> -->
 </ion-header>
 
 <ion-content *ngIf="tab2ModeSelected === 'daily'">
@@ -46,12 +46,12 @@
     <ion-grid>
       <ion-row>
         <ion-col>
-          <circle-progress (click)="requestSleepAnalysisToServer()"
+          <circle-progress
           [showUnits]="true"
           [units]="scoreUnitsText"
           [unitsColor]="'#AAAAAA'"
                     [maxPercent]="100"
-          [percent]="uiData.sleepScore || 0"
+          [percent]="uiData.sleepScore ? uiData.sleepScore : 0"
           [radius]="70"
           [outerStrokeWidth]="10"
           [innerStrokeWidth]="5"
@@ -64,8 +64,7 @@
         </ion-col>
         <ion-col>
           <div>
-            <ion-button *ngIf="deviceService.isDebugMode" (click)="goToRawdataPage()" color="dark" fill="clear"><h3>{{ 'COMMON.sleepTime' | translate }}</h3></ion-button>
-            <h1 *ngIf="!deviceService.isDebugMode">{{ 'COMMON.sleepTime' | translate }}</h1>
+            <h1>{{ 'COMMON.sleepTime' | translate }}</h1>
           </div>
           <div>
             <ion-label class="time-text">{{ uiData.totalSleepHour }}</ion-label><ion-label class="small-text space">h</ion-label>
@@ -75,15 +74,14 @@
           <div>
             <p>{{ uiData.asleepTime }} ~ {{ uiData.wakeTime }}</p>
           </div>
-          <div class="ion-no-padding">
-            <ion-button style="max-width: 3.5rem;" (click)="changeDateBack()" color="warning" fill="clear">
+          <!-- <div class="ion-no-padding">
+            <ion-button style="max-width: 3.5rem;" color="warning" fill="clear">
               <ion-icon style="font-size: 3.5rem" name="chevron-back"></ion-icon>
             </ion-button>
-            <!-- <ion-button style="max-width: 3.0em;" fill="clear" size="small"><ion-spinner *ngIf="tab2DailyIsLoading" name="lines"></ion-spinner></ion-button> -->
-            <ion-button style="max-width: 3.5rem;" (click)="changeDateForward()" color="warning" fill="clear">
+            <ion-button style="max-width: 3.5rem;" color="warning" fill="clear">
               <ion-icon style="font-size: 3.5rem" name="chevron-forward"></ion-icon>
             </ion-button>
-          </div>
+          </div> -->
         </ion-col>
       </ion-row>
     </ion-grid>
@@ -163,7 +161,7 @@
                     <ion-label style="font-size: 1.6rem;">{{ uiData.timeToFallAsleep}}</ion-label>{{ 'COMMON.minute' | translate }}
                   </ion-col>
                 </ion-row>
-                <ion-card-subtitle color="dark">{{ 'TAB2.timeToFallAsleep' | translate }}</ion-card-subtitle>
+                <ion-card-subtitle>{{ 'TAB2.timeToFallAsleep' | translate }}</ion-card-subtitle>
               </ion-grid>
           </ion-card>
         </ion-col>
@@ -178,7 +176,7 @@
                     <ion-label style="font-size: 1.6rem;">{{ uiData.awayTime}}</ion-label>{{ 'COMMON.minute' | translate }}
                   </ion-col>
                 </ion-row>
-                <ion-card-subtitle color="dark">{{ 'TAB2.awayFromBed' | translate }}</ion-card-subtitle>
+                <ion-card-subtitle>{{ 'TAB2.awayFromBed' | translate }}</ion-card-subtitle>
               </ion-grid>
           </ion-card>
         </ion-col>
@@ -195,7 +193,7 @@
                     <ion-label style="font-size: 1.6rem;">{{ uiData.avgRespiratory}}</ion-label> {{ 'COMMON.count' | translate }}
                   </ion-col>
                 </ion-row>
-                <ion-card-subtitle color="dark">{{ 'TAB2.averageRespiration' | translate }}</ion-card-subtitle>
+                <ion-card-subtitle>{{ 'TAB2.averageRespiration' | translate }}</ion-card-subtitle>
               </ion-grid>
           </ion-card>
         </ion-col>
@@ -210,7 +208,7 @@
                     <ion-label style="font-size: 1.6rem;">{{ uiData.avgHeartrate}}</ion-label> {{ 'COMMON.count' | translate }}
                   </ion-col>
                 </ion-row>
-                <ion-card-subtitle color="dark">{{ 'TAB2.averageHeartRate' | translate }}</ion-card-subtitle>
+                <ion-card-subtitle>{{ 'TAB2.averageHeartRate' | translate }}</ion-card-subtitle>
               </ion-grid>
           </ion-card>
         </ion-col>
@@ -218,48 +216,48 @@
     </ion-grid>
   </div>
 
-  <div class="title-text" *ngIf="uiData.respArray && uiData.respArray.length >= 36">
-    <h3 color="dark"><img class="title-icon" src="../../assets/imgs/tab2_icon_respiratory.svg">{{ 'COMMON.respiratory' | translate }}</h3>
-  </div>
+  <!-- <div class="title-text" *ngIf="uiData.respArray && uiData.respArray.length >= 36">
+    <h3><img class="title-icon" src="../../assets/imgs/tab2_icon_respiratory.svg">{{ 'COMMON.respiratory' | translate }}</h3>
+  </div> -->
 
-  <div class="chart" style="padding-left: 1.0em" *ngIf="uiData.respArray && uiData.respArray.length >= 36">
+  <!-- <div class="chart" style="padding-left: 1.0em" *ngIf="uiData.respArray && uiData.respArray.length >= 36">
     <canvas baseChart height="75" [data]="respChartData" [labels]="respChartLabels" [options]="respChartOptions"
       [plugins]="respChartPlugins" [legend]="respChartLegend" [type]="respChartType" >
     </canvas>
-  </div>
+  </div> -->
 
-  <div class="title-text" *ngIf="uiData.hrArray && uiData.hrArray.length >= 36">
-    <h3 color="dark"><img class="title-icon" src="../../assets/imgs/tab2_icon_heartrate.svg">{{ 'COMMON.heartrate' | translate }}</h3>
-  </div>
+  <!-- <div class="title-text" *ngIf="uiData.hrArray && uiData.hrArray.length >= 36">
+    <h3><img class="title-icon" src="../../assets/imgs/tab2_icon_heartrate.svg">{{ 'COMMON.heartrate' | translate }}</h3>
+  </div> -->
 
-  <div class="chart" style="padding-left: 1.0em" *ngIf="uiData.hrArray && uiData.hrArray.length >= 36">
+  <!-- <div class="chart" style="padding-left: 1.0em" *ngIf="uiData.hrArray && uiData.hrArray.length >= 36">
     <canvas baseChart height="75" [data]="hrChartData" [labels]="hrChartLabels" [options]="hrChartOptions"
       [plugins]="hrChartPlugins" [legend]="hrChartLegend" [type]="hrChartType" >
     </canvas>
-  </div>
+  </div> -->
 
   <!-- four grids 2 -->
-  <div class="title-text">
-    <h3 color="dark"><img class="title-icon" src="../../assets/imgs/tab2_icon_snoring.png">{{ 'COMMON.snoring' | translate }}/<img class="title-icon" src="../../assets/imgs/tab2_icon_apnea.png">{{ 'COMMON.apnea' | translate }}</h3>
-  </div>
+  <!-- <div class="title-text">
+    <h3><img class="title-icon" src="../../assets/imgs/tab2_icon_snoring.png">{{ 'COMMON.snoring' | translate }}/<img class="title-icon" src="../../assets/imgs/tab2_icon_apnea.png">{{ 'COMMON.apnea' | translate }}</h3>
+  </div> -->
 
-  <div class="chart" style="padding-left: 1.0em">
+  <!-- <div class="chart" style="padding-left: 1.0em">
     <canvas baseChart height="20rem" [data]="snoringChartData" [labels]="snoringChartLabels" [options]="snoringChartOptions"
       [plugins]="snoringChartPlugins" [legend]="snoringChartLegend" [type]="snoringChartType" >
     </canvas>
-  </div>
-  <div class="chart" style="padding-left: 1.0em">
+  </div> -->
+  <!-- <div class="chart" style="padding-left: 1.0em">
     <canvas baseChart height="20rem" [data]="apneaChartData" [labels]="apneaChartLabels" [options]="snoringChartOptions"
       [plugins]="apneaChartPlugins" [legend]="apneaChartLegend" [type]="apneaChartType" >
     </canvas>
-  </div>
-  <div class="chart">
+  </div> -->
+  <!-- <div class="chart">
     <canvas baseChart height="40rem" [data]="motionBedChartData" [labels]="motionbedChartLabels" [options]="motionbedChartOptions"
       [plugins]="motionbedChartPlugins" [legend]="motionbedChartLegend" [type]="motionbedChartType" >
     </canvas>
-  </div>
+  </div> -->
   
-  <div id="four-column-grids">
+  <!-- <div id="four-column-grids">
     <ion-grid>
       <ion-row>
         <ion-col>
@@ -279,13 +277,13 @@
         </ion-col>
       </ion-row>
     </ion-grid>
-  </div>
+  </div> -->
 
-  <div class="title-text" style="margin-top: 3.0em">
-    <h3 color="dark"><img class="title-icon" src="../../assets/imgs/tab2_icon_feeling.png">{{ 'TAB2.feeling' | translate }}<ion-label style="font-size: 0.8rem; margin-left: 0.5em">{{ 'TAB2.feelingSelect' | translate }}</ion-label></h3>
-  </div>
+  <!-- <div class="title-text" style="margin-top: 3.0em">
+    <h3><img class="title-icon" src="../../assets/imgs/tab2_icon_feeling.png">{{ 'TAB2.feeling' | translate }}<ion-label style="font-size: 0.8rem; margin-left: 0.5em">{{ 'TAB2.feelingSelect' | translate }}</ion-label></h3>
+  </div> -->
 
-  <div style="max-width: 90%; text-align: center; margin-left: auto; margin-right: auto; margin-bottom: 3.0em">
+  <!-- <div style="max-width: 90%; text-align: center; margin-left: auto; margin-right: auto; margin-bottom: 3.0em">
     <ion-segment [value]=" sleepAnalysis.feeling " color="warning" (ionChange)="mySleepFeeling($event)" (click)="updateMySleepFeeling()">
       <ion-segment-button class="sleep-feeling-btn" value="1" mode="md">
         <ion-label>1</ion-label>
@@ -303,14 +301,13 @@
         <ion-label>5</ion-label>
       </ion-segment-button>
     </ion-segment>
-  </div>
+  </div> -->
 
-  <div class="title-text">
-    <h3 color="dark"><img class="title-icon" style="margin-right: 0.2em" src="../../assets/imgs/tab2_icon_advice.png">{{ 'TAB2.advice' | translate }}</h3>
-  </div>
+  <!-- <div class="title-text">
+    <h3><img class="title-icon" style="margin-right: 0.2em" src="../../assets/imgs/tab2_icon_advice.png">{{ 'TAB2.advice' | translate }}</h3>
+  </div> -->
 
-  <!-- Swiper Slider for Sleep Advice -->
-  <div class="advice-swiper swiper-container" *ngIf="careDisplayInfoArray.length > 0">
+  <!-- <div class="advice-swiper swiper-container" *ngIf="careDisplayInfoArray.length > 0">
     <div class="swiper-wrapper">
       <div class="swiper-slide" *ngFor="let advice of careDisplayInfoArray">
         <ion-card style="margin: 1em; border-radius: 10px;">
@@ -330,7 +327,7 @@
         <p>{{ 'TAB2.noAdviceData' | translate }}</p>
       </ion-card-content>
     </ion-card>
-  </div>
+  </div> -->
 
 </ion-content>
 
@@ -340,7 +337,7 @@
     <ion-grid>
       <ion-row>
         <ion-col class="title-left">
-          <h3 color="dark"><img class="title-icon" src="../../assets/imgs/tab2_icon_score.png">{{ 'COMMON.sleepScore' | translate }}</h3>
+          <h3><img class="title-icon" src="../../assets/imgs/tab2_icon_score.png">{{ 'COMMON.sleepScore' | translate }}</h3>
         </ion-col>
         <ion-col class="title-right">
           <ion-label style="font-size: 1.0rem;">{{ 'COMMON.average' | translate }} </ion-label> <ion-label class="stat-average">{{ uiStatData.weekAvgScore }}</ion-label><ion-label style="font-size: 1.0rem;"> {{ 'COMMON.score' | translate }}</ion-label>
@@ -358,7 +355,7 @@
     <ion-grid>
       <ion-row>
         <ion-col class="title-left">
-          <h3 color="dark"><img class="title-icon" src="../../assets/imgs/tab2_icon_time.png">{{ 'COMMON.sleepTime' | translate }}</h3>
+          <h3><img class="title-icon" src="../../assets/imgs/tab2_icon_time.png">{{ 'COMMON.sleepTime' | translate }}</h3>
         </ion-col>
         <ion-col class="title-right">
           <ion-label style="font-size: 1.0rem;">{{ 'COMMON.average' | translate }} </ion-label> <ion-label class="stat-average">{{ uiStatData.weekAvgTotalSleepHour }}</ion-label><ion-label style="font-size: 1.0rem;"> {{ 'COMMON.hours' | translate }} </ion-label> <ion-label class="stat-average">{{ uiStatData.weekAvgTotalSleepMinute }}</ion-label><ion-label style="font-size: 1.0rem;"> {{ 'COMMON.minute' | translate }}</ion-label>
@@ -376,7 +373,7 @@
     <ion-grid>
       <ion-row>
         <ion-col class="title-left">
-          <h3 color="dark"><img class="title-icon" src="../../assets/imgs/tab2_icon_pattern.png">{{ 'TAB2.sleepPattern' | translate }}</h3>
+          <h3><img class="title-icon" src="../../assets/imgs/tab2_icon_pattern.png">{{ 'TAB2.sleepPattern' | translate }}</h3>
         </ion-col>
         <ion-col class="title-right">
           <ion-label style="font-size: 1.0rem;">{{ 'COMMON.average' | translate }} </ion-label> <ion-label class="stat-average">{{ uiStatData.weekAvgAsleepHour }}</ion-label><ion-label style="font-size: 1.0rem;"> {{ 'COMMON.hour' | translate }} </ion-label> <ion-label class="stat-average">{{ uiStatData.weekAvgAsleepMinute }}</ion-label><ion-label style="font-size: 1.0rem;"> {{ 'COMMON.minute' | translate }}</ion-label>
@@ -394,7 +391,7 @@
     <ion-grid>
       <ion-row>
         <ion-col class="title-left">
-          <h3 color="dark"><img class="title-icon" src="../../assets/imgs/tab2_icon_snoring.png">{{ 'COMMON.snoring' | translate }}/<img class="title-icon" src="../../assets/imgs/tab2_icon_apnea.png">{{ 'COMMON.apnea' | translate }}</h3>
+          <h3><img class="title-icon" src="../../assets/imgs/tab2_icon_snoring.png">{{ 'COMMON.snoring' | translate }}/<img class="title-icon" src="../../assets/imgs/tab2_icon_apnea.png">{{ 'COMMON.apnea' | translate }}</h3>
         </ion-col>
         <ion-col class="title-right">
           <ion-label style="font-size: 1.0rem;">{{ 'COMMON.average' | translate }} </ion-label> <ion-label class="stat-average">{{ uiStatData.weekAvgSnoringHour }}</ion-label><ion-label style="font-size: 1.0rem;"> {{ 'COMMON.hours' | translate }} </ion-label><ion-label class="stat-average">{{ uiStatData.weekAvgSnoringMinute }}</ion-label><ion-label style="font-size: 1.0rem;"> {{ 'COMMON.minute' | translate }} </ion-label>
@@ -408,11 +405,11 @@
     </div>
   </div>
 
-  <div style="margin-top: 2.5em;">
+  <!-- <div style="margin-top: 2.5em;">
     <ion-grid>
       <ion-row>
         <ion-col size="7" class="title-left">
-          <h3 color="dark"><img class="title-icon" src="../../assets/imgs/icon_deepsleep.png">{{ 'TAB2.sleepStage3' | translate }}</h3>
+          <h3><img class="title-icon" src="../../assets/imgs/icon_deepsleep.png">{{ 'TAB2.sleepStage3' | translate }}</h3>
         </ion-col>
         <ion-col class="title-right">
           <ion-label style="font-size: 1.0rem;">{{ 'COMMON.average' | translate }} </ion-label> <ion-label class="stat-average">{{ uiStatData.weekAvgDeepSleep }}</ion-label><ion-label style="font-size: 1.0rem;"> {{ 'COMMON.minute' | translate }}</ion-label>
@@ -430,7 +427,7 @@
     <ion-grid>
       <ion-row>
         <ion-col size="7" class="title-left">
-          <h3 color="dark"><img class="title-icon" src="../../assets/imgs/icon_tossing.png">{{ 'TAB2.tossing' | translate }}</h3>
+          <h3><img class="title-icon" src="../../assets/imgs/icon_tossing.png">{{ 'TAB2.tossing' | translate }}</h3>
         </ion-col>
         <ion-col class="title-right">
           <ion-label style="font-size: 1.0rem;">{{ 'COMMON.average' | translate }} </ion-label> <ion-label class="stat-average">{{ uiStatData.weekAvgTossing }}</ion-label><ion-label style="font-size: 1.0rem;"> {{ 'COMMON.count' | translate }}</ion-label>
@@ -442,13 +439,13 @@
         [options]="weekChartOptions7"  [legend]="weekChartLegend" [type]="weekChartType7"
         [plugins]="sleepStatusChartPlugins"></canvas>
     </div>
-  </div>
+  </div> -->
 
   <div style="margin-top: 2.5em;">
     <ion-grid>
       <ion-row>
         <ion-col size="7" class="title-left">
-          <h3 color="dark"><img class="title-icon" src="../../assets/imgs/tab2_icon_feeling.png">{{ 'TAB2.feeling' | translate }}<ion-label style="font-size: 0.8rem; margin-left: 0.5em">{{ 'TAB2.feelingSelect' | translate }}</ion-label></h3>
+          <h3><img class="title-icon" src="../../assets/imgs/tab2_icon_feeling.png">{{ 'TAB2.feeling' | translate }}<ion-label style="font-size: 0.8rem; margin-left: 0.5em">{{ 'TAB2.feelingSelect' | translate }}</ion-label></h3>
         </ion-col>
         <ion-col class="title-right">
           <ion-label style="font-size: 1.0rem;">{{ 'COMMON.average' | translate }} </ion-label> <ion-label class="stat-average">{{ uiStatData.weekAvgFeeling }}</ion-label><ion-label style="font-size: 1.0rem;"> {{ 'COMMON.score' | translate }}</ion-label>
@@ -469,9 +466,9 @@
   <div class="ion-padding">
     <div class="calendar-header" style="font-size: 1.1em; padding-left: 5.0em; padding-right: 5.0em">
         <ion-toolbar style="background-color: transparent;">
-            <ion-buttons slot="start" (click)="goToLastMonth()" fill="clear"><ion-icon name="chevron-back" class="header-icon"></ion-icon></ion-buttons>
+            <ion-buttons slot="start" fill="clear"><ion-icon name="chevron-back" class="header-icon"></ion-icon></ion-buttons>
             <ion-label color="warning">{{ currentMonth }}</ion-label>
-            <ion-buttons slot="end" (click)="goToNextMonth()"><ion-icon name="chevron-forward" class="header-icon"></ion-icon></ion-buttons>
+            <ion-buttons slot="end"><ion-icon name="chevron-forward" class="header-icon"></ion-icon></ion-buttons>
         </ion-toolbar>
     </div>
     <div class="calendar-body">
@@ -487,10 +484,9 @@
             </ion-row>
             <ion-row class="calendar-date">
                 <ion-col col-1 *ngFor="let lastDay of daysInLastMonth" class="last-month jb-medium">{{ lastDay }}</ion-col>
-                <ion-col col-1 *ngFor="let day of daysInThisMonth" class="current-month" (click)="selectCalender(day.day)">
-                    <span class="currentDate jb-medium" *ngIf="dateManager(day.day) === 'current'">{{ day.day }}</span>
-                    <span class="db-exist-date jb-medium" [style.color]="day.color" *ngIf="day.exist && dateManager(day.day) !== 'current'">{{ day.day }}</span>
-                    <span class="otherDate jb-medium" *ngIf="!day.exist && dateManager(day.day) !== 'current'">{{ day.day }}</span>
+                <ion-col col-1 *ngFor="let day of daysInThisMonth" class="current-month">
+                    <span class="db-exist-date jb-medium" [style.color]="day.color" *ngIf="day.exist">{{ day.day }}</span>
+                    <span class="otherDate jb-medium" *ngIf="!day.exist">{{ day.day }}</span>
                 </ion-col>
                 <ion-col col-1 *ngFor="let nextDay of daysInNextMonth" class="next-month jb-medium">{{nextDay}}</ion-col>
             </ion-row>
@@ -558,7 +554,7 @@
     <ion-grid>
       <ion-row>
         <ion-col class="title-left">
-          <h3 color="dark"><img class="title-icon" src="../../assets/imgs/tab2_icon_score.png">{{ 'COMMON.sleepScore' | translate }}</h3>
+          <h3><img class="title-icon" src="../../assets/imgs/tab2_icon_score.png">{{ 'COMMON.sleepScore' | translate }}</h3>
         </ion-col>
         <ion-col class="title-right">
           <ion-label style="font-size: 1.0rem;">{{ 'COMMON.average' | translate }} </ion-label> <ion-label class="stat-average">{{ uiStatData.monthAvgScore }}</ion-label><ion-label style="font-size: 1.0rem;"> {{ 'COMMON.score' | translate }}</ion-label>
@@ -576,7 +572,7 @@
     <ion-grid>
       <ion-row>
         <ion-col class="title-left">
-          <h3 color="dark"><img class="title-icon" src="../../assets/imgs/tab2_icon_time.png">{{ 'COMMON.sleepTime' | translate }}</h3>
+          <h3><img class="title-icon" src="../../assets/imgs/tab2_icon_time.png">{{ 'COMMON.sleepTime' | translate }}</h3>
         </ion-col>
         <ion-col class="title-right">
           <ion-label style="font-size: 1.0rem;">{{ 'COMMON.average' | translate }} </ion-label> <ion-label class="stat-average">{{ uiStatData.monthAvgTotalSleepHour }}</ion-label><ion-label style="font-size: 1.0rem;"> {{ 'COMMON.hours' | translate }} </ion-label><ion-label class="stat-average">{{ uiStatData.monthAvgTotalSleepMinute }}</ion-label><ion-label style="font-size: 1.0rem;"> {{ 'COMMON.minute' | translate }}</ion-label>
@@ -594,7 +590,7 @@
     <ion-grid>
       <ion-row>
         <ion-col class="title-left">
-          <h3 color="dark"><img class="title-icon" src="../../assets/imgs/tab2_icon_pattern.png">{{ 'TAB2.sleepPattern' | translate }}</h3>
+          <h3><img class="title-icon" src="../../assets/imgs/tab2_icon_pattern.png">{{ 'TAB2.sleepPattern' | translate }}</h3>
         </ion-col>
         <ion-col class="title-right">
           <ion-label style="font-size: 1.0rem;">{{ 'COMMON.average' | translate }} </ion-label> <ion-label class="stat-average">{{ uiStatData.monthAvgAsleepHour }}</ion-label><ion-label style="font-size: 1.0rem;"> {{ 'COMMON.hour' | translate }} </ion-label><ion-label class="stat-average">{{ uiStatData.monthAvgAsleepMinute }}</ion-label><ion-label style="font-size: 1.0rem;"> {{ 'COMMON.minute' | translate }}</ion-label>
@@ -612,7 +608,7 @@
     <ion-grid>
       <ion-row>
         <ion-col class="title-left">
-          <h3 color="dark"><img class="title-icon" src="../../assets/imgs/tab2_icon_snoring.png">{{ 'COMMON.snoring' | translate }}/<img class="title-icon" src="../../assets/imgs/tab2_icon_apnea.png">{{ 'COMMON.apnea' | translate }}</h3>
+          <h3><img class="title-icon" src="../../assets/imgs/tab2_icon_snoring.png">{{ 'COMMON.snoring' | translate }}/<img class="title-icon" src="../../assets/imgs/tab2_icon_apnea.png">{{ 'COMMON.apnea' | translate }}</h3>
         </ion-col>
         <ion-col class="title-right">
           <!-- <ion-label style="font-size: 1.0rem;">{{ 'COMMON.average' | translate }} </ion-label>  -->
@@ -627,11 +623,11 @@
     </div>
   </div>
 
-  <div style="margin-top: 2.5em;">
+  <!-- <div style="margin-top: 2.5em;">
     <ion-grid>
       <ion-row>
         <ion-col size="7" class="title-left">
-          <h3 color="dark"><img class="title-icon" src="../../assets/imgs/icon_deepsleep.png">{{ 'TAB2.sleepStage3' | translate }}</h3>
+          <h3><img class="title-icon" src="../../assets/imgs/icon_deepsleep.png">{{ 'TAB2.sleepStage3' | translate }}</h3>
         </ion-col>
         <ion-col class="title-right">
           <ion-label style="font-size: 1.0rem;">{{ 'COMMON.average' | translate }} </ion-label> <ion-label class="stat-average">{{ uiStatData.monthAvgDeepSleep }}</ion-label><ion-label style="font-size: 1.0rem;"> {{ 'COMMON.minute' | translate }}</ion-label>
@@ -649,7 +645,7 @@
     <ion-grid>
       <ion-row>
         <ion-col size="7" class="title-left">
-          <h3 color="dark"><img class="title-icon" src="../../assets/imgs/icon_tossing.png">{{ 'TAB2.tossing' | translate }}</h3>
+          <h3><img class="title-icon" src="../../assets/imgs/icon_tossing.png">{{ 'TAB2.tossing' | translate }}</h3>
         </ion-col>
         <ion-col class="title-right">
           <ion-label style="font-size: 1.0rem;">{{ 'COMMON.average' | translate }} </ion-label> <ion-label class="stat-average">{{ uiStatData.monthAvgTossing }}</ion-label><ion-label style="font-size: 1.0rem;"> {{ 'COMMON.count' | translate }}</ion-label>
@@ -661,13 +657,13 @@
         [options]="monthChartOptions7"  [legend]="weekChartLegend" [type]="weekChartType7"
         [plugins]="sleepStatusChartPlugins"></canvas>
     </div>
-  </div>
+  </div> -->
 
   <div style="margin-top: 2.5em;">
     <ion-grid>
       <ion-row>
         <ion-col class="title-left">
-          <h3 color="dark"><img class="title-icon" src="../../assets/imgs/tab2_icon_feeling.png">{{ 'TAB2.feeling' | translate }}</h3>
+          <h3><img class="title-icon" src="../../assets/imgs/tab2_icon_feeling.png">{{ 'TAB2.feeling' | translate }}</h3>
         </ion-col>
         <ion-col class="title-right">
           <ion-label style="font-size: 1.0rem;">{{ 'COMMON.average' | translate }} </ion-label> <ion-label class="stat-average">{{ uiStatData.monthAvgFeeling }}</ion-label><ion-label style="font-size: 1.0rem;"> {{ 'COMMON.score' | translate }}</ion-label>
