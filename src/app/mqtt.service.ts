@@ -68,12 +68,22 @@ export class MqttService {
     });
     this.sub.push(s);
 
-    // 네트워크 상태 리스너
+    // 네트워크 상태 리스너 - WiFi ↔ Cellular 전환 시 MQTT 재연결 보장
     Network.addListener('networkStatusChange', (status) => {
-      console.log('networkStatusChange', JSON.stringify(status));
-      if (!status.connected) {
-        alert('네트워크에 연결되지 않았습니다. WiFi 또는 Cellular에 연결 해 주세요.');
+      console.log('[Network] ========== 네트워크 상태 변경 ==========');
+      console.log('[Network] 상태:', JSON.stringify(status));
+      console.log('[Network] 연결됨:', status.connected);
+      console.log('[Network] 연결 타입:', status.connectionType);
+
+      if (status.connected) {
+        // ✅ 네트워크 복구 시 MQTT 재연결 (WiFi ↔ Cellular 전환 포함)
+        console.log('[Network] ✅ 네트워크 복구 감지, MQTT 재구독 시도');
+        this.ensureSubscription();
+      } else {
+        // ❌ 네트워크 끊김 (alert 제거, 로그만 출력)
+        console.warn('[Network] ⚠️ 네트워크 연결 끊김');
       }
+      console.log('[Network] ==========================================');
     });
   }
 

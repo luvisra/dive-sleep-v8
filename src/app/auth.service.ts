@@ -210,12 +210,21 @@ export class AuthService implements OnDestroy {
       console.error('[Auth] 에러 메시지: ' + (error as any)?.message);
       console.error('[Auth] 에러 전체: ' + JSON.stringify(error, null, 2));
       console.error('[Auth] ==========================================');
-      // 에러가 발생해도 메인 페이지로 이동 (devId는 빈 문자열)
-      this.deviceService.devId = '';
-      this.deviceService.devIdSubject.next('');
+
+      // ✅ localStorage fallback: API 조회 실패 시 캐시된 devId 복구
+      const cachedDevId = localStorage.getItem('devId');
+      if (cachedDevId && cachedDevId !== '') {
+        console.log('[Auth] ✅ localStorage에서 devId 복구:', cachedDevId);
+        this.deviceService.devId = cachedDevId;
+        this.deviceService.devIdSubject.next(cachedDevId);
+      } else {
+        console.log('[Auth] ⚠️ localStorage에 devId 없음, 빈 문자열 설정');
+        this.deviceService.devId = '';
+        this.deviceService.devIdSubject.next('');
+      }
 
       // ✅ 에러 발생 시에도 signedInSubject emit (MQTT 구독 트리거)
-      console.log('[Auth] ⚠️ 에러 발생, devId 없이 signedInSubject emit');
+      console.log('[Auth] ⚠️ 에러 발생, devId: ' + this.deviceService.devId + ', signedInSubject emit');
       this.signedInSubject.next(this.signedIn);
 
       this.router.navigateByUrl(GLOBAL.START_PAGE, this.navigationExtras);

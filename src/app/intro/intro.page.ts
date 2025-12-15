@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Router, NavigationExtras } from '@angular/router';
+import { Router } from '@angular/router';
 import { AuthService } from './../auth.service';
 import { GLOBAL } from '../static_config';
 import { UtilService } from './../util.service';
@@ -44,13 +44,14 @@ export class IntroPage implements OnInit, OnDestroy {
     if (this.authService.signedIn && !this.isNavigating) {
       // 중복 실행 방지
       this.isNavigating = true;
-      
+
       // 이미 로그인된 경우 - 로딩 표시하고 메인 페이지로 이동
-      this.utilService.presentLoading('로그인 정보 확인 중...', 1500);
+      // ✅ timeout 시간 증가 (800ms → 3000ms): API 조회 및 devId 로드 시간 보장
+      this.utilService.presentLoading('로그인 정보 확인 중...', 5000);
       setTimeout(() => {
         this.utilService.dismissLoading();
         this.router.navigateByUrl(GLOBAL.START_PAGE, { replaceUrl: true });
-      }, 800);
+      }, 3000);
     } else if (!this.authService.signedIn) {
       // 로그인되지 않은 경우 - 스플래시 숨기고 로그인 화면 표시
       setTimeout(() => {
