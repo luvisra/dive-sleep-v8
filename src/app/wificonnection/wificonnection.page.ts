@@ -9,7 +9,6 @@ import { AuthService } from '../auth.service';
 import { APIService } from '../API.service';
 import { BleService } from '../ble.service';
 import { UtilService } from '../util.service';
-import { PubSub } from '../pubsub.instance';
 import { Subscription } from 'rxjs';
 import { GLOBAL } from '../static_config';
 
@@ -246,9 +245,9 @@ export class WificonnectionPage implements OnInit, OnDestroy {
 
       console.log('[BLE Connected] 최종 사용할 WiFi MAC:', this.wifiDevToBeConnected);
 
-      // MQTT 메시지 수신 구독
-      console.log('[BLE Connected] MQTT 구독 시작...');
-      this.subscribeDeviceAlive();
+      // ✅ MQTT 메시지 수신 대기 (blescan에서 이미 구독 시작됨)
+      console.log('[BLE Connected] MQTT 메시지 수신 대기 시작...');
+      this.subscribeMqttMessage();
 
       // WiFi 정보를 BLE로 전송
       console.log('[BLE Connected] WiFi 정보 전송 시작...');
@@ -336,103 +335,35 @@ export class WificonnectionPage implements OnInit, OnDestroy {
     }
   }
 
-  private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
+  /**
+   * MqttService의 메시지 스트림을 구독하여 장치 연결 상태 확인
+   * (blescan에서 이미 MQTT 구독이 시작된 상태)
+   */
+  private subscribeMqttMessage(): void {
+    console.log('[MQTT Message] ========== MQTT 메시지 구독 시작 ==========');
+    console.log('[MQTT Message] mqttService의 messageReceived$ 구독');
+    console.log('[MQTT Message] WiFi MAC:', this.wifiDevToBeConnected);
 
-  private subscribeDeviceAlive(): void {
-    const topic = `cnf_esp/pub_unicast/${this.wifiDevToBeConnected}/message`;
-    
-    console.log('[MQTT Subscribe] ========== MQTT 구독 시작 ==========');
-    console.log('[MQTT Subscribe] BLE MAC:', this.bleDevice);
-    console.log('[MQTT Subscribe] WiFi MAC (변환됨):', this.wifiDevToBeConnected);
-    console.log('[MQTT Subscribe] 구독 토픽:', topic);
-    console.log('[MQTT Subscribe] 현재 시각:', new Date().toISOString());
-    console.log('[MQTT Subscribe] PubSub 객체 존재:', !!PubSub);
-    console.log('[MQTT Subscribe] PubSub.subscribe 함수 존재:', typeof PubSub.subscribe === 'function');
-    console.log('[MQTT Subscribe] ===========================================');
+    const mqttSub = this.mqttService.messageReceived$.subscribe({
+      next: (data: any) => {
+        console.log('[MQTT Message] ========== MQTT 메시지 수신 ==========');
+        console.log('[MQTT Message] 🎉🎉🎉 메시지가 도착했습니다! 🎉🎉🎉');
+        console.log('[MQTT Message] 수신 시각:', new Date().toISOString());
+        console.log('[MQTT Message] 원시 데이터:', JSON.stringify(data, null, 2));
 
-    try {
-      console.log('[MQTT Subscribe] PubSub.subscribe() 호출 시작...');
-      const observable = PubSub.subscribe({ topics: topic });
-      console.log('[MQTT Subscribe] Observable 생성 완료:', !!observable);
-      console.log('[MQTT Subscribe] Observable.subscribe 함수 존재:', typeof observable.subscribe === 'function');
-      
-      console.log('[MQTT Subscribe] Observable.subscribe() 호출 시작...');
-      const mqttSub = observable.subscribe({
-        next: (data: any) => {
-          console.log('[MQTT Receive] ========== MQTT 메시지 수신 ==========');
-          console.log('[MQTT Receive] 🎉🎉🎉 메시지가 도착했습니다! 🎉🎉🎉');
-          console.log('[MQTT Receive] 수신 시각:', new Date().toISOString());
-          console.log('[MQTT Receive] 원시 데이터 타입:', typeof data);
-          console.log('[MQTT Receive] 원시 데이터 (전체):', JSON.stringify(data, null, 2));
-          
-          // 모든 가능한 경로 탐색
-          console.log('[MQTT Receive] ========== 데이터 구조 분석 ==========');
-          console.log('[MQTT Receive] data 존재:', !!data);
-          console.log('[MQTT Receive] data.value 존재:', !!data?.value);
-          console.log('[MQTT Receive] data.message 존재:', !!data?.message);
-          console.log('[MQTT Receive] data.value.message 존재:', !!data?.value?.message);
-          
-          if (data) {
-            // 모든 키 출력
-            console.log('[MQTT Receive] data의 모든 키:', Object.keys(data));
-            
-            // data.value가 있으면
-            if (data.value) {
-              console.log('[MQTT Receive] data.value 타입:', typeof data.value);
-              console.log('[MQTT Receive] data.value 내용:', JSON.stringify(data.value, null, 2));
-              console.log('[MQTT Receive] data.value의 모든 키:', Object.keys(data.value));
-            }
-            
-            // data.message가 있으면
-            if (data.message) {
-              console.log('[MQTT Receive] data.message 타입:', typeof data.message);
-              console.log('[MQTT Receive] data.message 내용:', JSON.stringify(data.message, null, 2));
-            }
-          }
-          console.log('[MQTT Receive] =============================================');
-          
-          this.handleDeviceAlive(data);
-        },
-        error: (error: any) => {
-          console.error('[MQTT Error] ========== MQTT 구독 에러 ==========');
-          console.error('[MQTT Error] 에러 시각:', new Date().toISOString());
-          console.error('[MQTT Error] 에러 타입:', typeof error);
-          console.error('[MQTT Error] 에러 내용:', JSON.stringify(error, null, 2));
-          console.error('[MQTT Error] ==========================================');
-          this.handleConnectionError('디바이스 통신 중 오류가 발생했습니다.');
-        }
-      });
-      
-      console.log('[MQTT Subscribe] ✅ Observable.subscribe() 완료');
-      console.log('[MQTT Subscribe] Subscription 객체 존재:', !!mqttSub);
-      console.log('[MQTT Subscribe] Subscription.closed:', mqttSub?.closed);
-      
-      this.subscriptions.push(mqttSub);
-      this.mqttSubscribeTime = Date.now();
-      
-      const elapsedSinceStart = this.mqttSubscribeTime - this.connectionStartTime;
-      const elapsedSinceWrite = this.bleWriteCompleteTime > 0 ? this.mqttSubscribeTime - this.bleWriteCompleteTime : 0;
-      
-      console.log('[MQTT Subscribe] 구독 객체가 subscriptions 배열에 추가됨. 총:', this.subscriptions.length);
-      console.log('[MQTT Subscribe] 구독 완료 시각:', new Date(this.mqttSubscribeTime).toISOString());
-      console.log('[MQTT Subscribe] 연결 시작부터 경과:', elapsedSinceStart, 'ms (', (elapsedSinceStart / 1000).toFixed(1), '초)');
-      if (elapsedSinceWrite > 0) {
-        console.log('[MQTT Subscribe] BLE Write 완료부터 경과:', elapsedSinceWrite, 'ms (', (elapsedSinceWrite / 1000).toFixed(1), '초)');
+        // 장치 연결 성공 처리
+        this.handleDeviceAlive(data);
+      },
+      error: (error: any) => {
+        console.error('[MQTT Message] ❌ 메시지 구독 에러:', JSON.stringify(error, null, 2));
+        this.handleConnectionError('디바이스 통신 중 오류가 발생했습니다.');
       }
-      
-      console.log('[MQTT Subscribe] ⏳ 이제 MQTT 메시지를 기다리는 중...');
-      console.log('[MQTT Subscribe] Device가 메시지를 보내면 [MQTT Receive] 로그가 나타납니다');
-      
-    } catch (error) {
-      console.error('[MQTT Subscribe] ========== 구독 생성 에러 ==========');
-      console.error('[MQTT Subscribe] 에러 발생 시각:', new Date().toISOString());
-      console.error('[MQTT Subscribe] 에러 타입:', typeof error);
-      console.error('[MQTT Subscribe] 에러 내용:', JSON.stringify(error, null, 2));
-      console.error('[MQTT Subscribe] ==========================================');
-      throw error;
-    }
+    });
+
+    this.subscriptions.push(mqttSub);
+    console.log('[MQTT Message] ✅ 메시지 구독 완료');
+    console.log('[MQTT Message] 장치가 WiFi에 연결되면 메시지를 수신합니다.');
+    console.log('[MQTT Message] ===========================================');
   }
 
   private handleDeviceAlive(data: any): void {
@@ -726,7 +657,7 @@ export class WificonnectionPage implements OnInit, OnDestroy {
   }
 
   private handleConnectionSuccess(): void {
-    console.log('Connection completed successfully!');
+    console.log('[Connection Success] ========== 연결 성공! ==========');
 
     // 타임아웃 클리어
     if (this.connectionTimeout) {
@@ -736,6 +667,10 @@ export class WificonnectionPage implements OnInit, OnDestroy {
       clearInterval(this.progressInterval);
     }
 
+    // ✅ MQTT 영구 구독은 유지 (cleanup에서 해제하지 않음)
+    console.log('[Connection Success] ✅ MQTT 영구 구독 유지');
+    console.log('[Connection Success] deviceService.devId:', this.deviceService.devId);
+
     // BLE 연결 해제
     this.bleService.tryToDisconnectBle(this.bleDevice);
 
@@ -743,10 +678,13 @@ export class WificonnectionPage implements OnInit, OnDestroy {
     this.ngZone.run(() => {
       this.showConnectionStatus = false;
     });
+
+    console.log('[Connection Success] ==========================================');
   }
 
   private handleConnectionError(errorMessage: string): void {
-    console.error('Connection error:', errorMessage);
+    console.error('[Connection Error] ========== 연결 실패 ==========');
+    console.error('[Connection Error] 에러:', errorMessage);
 
     this.ngZone.run(() => {
       this.connectionStatus.failed = true;
@@ -764,8 +702,15 @@ export class WificonnectionPage implements OnInit, OnDestroy {
       clearInterval(this.progressInterval);
     }
 
+    // ✅ 실패 시 MQTT 구독 해제
+    console.log('[Connection Error] MQTT 구독 해제 시작...');
+    this.mqttService.unsubscribe();
+    console.log('[Connection Error] MQTT 구독 해제 완료');
+
     // BLE 연결 해제
     this.bleService.tryToDisconnectBle(this.bleDevice);
+
+    console.error('[Connection Error] ==========================================');
   }
 
   private cleanup(): void {

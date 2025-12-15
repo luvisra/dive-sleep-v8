@@ -15,6 +15,7 @@ import { FamilyShareService } from './family-share.service';
 import { UtilService } from './util.service';
 import { GLOBAL } from './static_config';
 import { Network } from '@capacitor/network';
+import { Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -28,6 +29,9 @@ export class MqttService {
   private maxReconnectAttempts = 5;
   private reconnectTimeout: any = null;
   private isReconnecting = false;
+
+  // ✅ MQTT 메시지 수신 알림용 Subject (wificonnection에서 구독)
+  public messageReceived$ = new Subject<any>();
 
   constructor(
     private deviceService: DeviceService,
@@ -153,22 +157,35 @@ export class MqttService {
     }
   }
 
-  subscribeMessages() {
-    if (!this.deviceService.devId) {
+  /**
+   * 특정 devId로 MQTT 구독 시작 (외부에서 호출 가능)
+   * @param devId 구독할 장치 ID (선택사항, 없으면 deviceService.devId 사용)
+   * @returns 구독 성공 여부
+   */
+  subscribeToDevice(devId?: string): boolean {
+    const targetDevId = devId || this.deviceService.devId;
+
+    if (!targetDevId) {
       console.warn('[MQTT Subscribe] ⚠️ devId 없음, 구독 스킵');
-      return;
+      return false;
     }
 
-    // ✅ 이미 구독 중이면 스킵 (재구독하지 않음)
-    if (this.currentMqttSession) {
+    // ✅ 이미 같은 devId로 구독 중이면 스킵
+    if (this.currentMqttSession && this.deviceService.devId === targetDevId) {
       console.log('[MQTT Subscribe] 이미 구독 중, 스킵 (재구독 안 함)');
-      return;
+      return true;
     }
 
-    const topic = `cnf_esp/pub_unicast/${this.deviceService.devId}/message`;
+    // ✅ 다른 devId로 구독 중이면 기존 구독 해제
+    if (this.currentMqttSession && this.deviceService.devId !== targetDevId) {
+      console.log('[MQTT Subscribe] 다른 devId로 구독 중, 기존 구독 해제');
+      this.unsubscribe();
+    }
+
+    const topic = `cnf_esp/pub_unicast/${targetDevId}/message`;
     console.log('[MQTT Subscribe] ========== MQTT 구독 시작 ==========');
     console.log('[MQTT Subscribe] Topic:', topic);
-    console.log('[MQTT Subscribe] Device ID:', this.deviceService.devId);
+    console.log('[MQTT Subscribe] Device ID:', targetDevId);
 
     try {
       this.currentMqttSession = PubSub.subscribe({
@@ -200,11 +217,20 @@ export class MqttService {
       console.log('[MQTT Subscribe] currentMqttSession 상태:', !!this.currentMqttSession);
       // 구독 성공 시 재연결 카운터 리셋
       this.reconnectAttempts = 0;
+      return true;
     } catch (error) {
       console.error('[MQTT Subscribe] ❌ 구독 실패:', JSON.stringify(error, null, 2));
       // 자동 재연결 시도
       this.attemptReconnect();
+      return false;
     }
+  }
+
+  /**
+   * deviceService.devId로 MQTT 구독 시작 (레거시 호환성)
+   */
+  subscribeMessages() {
+    this.subscribeToDevice();
   }
 
   private attemptReconnect() {
@@ -262,10 +288,14 @@ export class MqttService {
     console.log('[MQTT Handle] Original data:', JSON.stringify(data, null, 2));
     console.log('[MQTT Handle] data type:', typeof data);
     console.log('[MQTT Handle] data.value exists:', !!data.value);
-    
+
     const value = data.value || data;
     console.log('[MQTT Handle] Parsed value:', JSON.stringify(value, null, 2));
     console.log('[MQTT Handle] value type:', typeof value);
+
+    // ✅ 메시지 수신 알림 emit (wificonnection 등에서 구독 가능)
+    this.messageReceived$.next(data);
+    console.log('[MQTT Handle] messageReceived$ emit 완료');
 
     // ✅ 모든 MQTT 메시지 수신 시 온라인 상태를 true로 설정
     this.deviceService.setOnline(true);

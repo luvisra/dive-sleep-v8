@@ -25,6 +25,9 @@ export class DeviceService {
   isMotionBedConnected = false;
   isAndroid = this.platform.is('android');
   devIdSubject = new BehaviorSubject<string>(this.devId);
+
+  // ✅ devId 유무 확인용 Observable (header component에서 사용)
+  public hasDevice$ = new BehaviorSubject<boolean>(false);
   targetAsleepTimeValue: any;
   targetTotalSleepTimeValue: any;
   targetAsleepTimeHour: string = '';
@@ -104,6 +107,9 @@ export class DeviceService {
     this.devIdSubject.subscribe(data => {
       if (data != null) {
         this.devId = data;
+        // ✅ devId 유무에 따라 hasDevice$ 업데이트
+        this.hasDevice$.next(data !== '' && data !== null);
+        console.log('[DeviceService] devId 변경:', data, '/ hasDevice:', data !== '' && data !== null);
       }
     });
 

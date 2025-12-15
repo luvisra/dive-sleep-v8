@@ -88,6 +88,25 @@ export class BlescanPage implements OnInit {
         this.ngZone.run(() => {
           this.foundBleDev = this.findMaxRssi(this.bleService.results);
           this.foundBleDevId = this.foundBleDev.id;
+
+          // ✅ BLE MAC → WiFi MAC 변환 후 MQTT 구독 시작
+          console.log('[BLE Scan] ========== BLE 장치 발견 ==========');
+          console.log('[BLE Scan] BLE MAC:', this.foundBleDevId);
+
+          const wifiDevId = this.utilService.convertBleMacAddress(this.foundBleDevId);
+          console.log('[BLE Scan] WiFi MAC (변환):', wifiDevId);
+
+          // MQTT 구독 시작 (WiFi MAC 기준)
+          console.log('[BLE Scan] MQTT 구독 시작 시도...');
+          const subscribed = this.mqttService.subscribeToDevice(wifiDevId);
+
+          if (subscribed) {
+            console.log('[BLE Scan] ✅ MQTT 구독 성공!');
+            console.log('[BLE Scan] 장치가 WiFi에 연결되면 메시지를 수신합니다.');
+          } else {
+            console.warn('[BLE Scan] ⚠️ MQTT 구독 실패 또는 이미 구독 중');
+          }
+          console.log('[BLE Scan] ==========================================');
         });
       }
     });

@@ -31,7 +31,8 @@
         "saturday": "Sat",
         "sunday": "Sun",
         "connected": "Connected",
-        "scanning": "Scanning.."
+        "scanning": "Scanning..",
+        "nodevice": "Device Required"
 
     },
 

@@ -31,7 +31,8 @@
         "saturday": "토",
         "sunday": "일",
         "connected": "연결됨",
-        "scanning": "검색중.."
+        "scanning": "검색중..",
+        "nodevice": "장치 연결 필요"
     },
 
     "PERMISSION": {

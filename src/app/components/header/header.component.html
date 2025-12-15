@@ -2,11 +2,32 @@
   <ion-toolbar class="ion-no-padding">
     <div class="parent" style="background-color: transparent;">
       <div>
-        <img *ngIf="!(deviceService.isOnline$ | async)" id="icon-left" src="../../assets/imgs/navibar_sensor_offline.png"
-        routerLink="/device-registration" routerDirection="forward"/>
-        <ion-label *ngIf="!(deviceService.isOnline$ | async)" style="margin-left: -0.7em; margin-top: 1.0em; position: absolute; font-size: 0.8rem;" color="warning">{{ 'COMMON.scanning' | translate }}</ion-label>
-        <img *ngIf="(deviceService.isOnline$ | async)" id="icon-left" src="../../assets/imgs/navibar_sensor_online.png"
-        routerLink="/device-registration" routerDirection="forward"/><ion-label *ngIf="(deviceService.isOnline$ | async)" style="margin-left: -0.7em; margin-top: 1.0em; position: absolute; font-size: 0.8rem;" color="warning">{{ 'COMMON.connected' | translate }}</ion-label>
+        <!-- 케이스 1: devId 없음 - "장치 연결 필요" -->
+        <ng-container *ngIf="!(deviceService.hasDevice$ | async)">
+          <img id="icon-left" src="../../assets/imgs/navibar_sensor_offline.png"
+            routerLink="/device-registration" routerDirection="forward"/>
+          <ion-label style="margin-left: -0.7em; margin-top: 1.0em; position: absolute; font-size: 0.8rem;" color="warning">
+            {{ 'COMMON.nodevice' | translate }}
+          </ion-label>
+        </ng-container>
+
+        <!-- 케이스 2: devId 있음 + offline - "검색중.." -->
+        <ng-container *ngIf="(deviceService.hasDevice$ | async) && !(deviceService.isOnline$ | async)">
+          <img id="icon-left" src="../../assets/imgs/navibar_sensor_offline.png"
+            routerLink="/device-registration" routerDirection="forward"/>
+          <ion-label style="margin-left: -0.7em; margin-top: 1.0em; position: absolute; font-size: 0.8rem;" color="warning">
+            {{ 'COMMON.scanning' | translate }}
+          </ion-label>
+        </ng-container>
+
+        <!-- 케이스 3: devId 있음 + online - "연결됨" -->
+        <ng-container *ngIf="(deviceService.hasDevice$ | async) && (deviceService.isOnline$ | async)">
+          <img id="icon-left" src="../../assets/imgs/navibar_sensor_online.png"
+            routerLink="/device-registration" routerDirection="forward"/>
+          <ion-label style="margin-left: -0.7em; margin-top: 1.0em; position: absolute; font-size: 0.8rem;" color="warning">
+            {{ 'COMMON.connected' | translate }}
+          </ion-label>
+        </ng-container>
       </div>
       <div id="icon-middle">
         <img *ngIf="showLogo" src="../../assets/imgs/dive_logo_small.png" />
