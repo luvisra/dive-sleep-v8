@@ -32,7 +32,8 @@
         "sunday": "일",
         "connected": "연결됨",
         "scanning": "검색중..",
-        "nodevice": "장치 연결 필요"
+        "nodevice": "장치 연결 필요",
+        "unknown": "확인중..."
     },
 
     "PERMISSION": {
@@ -108,6 +109,7 @@
         "sleepStage3": "깊은잠",
         "tossing": "뒤척임",
         "sleepPattern": "잠든 시간",
+        "actualSleepTime": "실제 수면시간",
         "timeToFallAsleep": "입면까지의 시간",
         "awayFromBed": "침대 벗어남",
         "averageRespiration": "평균 호흡",
@@ -140,6 +142,7 @@
         "hejhome": "헤이홈 계정 연결",
         "usage": "사용 방법",
         "version": "버전 정보",
+        "realtimeGraph": "실시간 그래프",
         "language": "언어 설정",
         "languageAuto": "자동 감지",
         "familyShare": "가족 데이터",

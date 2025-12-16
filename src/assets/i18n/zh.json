@@ -32,7 +32,8 @@
         "sunday": "日",
         "connected": "连接的",
         "scanning": "扫描..",
-        "nodevice": "需要连接设备"
+        "nodevice": "需要连接设备",
+        "unknown": "检查中..."
     },
 
     "sound": {
@@ -101,6 +102,7 @@
         "sleepStage3": "深睡",
         "tossing": "翻身",
         "sleepPattern": "睡眠规律",
+        "actualSleepTime": "实际睡眠时间",
         "timeToFallAsleep": "入睡用时",
         "awayFromBed": "离床",
         "averageRespiration": "平均呼吸",

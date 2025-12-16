@@ -71,18 +71,12 @@ export class OtaPage implements OnInit {
       );
     }
     if (this.percentValue === 99) {
-      this.translate.get('OTA.doneMessage').subscribe(
-        value => {
-          this.utilService.presentLoadingWithOptions(value, 2000);
-        }
-      );
       this.ngZone.run(() => {
         if (this.isBetaEnabled) {
           this.progressMessage = 'BETA 펌웨어 업데이트 완료';
         } else {
           this.translate.get('OTA.done').subscribe(
             value => {
-              // this.utilService.presentLoadingWithOptions(value, 2000);
               this.progressMessage = value;
             }
           );
@@ -92,6 +86,25 @@ export class OtaPage implements OnInit {
       });
       this.timerSub.unsubscribe();
       this.clearEvents();
+
+      // 성공 Alert 표시
+      if (this.isBetaEnabled) {
+        this.utilService.presentAlert(
+          'BETA 펌웨어 업데이트',
+          '성공',
+          'BETA 펌웨어 업데이트가 성공적으로 완료되었습니다.'
+        );
+      } else {
+        this.translate.get('OTA.doneMessage').subscribe(
+          message => {
+            this.translate.get('OTA.done').subscribe(
+              title => {
+                this.utilService.presentAlert('펌웨어 업데이트', title, message);
+              }
+            );
+          }
+        );
+      }
     }
   }
 

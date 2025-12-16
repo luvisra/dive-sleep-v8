@@ -1,5 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Observable, BehaviorSubject } from 'rxjs';
+
+export enum ConnectionState {
+  UNKNOWN = 'unknown',
+  OFFLINE = 'offline',
+  ONLINE = 'online'
+}
 import { AudioService } from './audio.service';
 import { AlertController } from '@ionic/angular';
 import { Platform } from '@ionic/angular';
@@ -20,6 +26,12 @@ export class DeviceService {
   devId = '';
   userNickname: string = '';
   userPhoto: SafeResourceUrl | null = null;
+  
+  // ✅ 연결 상태 관리 (unknown/offline/online)
+  private connectionStateSubject = new BehaviorSubject<ConnectionState>(ConnectionState.UNKNOWN);
+  public connectionState$ = this.connectionStateSubject.asObservable();
+  
+  // ✅ 기존 isOnline 호환성 유지 (getter로 변경)
   private isOnlineSubject = new BehaviorSubject<boolean>(false);
   public isOnline$ = this.isOnlineSubject.asObservable();
   isMotionBedConnected = false;
@@ -190,12 +202,22 @@ export class DeviceService {
   }
 
   get isOnline(): boolean {
-    return this.isOnlineSubject.value;
+    return this.connectionStateSubject.value === ConnectionState.ONLINE;
   }
 
+  // ✅ 기존 setOnline 메서드 (하위 호환성)
   setOnline(status: boolean) {
     console.log('[DeviceService] setOnline:', status);
-    this.isOnlineSubject.next(status);
+    const state = status ? ConnectionState.ONLINE : ConnectionState.OFFLINE;
+    this.setConnectionState(state);
+  }
+
+  // ✅ 새로운 상태 설정 메서드
+  setConnectionState(state: ConnectionState) {
+    console.log('[DeviceService] setConnectionState:', state);
+    this.connectionStateSubject.next(state);
+    // 기존 isOnlineSubject도 동기화
+    this.isOnlineSubject.next(state === ConnectionState.ONLINE);
   }
 
   async initNotifications() {

@@ -32,7 +32,8 @@
         "sunday": "Sun",
         "connected": "Connected",
         "scanning": "Scanning..",
-        "nodevice": "Device Required"
+        "nodevice": "Device Required",
+        "unknown": "Checking..."
 
     },
 
@@ -102,6 +103,7 @@
         "sleepStage3": "Deep",
         "tossing": "Toss&Turn",
         "sleepPattern": "Sleep Pattern",
+        "actualSleepTime": "Actual Sleep Time",
         "timeToFallAsleep": "Time to fall asleep",
         "awayFromBed": "Away",
         "averageRespiration": "Average Respiration",
@@ -135,6 +137,7 @@
         "hejhome": "Hejhome Account",
         "usage": "Usage",
         "version": "Version",
+        "realtimeGraph": "Realtime Graph",
         "language": "Language",
         "languageAuto": "Automatic",
         "familyShare": "Share with family",

@@ -6,8 +6,11 @@ export class Tab2DayUiSleepData {
     totalInbedMinute?: string;
     startTime?: string;
     endTime?: string;
+    inbedTime?: string;
     asleepTime?: string;
     wakeTime?: string;
+    actualSleepHour?: string;
+    actualSleepMinute?: string;
     timeToFallAsleep?: number;
     outOfBedTime?: number;
     feeling?: number;

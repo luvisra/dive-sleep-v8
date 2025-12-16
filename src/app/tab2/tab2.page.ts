@@ -278,19 +278,55 @@ export class Tab2Page implements OnInit, AfterViewInit {
 
   initUiData() {
     this.ngZone.run(() => {
-      this.uiData.sleepArray = [];
-      this.uiData.sleepTimeArray = [];
+      /* sleep info */
+      this.uiData.sleepScore = 0;
+      this.uiData.totalSleepHour = '0';
+      this.uiData.totalSleepMinute = '0';
+      this.uiData.totalInbedMinute = '0';
+      this.uiData.startTime = '0';
+      this.uiData.endTime = '0';
+      this.uiData.inbedTime = '0';
+      this.uiData.asleepTime = '0';
+      this.uiData.wakeTime = '0';
+      this.uiData.actualSleepHour = '0';
+      this.uiData.actualSleepMinute = '0';
+      this.uiData.timeToFallAsleep = 0;
+      this.uiData.outOfBedTime = 0;
+      this.uiData.feeling = 0;
+
+      /* sleep status */
+      this.uiData.awayTime = 0;
       this.uiData.sleepStatus1 = 0;
       this.uiData.sleepStatus2 = 0;
       this.uiData.sleepStatus3 = 0;
       this.uiData.sleepStatus4 = 0;
+
+      /* averages */
       this.uiData.avgRespiratory = 0;
       this.uiData.avgHeartrate = 0;
       this.uiData.avgSnoring = 0;
-      this.uiData.avgApnea = 0;
       this.uiData.avgMotionBed = 0;
-      this.uiData.timeToFallAsleep = 0;
-      this.uiData.awayTime = 0;
+      this.uiData.avgImpulse = 0;
+      this.uiData.avgApnea = 0;
+
+      /* arrays */
+      this.uiData.moveArray = [];
+      this.uiData.moveTimeArray = [];
+      this.uiData.hrArray = [];
+      this.uiData.respArray = [];
+      this.uiData.sleepArray = [];
+      this.uiData.sleepTimeArray = [];
+      this.uiData.snoringArray = [];
+      this.uiData.snoringTimeArray = [];
+      this.uiData.apneaArray = [];
+      this.uiData.apneaTimeArray = [];
+      this.uiData.motionBedArray = [];
+      this.uiData.motionTimeBedArray = [];
+      this.uiData.tossArray = [];
+      this.uiData.tossTimeArray = [];
+
+      // 색상도 초기화
+      this.circleColor = '#3478F5';
     });
   }
 
@@ -448,6 +484,253 @@ export class Tab2Page implements OnInit, AfterViewInit {
     this.sleepAnalysis.tab2DayUiSubject.next(true);
   }
 
+  /**
+   * 선택된 날짜를 포맷팅하여 반환 (예: "2025년 12월 16일")
+   */
+  getFormattedDate(): string {
+    return moment(this.selectedDate).format('YYYY년 MM월 DD일');
+  }
+
+  /**
+   * 모든 UI 데이터 초기화 (ngZone 없이)
+   */
+  private clearAllUiData() {
+    // sleepAnalysis의 sleepDayResult를 빈 배열로 초기화 (중요!)
+    this.sleepAnalysis.sleepDayResult.sleep = [];
+    this.sleepAnalysis.sleepDayResult.impulse = [];
+    this.sleepAnalysis.sleepDayResult.respiratory = [];
+    this.sleepAnalysis.sleepDayResult.heartrate = [];
+    this.sleepAnalysis.sleepDayResult.snoring = [];
+    this.sleepAnalysis.sleepDayResult.apnea = [];
+    this.sleepAnalysis.sleepDayResult.motionBed = [];
+
+    /* sleep info */
+    this.uiData.sleepScore = 0;
+    this.uiData.totalSleepHour = '0';
+    this.uiData.totalSleepMinute = '0';
+    this.uiData.totalInbedMinute = '0';
+    this.uiData.startTime = '0';
+    this.uiData.endTime = '0';
+    this.uiData.inbedTime = '0';
+    this.uiData.asleepTime = '0';
+    this.uiData.wakeTime = '0';
+    this.uiData.actualSleepHour = '0';
+    this.uiData.actualSleepMinute = '0';
+    this.uiData.timeToFallAsleep = 0;
+    this.uiData.outOfBedTime = 0;
+    this.uiData.feeling = 0;
+
+    /* sleep status */
+    this.uiData.awayTime = 0;
+    this.uiData.sleepStatus1 = 0;
+    this.uiData.sleepStatus2 = 0;
+    this.uiData.sleepStatus3 = 0;
+    this.uiData.sleepStatus4 = 0;
+
+    /* averages */
+    this.uiData.avgRespiratory = 0;
+    this.uiData.avgHeartrate = 0;
+    this.uiData.avgSnoring = 0;
+    this.uiData.avgMotionBed = 0;
+    this.uiData.avgImpulse = 0;
+    this.uiData.avgApnea = 0;
+
+    /* arrays */
+    this.uiData.moveArray = [];
+    this.uiData.moveTimeArray = [];
+    this.uiData.hrArray = [];
+    this.uiData.respArray = [];
+    this.uiData.sleepArray = [];
+    this.uiData.sleepTimeArray = [];
+    this.uiData.snoringArray = [];
+    this.uiData.snoringTimeArray = [];
+    this.uiData.apneaArray = [];
+    this.uiData.apneaTimeArray = [];
+    this.uiData.motionBedArray = [];
+    this.uiData.motionTimeBedArray = [];
+    this.uiData.tossArray = [];
+    this.uiData.tossTimeArray = [];
+
+    // 색상도 초기화
+    this.circleColor = '#3478F5';
+
+    // 차트 데이터 초기화 - 새 배열로 할당하여 변경 감지 트리거
+    this.respiratoryChartData = {
+      datasets: [{
+        data: [],
+        label: 'Respiratory',
+        type: 'bar',
+        borderColor: '#10DC60',
+        backgroundColor: 'rgba(16, 220, 96, 0.2)',
+      }],
+      labels: []
+    };
+    this.respiratoryChartLabels = [];
+
+    this.heartrateChartData = {
+      datasets: [{
+        data: [],
+        label: 'Heartrate',
+        type: 'bar',
+        borderColor: '#ED6230',
+        backgroundColor: 'rgba(237, 98, 48, 0.2)',
+      }],
+      labels: []
+    };
+    this.heartrateChartLabels = [];
+
+    this.snoringChartData = {
+      datasets: [{
+        data: [],
+        label: 'Snoring',
+        type: 'bar',
+        borderColor: '#3478F5',
+        backgroundColor: 'rgba(52, 120, 245, 0.2)',
+      }],
+      labels: []
+    };
+    this.snoringChartLabels = [];
+
+    this.apneaChartData = {
+      datasets: [{
+        data: [],
+        label: 'Apnea',
+        type: 'bar',
+        borderColor: '#ED6230',
+        backgroundColor: 'rgba(237, 98, 48, 0.2)',
+      }],
+      labels: []
+    };
+    this.apneaChartLabels = [];
+
+    this.motionBedChartData = {
+      datasets: [{
+        data: [],
+        label: 'Motion Bed',
+        type: 'line',
+        borderColor: '#3478F5',
+        backgroundColor: 'rgba(52, 120, 245, 0.2)',
+      }],
+      labels: []
+    };
+    this.motionBedChartLabels = [];
+
+    this.impulseChartData = {
+      datasets: [{
+        data: [],
+        label: 'Impulse',
+        type: 'bar',
+        borderColor: '#ED6230',
+        backgroundColor: 'rgba(237, 98, 48, 0.2)',
+      }],
+      labels: []
+    };
+    this.impulseChartLabels = [];
+  }
+
+  /**
+   * 이전 날짜로 이동
+   */
+  changeDateBack() {
+    const originalDate = moment(this.selectedDate, 'YYYY-MM-DD');
+    const changeDate = moment(this.selectedDate, 'YYYY-MM-DD').subtract(1, 'day');
+
+    console.log('[Tab2] changeDateBack:', changeDate.format('YYYY-MM-DD'), '← 원래:', originalDate.format('YYYY-MM-DD'));
+
+    this.ngZone.run(() => {
+      // UI 초기화 (이전 데이터 클리어)
+      this.clearAllUiData();
+
+      // 날짜 변경
+      this.selectedDate = changeDate.format('YYYY-MM-DD');
+    });
+
+    if (changeDate.month() !== originalDate.month()) {
+      this.updateMonthlySleepResults(changeDate, 'back');
+    } else {
+      this.onChangeDate();
+    }
+  }
+
+  /**
+   * 다음 날짜로 이동 (오늘 이후로는 불가)
+   */
+  changeDateForward() {
+    const today = moment();
+    const originalDate = moment(this.selectedDate, 'YYYY-MM-DD');
+    const changeDate = moment(this.selectedDate, 'YYYY-MM-DD').add(1, 'day');
+    const diff = moment.duration(today.diff(changeDate)).asDays();
+
+    console.log('[Tab2] changeDateForward:', changeDate.format('YYYY-MM-DD'), '← 원래:', originalDate.format('YYYY-MM-DD'), 'diff:', diff);
+
+    // 오늘 이후로는 이동 불가
+    if (diff < 0) {
+      console.log('[Tab2] 오늘 이후로는 이동할 수 없습니다.');
+      return;
+    }
+
+    this.ngZone.run(() => {
+      // UI 초기화 (이전 데이터 클리어)
+      this.clearAllUiData();
+
+      // 날짜 변경
+      this.selectedDate = changeDate.format('YYYY-MM-DD');
+    });
+
+    if (changeDate.month() !== originalDate.month()) {
+      this.updateMonthlySleepResults(changeDate, 'forward');
+    } else {
+      this.onChangeDate();
+    }
+  }
+
+  /**
+   * 날짜 변경 시 해당 날짜의 수면 데이터 로드
+   */
+  onChangeDate() {
+    console.log('[Tab2] onChangeDate:', this.selectedDate);
+
+    if (!this.authService.user) {
+      console.warn('[Tab2] 사용자 정보 없음');
+      return;
+    }
+
+    // 선택된 날짜의 수면 데이터 찾기
+    this.sleepAnalysis.findDiveSleepResultsByDate(this.selectedDate);
+
+    // UI 업데이트
+    this.sleepAnalysis.tab2DayUiSubject.next(true);
+  }
+
+  /**
+   * 월이 변경될 때 해당 월의 수면 데이터 로드
+   */
+  async updateMonthlySleepResults(changeDate: moment.Moment, direction: 'back' | 'forward') {
+    console.log('[Tab2] updateMonthlySleepResults:', changeDate.format('YYYY-MM'), 'direction:', direction);
+
+    if (!this.authService.user) {
+      console.warn('[Tab2] 사용자 정보 없음');
+      return;
+    }
+
+    try {
+      await this.sleepAnalysis.querySleepDataMonth(
+        this.authService.user.username,
+        changeDate.year(),
+        changeDate.month() + 1,
+        false
+      );
+
+      // 선택된 날짜의 수면 데이터 찾기
+      this.sleepAnalysis.findDiveSleepResultsByDate(this.selectedDate);
+
+      // UI 업데이트
+      this.sleepAnalysis.tab2DayUiSubject.next(true);
+    } catch (error) {
+      console.error('[Tab2] 월간 데이터 로드 실패:', error);
+    }
+  }
+
   async requestSleepAnalysis() {
     const loading = await this.loadingController.create({
       message: '수면 분석 요청 중...',
@@ -468,14 +751,40 @@ export class Tab2Page implements OnInit, AfterViewInit {
   processSleepDetailUi() {
     console.log('[Tab2] ========== processSleepDetailUi 시작 ==========');
     this.initCharts();
-    
+
     const sArray = new Array();
     const tArray = new Array();
     const rArray = new Array();
     const hArray = new Array();
 
     if (!this.sleepAnalysis.sleepDayResult) {
-      console.error('[Tab2] ❌ sleepDayResult가 없음');
+      console.error('[Tab2] ❌ sleepDayResult가 없음 - UI 초기화 상태 유지');
+      // 데이터가 없어도 UI가 초기화된 상태로 표시되도록 ngZone.run으로 변경 감지 트리거
+      this.ngZone.run(() => {
+        // 모든 필드를 명시적으로 초기화하여 변경 감지 트리거
+        this.uiData.sleepScore = 0;
+        this.uiData.totalSleepHour = '0';
+        this.uiData.totalSleepMinute = '0';
+        this.uiData.inbedTime = '00:00';
+        this.uiData.asleepTime = '00:00';
+        this.uiData.wakeTime = '00:00';
+        this.uiData.actualSleepHour = '0';
+        this.uiData.actualSleepMinute = '0';
+        this.uiData.timeToFallAsleep = 0;
+        this.uiData.awayTime = 0;
+        this.uiData.avgRespiratory = 0;
+        this.uiData.avgHeartrate = 0;
+        this.uiData.avgSnoring = 0;
+        this.uiData.avgApnea = 0;
+        this.uiData.avgMotionBed = 0;
+        this.uiData.avgImpulse = 0;
+        this.uiData.sleepStatus1 = 0;
+        this.uiData.sleepStatus2 = 0;
+        this.uiData.sleepStatus3 = 0;
+        this.uiData.sleepStatus4 = 0;
+        this.circleColor = '#3478F5';
+      });
+      console.log('[Tab2] ========== processSleepDetailUi 완료 (데이터 없음) ==========');
       return;
     }
 
@@ -533,21 +842,54 @@ export class Tab2Page implements OnInit, AfterViewInit {
         console.log('[Tab2] ✅ sleepScore:', this.uiData.sleepScore, 'color:', this.circleColor);
       }
 
-      // 총 수면 시간
+      // 실제 수면 시간 (asleepTime ~ wakeTime)
       if (result.totalSleepMinute !== undefined) {
         const totalMinutes = typeof result.totalSleepMinute === 'string' ? parseFloat(result.totalSleepMinute) : result.totalSleepMinute;
         const hour = Math.floor(totalMinutes / 60);
         const minute = Math.round(totalMinutes - hour * 60);
-        this.uiData.totalSleepHour = hour.toString();
-        this.uiData.totalSleepMinute = minute.toString();
-        console.log('[Tab2] ✅ totalSleepTime:', hour, 'h', minute, 'min');
+        this.uiData.actualSleepHour = hour.toString();
+        this.uiData.actualSleepMinute = minute.toString();
+        console.log('[Tab2] ✅ actualSleepTime:', hour, 'h', minute, 'min');
       }
 
-      // 취침/기상 시간
-      if (result.startTime) {
-        this.uiData.asleepTime = result.startTime.substring(11, 16); // HH:MM 형식
+      // 침대에 있던 총 시간 (inbedTime ~ wakeTime)
+      if (result.totalInbedMinute !== undefined) {
+        const totalMinutes = typeof result.totalInbedMinute === 'string' ? parseFloat(result.totalInbedMinute) : result.totalInbedMinute;
+        const hour = Math.floor(totalMinutes / 60);
+        const minute = Math.round(totalMinutes - hour * 60);
+        this.uiData.totalSleepHour = hour.toString();
+        this.uiData.totalSleepMinute = minute.toString();
+        console.log('[Tab2] ✅ totalInbedTime:', hour, 'h', minute, 'min');
+      } else if (result.startTime && result.endTime) {
+        // totalInbedMinute가 없으면 startTime ~ endTime으로 계산
+        const startMoment = moment(result.startTime);
+        const endMoment = moment(result.endTime);
+        const totalMinutes = endMoment.diff(startMoment, 'minutes');
+        const hour = Math.floor(totalMinutes / 60);
+        const minute = totalMinutes - hour * 60;
+        this.uiData.totalSleepHour = hour.toString();
+        this.uiData.totalSleepMinute = minute.toString();
+        console.log('[Tab2] ✅ totalInbedTime (calculated):', hour, 'h', minute, 'min');
       }
-      if (result.endTime) {
+
+      // 침대에 누운 시간 (inbedTime)
+      if (result.startTime) {
+        this.uiData.inbedTime = result.startTime.substring(11, 16); // HH:MM 형식
+      }
+
+      // 입면 시간 (asleepTime)
+      if (result.asleepTime) {
+        this.uiData.asleepTime = result.asleepTime.substring(11, 16);
+      } else if (result.startTime) {
+        // asleepTime이 없으면 startTime 사용 (하위 호환성)
+        this.uiData.asleepTime = result.startTime.substring(11, 16);
+      }
+
+      // 기상 시간 (wakeTime)
+      if (result.wakeTime) {
+        this.uiData.wakeTime = result.wakeTime.substring(11, 16);
+      } else if (result.endTime) {
+        // wakeTime이 없으면 endTime 사용 (하위 호환성)
         this.uiData.wakeTime = result.endTime.substring(11, 16);
       }
 

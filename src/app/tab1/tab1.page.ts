@@ -65,9 +65,6 @@ export class Tab1Page implements OnInit, AfterViewInit {
   appPausedTime: any;
   scoreUnitsText: string = '';
   deviceCheckTimer: any;
-  private devIdCheckTimer: any = null;
-  private isDevIdCheckRunning = false;
-  private readonly DEV_ID_CHECK_TIMEOUT = 5000; // 5초
 
   ngAfterViewInit() {
     this.initSwiper();
@@ -211,9 +208,9 @@ export class Tab1Page implements OnInit, AfterViewInit {
   doRefresh(event: any) {
     console.log('[Refresh] ========== doRefresh() 호출 ==========');
 
-    // ✅ 먼저 오프라인으로 설정 (ping 응답 받으면 자동으로 온라인으로 변경됨)
-    this.deviceService.setOnline(false);
-    console.log('[Refresh] 온라인 상태를 false로 초기화');
+    // ✅ 장치 ID 불변성 보장
+    const currentDevId = this.deviceService.devId;
+    console.log('[Refresh] 현재 devId:', currentDevId || '(없음)');
 
     // ✅ IoT Policy 재연결
     this.mqttService.attachDevToIotPolicy();
@@ -262,10 +259,9 @@ export class Tab1Page implements OnInit, AfterViewInit {
     }, 1000);
   }
 
-  checkDeviceIsAlive() {
+  async checkDeviceIsAlive() {
     console.log('[Check Alive] ========== checkDeviceIsAlive() 호출 ==========');
     console.log('[Check Alive] deviceService.devId:', this.deviceService.devId || '(없음)');
-    console.log('[Check Alive] deviceService.isOnline (현재):', this.deviceService.isOnline);
     console.log('[Check Alive] authService.signedIn:', this.authService.signedIn);
 
     if (this.authService.signedIn && (this.deviceService.devId === '' || this.deviceService.devId === null)) {
@@ -274,44 +270,21 @@ export class Tab1Page implements OnInit, AfterViewInit {
       return;
     }
 
-    console.log('[Check Alive] 네트워크 확인 시작...');
-    this.mqttService.checkNetwork().then((isConnected) => {
-      if (!isConnected) {
-        console.error('[Check Alive] ❌ 네트워크 연결 안 됨');
-        alert('네트워크 연결을 확인 해 주세요.');
-        return;
+    // ✅ MQTT 구독 + ping (Promise 기반)
+    console.log('[Check Alive] MQTT ensureSubscriptionWithPing() 호출...');
+    try {
+      const isOnline = await this.mqttService.ensureSubscriptionWithPing();
+      console.log('[Check Alive] ✅ 확인 완료, 온라인 상태:', isOnline);
+      
+      if (isOnline) {
+        console.log('[Check Alive] refreshGoqualDeviceList() 호출');
+        this.refreshGoqualDeviceList();
       }
-
-      console.log('[Check Alive] ✅ 네트워크 연결됨');
-
-      if (this.deviceCheckTimer !== undefined) {
-        console.log('[Check Alive] 기존 타이머 제거');
-        clearTimeout(this.deviceCheckTimer);
-      }
-
-      // ✅ 구독 상태 확인 및 자동 복구
-      console.log('[Check Alive] MQTT 구독 상태 확인 중...');
-      this.mqttService.ensureSubscription();
-
-      // ✅ Ping만 전송 (구독은 유지)
-      console.log('[Check Alive] Ping 전송...');
-      this.mqttService.sendMessageToDevice('ping');
-
-      console.log('[Check Alive] refreshGoqualDeviceList() 호출');
-      this.refreshGoqualDeviceList();
-
-      // ✅ 타임아웃 설정: 5초 후에도 응답 없으면 오프라인으로 설정
-      this.deviceCheckTimer = setTimeout(() => {
-        if (!this.deviceService.isOnline) {
-          console.log('[Check Alive] ⚠️ 타임아웃: 5초 동안 응답 없음 - 디바이스 오프라인');
-          this.deviceService.setOnline(false);
-        }
-      }, 5000);
-
-      console.log('[Check Alive] ===============================================');
-    }).catch((error) => {
-      console.error('[Check Alive] 네트워크 확인 에러:', JSON.stringify(error, null, 2));
-    });
+    } catch (error) {
+      console.error('[Check Alive] ❌ 확인 실패:', error);
+    }
+    
+    console.log('[Check Alive] ===============================================');
   }
 
   slideSelected(event: any) {
@@ -338,13 +311,6 @@ export class Tab1Page implements OnInit, AfterViewInit {
     // 일반적인 deviceCheckTimer 정리
     if (this.deviceCheckTimer !== undefined) {
       clearTimeout(this.deviceCheckTimer);
-    }
-    // devId 확인 타이머 정리
-    if (this.devIdCheckTimer) {
-      console.log('[Tab1 Leave] devId 확인 타이머를 제거합니다.');
-      clearTimeout(this.devIdCheckTimer);
-      this.devIdCheckTimer = null;
-      this.isDevIdCheckRunning = false;
     }
   }
 
@@ -416,8 +382,15 @@ export class Tab1Page implements OnInit, AfterViewInit {
       }
     }
 
-    // 뷰에 진입할 때마다 devId 상태를 일관된 로직으로 확인
-    this.handleDevIdChange(this.deviceService.devId);
+    // ✅ devId 상태 확인
+    if (this.authService.signedIn) {
+      if (this.deviceService.devId && this.deviceService.devId !== '') {
+        console.log('[Tab1 Enter] devId 존재, 장치 상태 확인');
+        this.checkDeviceIsAlive();
+      } else {
+        console.log('[Tab1 Enter] devId 없음');
+      }
+    }
     console.log('[Tab1 Enter] ==========================================');
   }
 
@@ -480,79 +453,5 @@ export class Tab1Page implements OnInit, AfterViewInit {
         }
       }
     });
-
-    // devId 변경 감지 및 처리
-    this.deviceService.devIdSubject.subscribe({
-      next: devId => this.handleDevIdChange(devId)
-    });
-  }
-
-  /**
-   * devId 변경을 감지하고 장치 상태 확인 또는 등록 안내를 처리하는 핵심 로직
-   * @param devId 감지된 devId
-   */
-  private handleDevIdChange(devId: string | null) {
-    console.log(`[DevId Handler] devId 변경 감지: "${devId || 'null'}"`);
-
-    // 1. 로그인 상태가 아니면 모든 로직 중단
-    if (!this.authService.signedIn) {
-      console.log('[DevId Handler] ⚠️ 로그인 상태 아님, 처리 중단');
-      // 기존 타이머가 있다면 정리
-      if (this.devIdCheckTimer) {
-        console.log('[DevId Handler] 기존 타이머 제거');
-        clearTimeout(this.devIdCheckTimer);
-        this.devIdCheckTimer = null;
-        this.isDevIdCheckRunning = false;
-      }
-      return;
-    }
-
-    // 2. 유효한 devId가 감지된 경우
-    if (devId && devId !== '') {
-      console.log('[DevId Handler] ✅ 유효한 devId 감지, 장치 상태 확인');
-      // 진행 중이던 타이머가 있다면 취소
-      if (this.devIdCheckTimer) {
-        console.log('[DevId Handler] 대기 타이머 취소');
-        clearTimeout(this.devIdCheckTimer);
-        this.devIdCheckTimer = null;
-      }
-      this.isDevIdCheckRunning = false; // 타이머 상태 초기화
-      // 즉시 장치 상태 확인
-      this.ngZone.run(() => {
-        this.checkDeviceIsAlive();
-      });
-      return;
-    }
-
-    // 3. devId가 비어있고, 현재 타이머가 돌고 있지 않은 경우
-    if (!this.isDevIdCheckRunning) {
-      console.log(`[DevId Handler] ⚠️ devId가 비어있음. ${this.DEV_ID_CHECK_TIMEOUT / 1000}초 후 재확인 시작...`);
-      this.isDevIdCheckRunning = true; // 타이머 시작 플래그 설정
-
-      this.devIdCheckTimer = setTimeout(() => {
-        console.log(`[DevId Handler] ⏰ ${this.DEV_ID_CHECK_TIMEOUT / 1000}초 경과, 최종 devId 확인`);
-        // 타임아웃 후 최종적으로 devId를 다시 확인
-        if (!this.deviceService.devId || this.deviceService.devId === '') {
-          console.log('[DevId Handler] ❌ 최종 확인 결과 devId 없음. 장치 등록 알림 표시.');
-          this.ngZone.run(() => {
-            this.utilService.presentAlertConfirm(
-              '장치 등록 필요',
-              '서비스를 이용하기 위해서는 장치등록이 필요합니다. 확인 버튼을 누르면 장치 등록 페이지로 바로 이동합니다.',
-              '/device-registration'
-            );
-          });
-        } else {
-          console.log(`[DevId Handler] ✅ 최종 확인 결과 devId 발견: ${this.deviceService.devId}. 장치 상태 확인`);
-          this.ngZone.run(() => {
-            this.checkDeviceIsAlive();
-          });
-        }
-        // 타이머 종료 후 플래그 초기화
-        this.isDevIdCheckRunning = false;
-        this.devIdCheckTimer = null;
-      }, this.DEV_ID_CHECK_TIMEOUT);
-    } else {
-      console.log('[DevId Handler] 🔄 이미 확인 절차 진행 중, 스킵');
-    }
   }
 }

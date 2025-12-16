@@ -2,6 +2,9 @@ import { Injectable, OnDestroy } from '@angular/core';
 import { Router, NavigationExtras } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 
+// ✅ 초기화 상태 타입 정의
+export type InitState = 'idle' | 'loading' | 'success' | 'error' | 'no-userinfo';
+
 // AWS Amplify v6
 import {
   getCurrentUser,
@@ -20,7 +23,9 @@ import { DeviceService } from './device.service';
 import { CheckFirstService } from './check-first.service';
 import { UtilService } from './util.service';
 import { APIService } from './API.service';
+import { MqttService } from './mqtt.service';
 import { GLOBAL } from './static_config';
+import { Injector } from '@angular/core';
 
 @Injectable({
   providedIn: 'root'
@@ -31,6 +36,13 @@ export class AuthService implements OnDestroy {
   phoneNumber: string | null = null;
   greeting: string = '';
   public signedInSubject = new BehaviorSubject<boolean>(this.signedIn);
+  
+  // ✅ 초기화 상태 관리
+  public initializationState$ = new BehaviorSubject<InitState>('idle');
+  public userInfoError$ = new BehaviorSubject<string | null>(null);
+  
+  // ✅ API 조회 timeout (안전장치)
+  private readonly USERINFO_TIMEOUT = 15000; // 15초
 
   navigationExtras: NavigationExtras = {
     replaceUrl: true,
@@ -45,7 +57,8 @@ export class AuthService implements OnDestroy {
     private deviceService: DeviceService,
     private checkFirstService: CheckFirstService,
     private utilService: UtilService,
-    private apiService: APIService
+    private apiService: APIService,
+    private injector: Injector
   ) {
     console.log('authservice: starting service.');
     this.checkAuthState();
@@ -98,6 +111,9 @@ export class AuthService implements OnDestroy {
       await this.utilService.loadingController.dismiss();
     }
 
+    // ✅ 초기화 시작
+    this.initializationState$.next('loading');
+
     console.log('[Auth] ========== 로그인 성공 ==========');
     console.log('[Auth] Cognito Username (UUID): ' + user.username);
     console.log('[Auth] Cognito UserId: ' + user.userId);
@@ -133,11 +149,20 @@ export class AuthService implements OnDestroy {
     localStorage.setItem('username', user.username); // Cognito username 저장
     localStorage.setItem('phoneNumber', phoneNumber || ''); // 전화번호 별도 저장
 
+    // ✅ 안전장치: 15초 timeout Promise
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      setTimeout(() => reject(new Error('UserInfo 조회 타임아웃 (15초)')), this.USERINFO_TIMEOUT);
+    });
+
     try {
-      // ✅ QueryDiveSleepUserinfo 사용 (레거시 코드 방식)
-      console.log('[Auth] DB에서 사용자 정보 조회 중...');
+      // ✅ QueryDiveSleepUserinfo 사용 (레거시 코드 방식) + timeout
+      console.log('[Auth] DB에서 사용자 정보 조회 중... (timeout: 15초)');
       console.log('[Auth] 조회 키: ' + dbUsername);
-      const res = await this.apiService.QueryDiveSleepUserinfo(dbUsername);
+      
+      const res = await Promise.race([
+        this.apiService.QueryDiveSleepUserinfo(dbUsername),
+        timeoutPromise
+      ]);
 
       console.log('[Auth] 조회 결과 items 길이: ' + (res.items ? res.items.length : 0));
       console.log('[Auth] 조회 결과 전체: ' + JSON.stringify(res, null, 2));
@@ -148,6 +173,7 @@ export class AuthService implements OnDestroy {
           console.log('[Auth] ⚠️ items[0]이 null입니다.');
           this.deviceService.devId = '';
           this.deviceService.devIdSubject.next('');
+          this.initializationState$.next('success');
         } else {
           const devId = item.dev_id;
           console.log('[Auth] ✅ 사용자 정보 조회 성공');
@@ -182,19 +208,30 @@ export class AuthService implements OnDestroy {
 
           if (!devId) {
             console.log('[Auth] ⚠️ devId가 없습니다. 장치 등록 필요.');
+            this.initializationState$.next('success');
           } else {
             console.log('[Auth] ✅ devId 설정 완료: ' + devId);
+            // ✅ MQTT 구독 + ping (비동기)
+            const mqttService = this.injector.get(MqttService);
+            mqttService.subscribeToDeviceWithPing(devId).then(isOnline => {
+              console.log('[Auth] MQTT 구독 + ping 완료, 온라인:', isOnline);
+            }).catch(err => {
+              console.error('[Auth] MQTT 구독 + ping 실패:', err);
+            });
+            this.initializationState$.next('success');
           }
         }
       } else if (res.items && res.items.length === 0) {
         console.log('[Auth] ⚠️ DB에 사용자 정보가 없습니다 (items.length === 0). 신규 사용자로 간주.');
         this.deviceService.devId = '';
         this.deviceService.devIdSubject.next('');
+        this.initializationState$.next('no-userinfo');
       } else {
         console.log('[Auth] ⚠️ 예상하지 못한 응답 형식: items가 없거나 길이가 1이 아닙니다.');
         console.log('[Auth] res.items: ' + JSON.stringify(res.items, null, 2));
         this.deviceService.devId = '';
         this.deviceService.devIdSubject.next('');
+        this.initializationState$.next('error');
       }
 
       // ✅ devId 로드 완료 후 signedInSubject emit (레이스 컨디션 방지)
@@ -205,7 +242,7 @@ export class AuthService implements OnDestroy {
       console.log('[Auth] ==========================================');
       this.router.navigateByUrl(GLOBAL.START_PAGE, this.navigationExtras);
     } catch (error) {
-      console.error('[Auth] ========== 사용자 정보 조회 에러 ==========');
+      console.error('[Auth] ========== 사용자 정보 조회 에러 (또는 timeout) ==========');
       console.error('[Auth] 에러 타입: ' + typeof error);
       console.error('[Auth] 에러 메시지: ' + (error as any)?.message);
       console.error('[Auth] 에러 전체: ' + JSON.stringify(error, null, 2));
@@ -217,10 +254,20 @@ export class AuthService implements OnDestroy {
         console.log('[Auth] ✅ localStorage에서 devId 복구:', cachedDevId);
         this.deviceService.devId = cachedDevId;
         this.deviceService.devIdSubject.next(cachedDevId);
+        // ✅ MQTT 구독 + ping (비동기)
+        const mqttService = this.injector.get(MqttService);
+        mqttService.subscribeToDeviceWithPing(cachedDevId).then(isOnline => {
+          console.log('[Auth] MQTT 구독 + ping 완료 (fallback), 온라인:', isOnline);
+        }).catch(err => {
+          console.error('[Auth] MQTT 구독 + ping 실패 (fallback):', err);
+        });
+        this.initializationState$.next('success');
       } else {
-        console.log('[Auth] ⚠️ localStorage에 devId 없음, 빈 문자열 설정');
+        console.log('[Auth] ⚠️ localStorage에 devId 없음, 에러 상태로 설정');
         this.deviceService.devId = '';
         this.deviceService.devIdSubject.next('');
+        this.userInfoError$.next((error as any)?.message || 'Unknown error');
+        this.initializationState$.next('error');
       }
 
       // ✅ 에러 발생 시에도 signedInSubject emit (MQTT 구독 트리거)
@@ -343,5 +390,77 @@ export class AuthService implements OnDestroy {
       console.error('Confirm reset password error:', error);
       throw error;
     }
+  }
+
+  // ✅ UserInfo 재조회 메서드 (doRefresh, 에러 재시도용)
+  async retryLoadUserInfo(): Promise<void> {
+    if (!this.user) {
+      console.warn('[Auth retryLoadUserInfo] user가 null입니다. 재조회 불가능.');
+      return;
+    }
+
+    const dbUsername = this.phoneNumber || this.user.username;
+    console.log('[Auth retryLoadUserInfo] ========== UserInfo 재조회 시작 ==========');
+    console.log('[Auth retryLoadUserInfo] 조회 키:', dbUsername);
+    
+    this.initializationState$.next('loading');
+
+    // ✅ 안전장치: 15초 timeout
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      setTimeout(() => reject(new Error('재조회 타임아웃 (15초)')), this.USERINFO_TIMEOUT);
+    });
+
+    try {
+      const res = await Promise.race([
+        this.apiService.QueryDiveSleepUserinfo(dbUsername),
+        timeoutPromise
+      ]);
+
+      console.log('[Auth retryLoadUserInfo] 조회 결과:', JSON.stringify(res, null, 2));
+
+      if (res.items && res.items.length > 0 && res.items[0]) {
+        const devId = res.items[0].dev_id || '';
+        console.log('[Auth retryLoadUserInfo] ✅ devId:', devId || '(없음)');
+        
+        this.deviceService.devId = devId;
+        this.deviceService.devIdSubject.next(devId);
+        localStorage.setItem('devId', devId);
+
+        if (devId) {
+          // ✅ MQTT 구독 + ping (비동기)
+          const mqttService = this.injector.get(MqttService);
+          mqttService.subscribeToDeviceWithPing(devId).then(isOnline => {
+            console.log('[Auth retryLoadUserInfo] MQTT 구독 + ping 완료, 온라인:', isOnline);
+          }).catch(err => {
+            console.error('[Auth retryLoadUserInfo] MQTT 구독 + ping 실패:', err);
+          });
+        }
+        
+        this.initializationState$.next('success');
+      } else if (res.items && res.items.length === 0) {
+        console.log('[Auth retryLoadUserInfo] ⚠️ 신규 사용자 (userInfo 없음)');
+        this.initializationState$.next('no-userinfo');
+      } else {
+        console.log('[Auth retryLoadUserInfo] ⚠️ 예상하지 못한 응답');
+        this.initializationState$.next('error');
+      }
+    } catch (error) {
+      console.error('[Auth retryLoadUserInfo] ========== 재조회 에러 ==========');
+      console.error('[Auth retryLoadUserInfo] 에러:', (error as any)?.message);
+
+      // ✅ localStorage fallback
+      const cachedDevId = localStorage.getItem('devId');
+      if (cachedDevId && cachedDevId !== '') {
+        console.log('[Auth retryLoadUserInfo] localStorage에서 devId 복구:', cachedDevId);
+        this.deviceService.devId = cachedDevId;
+        this.deviceService.devIdSubject.next(cachedDevId);
+        this.initializationState$.next('success');
+      } else {
+        this.userInfoError$.next((error as any)?.message || 'Unknown error');
+        this.initializationState$.next('error');
+      }
+    }
+
+    console.log('[Auth retryLoadUserInfo] ==========================================');
   }
 }

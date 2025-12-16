@@ -64,6 +64,9 @@
     <ion-item detail (click)="versionInfo()">
       <ion-icon slot="start" name="information-circle" class="menuItem"></ion-icon>{{ 'TAB4.version' | translate }}
     </ion-item>
+    <ion-item detail routerLink="/realtime-chart" routerDirection="forward">
+      <ion-icon slot="start" name="pulse" class="menuItem"></ion-icon>{{ 'TAB4.realtimeGraph' | translate }}
+    </ion-item>
     <ion-item detail (click)="factoryReset()">
       <ion-icon slot="start" name="refresh" class="menuItem"></ion-icon>{{ 'TAB4.factory' | translate }}
     </ion-item>

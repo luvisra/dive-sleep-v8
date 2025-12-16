@@ -8,7 +8,7 @@ import {
   ListAttachedPoliciesCommand
 } from '@aws-sdk/client-iot';
 
-import { DeviceService } from './device.service';
+import { DeviceService, ConnectionState } from './device.service';
 import { AuthService } from './auth.service';
 import { Platform } from '@ionic/angular';
 import { FamilyShareService } from './family-share.service';
@@ -32,6 +32,12 @@ export class MqttService {
 
   // ✅ MQTT 메시지 수신 알림용 Subject (wificonnection에서 구독)
   public messageReceived$ = new Subject<any>();
+
+  // ✅ ping 응답 대기용 timeout (8초)
+  private readonly SUBSCRIPTION_TIMEOUT = 8000;
+  
+  // ✅ 펌웨어 업데이트 alert 중복 방지
+  private shownFirmwareAlertVersion: string | null = null;
 
   constructor(
     private deviceService: DeviceService,
@@ -243,6 +249,109 @@ export class MqttService {
     this.subscribeToDevice();
   }
 
+  /**
+   * ✅ Promise 기반 구독 + ping 전송 (AuthService에서 호출)
+   * - 구독 시작 후 1초 대기
+   * - ping 전송
+   * - 8초 timeout 내에 응답 대기
+   * @param devId 구독할 장치 ID (선택사항)
+   * @returns Promise<boolean> 구독 및 연결 확인 성공 여부
+   */
+  async subscribeToDeviceWithPing(devId?: string): Promise<boolean> {
+    const targetDevId = devId || this.deviceService.devId;
+    
+    if (!targetDevId) {
+      console.warn('[MQTT Ping] ⚠️ devId 없음');
+      return false;
+    }
+
+    console.log('[MQTT Ping] ========== 구독 + Ping 시작 ==========');
+    console.log('[MQTT Ping] Target devId:', targetDevId);
+
+    // 1단계: 기존 구독 확인/설정
+    if (!this.currentMqttSession || this.deviceService.devId !== targetDevId) {
+      console.log('[MQTT Ping] 새로운 구독 시작...');
+      const subscribed = this.subscribeToDevice(targetDevId);
+      if (!subscribed) {
+        console.error('[MQTT Ping] ❌ 구독 실패');
+        this.deviceService.setConnectionState(ConnectionState.OFFLINE);
+        return false;
+      }
+      
+      // ✅ 구독 직후 1초 대기 (구독 안정화)
+      console.log('[MQTT Ping] 구독 안정화 대기 (1초)...');
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    } else {
+      console.log('[MQTT Ping] 이미 구독 중');
+    }
+
+    // 2단계: ping 전송 + 응답 대기 (8초 timeout)
+    console.log('[MQTT Ping] Ping 전송 중...');
+    
+    return new Promise<boolean>((resolve) => {
+      let resolved = false;
+      let timeoutHandle: any;
+
+      // ping 응답 대기용 구독
+      const pingSubscription = this.messageReceived$.subscribe(() => {
+        if (!resolved) {
+          resolved = true;
+          clearTimeout(timeoutHandle);
+          pingSubscription.unsubscribe();
+          console.log('[MQTT Ping] ✅ 응답 수신! (online)');
+          this.deviceService.setConnectionState(ConnectionState.ONLINE);
+          resolve(true);
+        }
+      });
+
+      // 8초 timeout
+      timeoutHandle = setTimeout(() => {
+        if (!resolved) {
+          resolved = true;
+          pingSubscription.unsubscribe();
+          console.warn('[MQTT Ping] ⚠️ Timeout (8초) - offline으로 간주');
+          this.deviceService.setConnectionState(ConnectionState.OFFLINE);
+          resolve(false);
+        }
+      }, this.SUBSCRIPTION_TIMEOUT);
+
+      // ping 전송
+      this.pubMqtt(targetDevId, 'ping', null).then((sent) => {
+        if (!sent) {
+          console.error('[MQTT Ping] ❌ ping 전송 실패');
+          if (!resolved) {
+            resolved = true;
+            clearTimeout(timeoutHandle);
+            pingSubscription.unsubscribe();
+            this.deviceService.setConnectionState(ConnectionState.OFFLINE);
+            resolve(false);
+          }
+        } else {
+          console.log('[MQTT Ping] ping 전송 완료, 응답 대기 중...');
+        }
+      });
+    });
+  }
+
+  /**
+   * ✅ 구독 상태 확인 + ping (Tab1 등에서 호출)
+   * @returns Promise<boolean> 연결 확인 성공 여부
+   */
+  async ensureSubscriptionWithPing(): Promise<boolean> {
+    console.log('[MQTT Ensure Ping] ========== 구독 확인 + Ping ==========');
+    console.log('[MQTT Ensure Ping] signedIn:', this.authService.signedIn);
+    console.log('[MQTT Ensure Ping] devId:', this.deviceService.devId);
+
+    if (!this.authService.signedIn || !this.deviceService.devId) {
+      console.warn('[MQTT Ensure Ping] ⚠️ 구독 불가능 (미로그인 또는 devId 없음)');
+      this.deviceService.setConnectionState(ConnectionState.OFFLINE);
+      return false;
+    }
+
+    // subscribeToDeviceWithPing 호출 (구독 + ping)
+    return await this.subscribeToDeviceWithPing();
+  }
+
   private attemptReconnect() {
     // 이미 재연결 중이거나 최대 시도 횟수를 초과한 경우
     if (this.isReconnecting || this.reconnectAttempts >= this.maxReconnectAttempts) {
@@ -307,9 +416,9 @@ export class MqttService {
     this.messageReceived$.next(data);
     console.log('[MQTT Handle] messageReceived$ emit 완료');
 
-    // ✅ 모든 MQTT 메시지 수신 시 온라인 상태를 true로 설정
-    this.deviceService.setOnline(true);
-    console.log('[MQTT Handle] 온라인 상태 업데이트: true');
+    // ✅ 모든 MQTT 메시지 수신 시 온라인 상태로 변경
+    this.deviceService.setConnectionState(ConnectionState.ONLINE);
+    console.log('[MQTT Handle] 연결 상태 업데이트: ONLINE');
 
     if (value.isMotionBed !== undefined) {
       this.deviceService.isMotionBedConnected = value.isMotionBed === 1;
@@ -350,6 +459,15 @@ export class MqttService {
     console.log('firmware_version', deviceVersion, cleanServerVersion, diff);
 
     if (diff >= 120) {
+      // ✅ 중복 alert 방지: 이미 표시한 버전이면 스킵
+      if (this.shownFirmwareAlertVersion === deviceVersion) {
+        console.log('[Firmware] Alert 이미 표시함, 스킵:', deviceVersion);
+        return;
+      }
+
+      console.log('[Firmware] Alert 표시:', deviceVersion);
+      this.shownFirmwareAlertVersion = deviceVersion;
+      
       this.utilService.presentAlertConfirm(
         '펌웨어 업데이트',
         '최신 펌웨어가 존재합니다. 펌웨어 업데이트 페이지로 이동합니다.',
