@@ -3,45 +3,42 @@ import { AudioService } from './audio.service';
 import { AuthService } from './auth.service';
 import { Injectable } from '@angular/core';
 import { Platform } from '@ionic/angular';
-import { FCM } from '@capacitor-community/fcm';
+
+// [변경] Firebase Messaging 플러그인 Import
+import { 
+  FirebaseMessaging, 
+  GetTokenOptions 
+} from '@capacitor-firebase/messaging';
+
+// [유지] 로컬 알림은 그대로 사용
+import { LocalNotifications } from '@capacitor/local-notifications';
+
+// [유지] 레거시 HTTP 요청 (Device Group 관리용)
 import { HTTP } from '@awesome-cordova-plugins/http/ngx';
 import { DeviceService } from './device.service';
 import { GCP_FCM_INFO } from './static_config';
-
-// 1. App 상태 관련
-import { App, AppState } from '@capacitor/app';
-
-// 2. 로컬 알림 관련
-import { LocalNotifications } from '@capacitor/local-notifications';
-
-// 3. 푸시 알림 관련 (타입 명칭 변경 주의)
-import { 
-  PushNotifications, 
-  PushNotificationSchema, // (구) PushNotification
-  Token,                  // (구) PushNotificationToken
-  ActionPerformed         // (구) PushNotificationActionPerformed
-} from '@capacitor/push-notifications';
-const fcm = FCM;
 
 @Injectable({
   providedIn: 'root'
 })
 export class FcmService {
-  remoteToken: any;
-  session: any;
-  notifications: PushNotificationSchema[] = [];
+  remoteToken: string = '';
   topicName = GCP_FCM_INFO.TOPIC_NAME;
   isInitialized = false;
-  constructor(private platform: Platform, private http: HTTP, private deviceService: DeviceService,
-              public audio: AudioService, private authService: AuthService, private apiService: APIService) {
-              }
 
-  // [Fix] token의 타입을 string으로 명시
+  constructor(
+    private platform: Platform, 
+    private http: HTTP, 
+    private deviceService: DeviceService,
+    public audio: AudioService, 
+    private authService: AuthService, 
+    private apiService: APIService
+  ) {}
+
+  // [유지] 사용자 테이블 토큰 업데이트 로직
   async updateTokenToUserTable(token: string) {
-    // [Fix] userName 초기화 (TS2454 방지) 및 타입 명시
     let userName: string | null = null;
     
-    // [Fix] Optional Chaining (?.)을 사용하여 null safety 확보 (TS2531 해결)
     if (this.authService.user?.username) {
       userName = this.authService.user.username;
     }
@@ -56,127 +53,131 @@ export class FcmService {
     };
 
     return await this.apiService.UpdateDiveSleepUserinfo(inputData).then((success) => {
-      console.log(success);
+      console.log('UpdateUserToken Success:', success);
     }).catch((err) => {
-      console.log(err);
+      console.log('UpdateUserToken Error:', err);
     });
   }
 
-  initFCM() {
-    // Request permission to use push notifications
-    // iOS will prompt user and return if they granted permission or not
-    // Android will just grant without prompting
+  // [수정] 초기화 및 리스너 등록
+  async initFCM() {
+    console.log('FCM Initializing...');
     const isFcmEnabled = localStorage.getItem('fcmEnabled');
-    console.log('fcm', 'Initializing.');
-    PushNotifications.requestPermissions().then(result => {
+
+    try {
+      // 1. 권한 요청
+      const result = await FirebaseMessaging.requestPermissions();
+      
       if (result.receive === 'granted') {
-        // Register with Apple / Google to receive push via APNS/FCM
-        PushNotifications.register().then((success) => {
-          if (isFcmEnabled === 'on') {
-            this.subscribeTopic(this.topicName);
-          }
-          console.log(success);
-        });
-      } else {
-        // Show some error
-      }
-      this.isInitialized = true;
-    });
+        console.log('Notification permission granted.');
+        
+        // 2. 토큰 가져오기 (iOS/Android 통합됨)
+        // iOS의 경우 APNS 토큰이 아닌 자동으로 매핑된 FCM 토큰을 가져옵니다.
+        const { token } = await FirebaseMessaging.getToken();
+        this.handleToken(token);
 
-    PushNotifications.addListener('registration',
-      (token: Token) => {
-        console.log('Push registration success, token: ' + token.value);
-
-        if (this.platform.is('android')) {
-          localStorage.setItem('fcmToken', token.value);
-          this.updateTokenToUserTable(token.value);
-          this.addToNotificationGroup(token.value);
-        } else if (this.platform.is('ios')) {
-          fcm.getToken().then((r) => {
-            // alert(`Token ${r.token}`);
-            console.log('fcmGetToken: ', r.token);
-            if (r.token) {
-                this.addToNotificationGroup(r.token);
-                localStorage.setItem('fcmEnabled', 'on');
-                console.log('iosFcmToken', r.token);
-                localStorage.setItem('fcmToken', r.token);
-                this.updateTokenToUserTable(r.token);
-            }
-          }).catch((err) => console.log(err));
+        // 3. 토픽 구독 (설정이 켜져있다면)
+        if (isFcmEnabled === 'on') {
+          await this.subscribeTopic(this.topicName);
         }
+
+      } else {
+        console.log('Notification permission denied.');
       }
-    );
+      
+      // 4. 리스너 등록: 토큰 갱신 감지
+      await FirebaseMessaging.addListener('tokenReceived', (event) => {
+        console.log('Token received:', event.token);
+        this.handleToken(event.token);
+      });
 
-    PushNotifications.addListener('registrationError',
-      (error: any) => {
-        console.log('Error on registration: ' + JSON.stringify(error));
-      }
-    );
+      // 5. 리스너 등록: 알림 수신 (Foreground)
+      await FirebaseMessaging.addListener('notificationReceived', async (event) => {
+        console.log('Push received:', JSON.stringify(event));
+        const notification = event.notification;
 
-    PushNotifications.addListener('pushNotificationReceived',
-      async (notification: PushNotificationSchema) => {
-        console.log('Push received: ' + JSON.stringify(notification));
-
-        if (notification.data.hasOwnProperty('alarm')) {
-          if (notification.data.alarm === 'stop') {
-            await this.audio.stop();
-          }
+        // 알람 정지 로직 (data 필드 확인)
+        if (notification.data && (notification.data as any).alarm === 'stop') {
+          await this.audio.stop();
         } else {
-          // [Fix] title과 body가 undefined일 경우 빈 문자열 할당 (TS2322 해결)
-          const notifs = LocalNotifications.schedule({
+          // 로컬 알림 표시 (Foreground에서 알림 보여주기 위함)
+          const notifs = await LocalNotifications.schedule({
             notifications: [
               {
                 title: notification.title ?? '', 
                 body: notification.body ?? '',
-                id: 1,
-                sound: 'default'
-                // schedule: { at: new Date(Date.now() + 1000 * 5) },
-                // attachments: null,
-                // actionTypeId: '',
-                // extra: null
+                id: new Date().getTime(), // 고유 ID 생성
+                sound: 'default',
+                extra: notification.data
               }
             ]
           });
-          console.log('scheduled notifications', notifs);
+          console.log('Scheduled local notification:', notifs);
         }
-      }
-    );
+      });
 
-    PushNotifications.addListener('pushNotificationActionPerformed',
-      (notification: ActionPerformed) => {
-        console.log('Push action performed: ' + JSON.stringify(notification));
-      }
-    );
-  }
+      // 6. 리스너 등록: 알림 클릭 (Action Performed)
+      await FirebaseMessaging.addListener('notificationActionPerformed', (event) => {
+        console.log('Push action performed:', JSON.stringify(event));
+        // 알림 클릭 시 이동할 페이지 로직 등을 여기에 작성
+      });
 
-  async subscribeTopic(topicName: string) {
-    await fcm
-    .subscribeTo({ topic: topicName })
-    .then(r => console.log('subscribed to topic ' + topicName))
-    .catch(err => console.log(err));
-  }
+      this.isInitialized = true;
 
-  async unsubscribeFrom(topicName: string) {
-    await fcm
-      .unsubscribeFrom({ topic: topicName })
-      .then(r => console.log('unsubscribed from topic ' + topicName))
-      .catch(err => console.log(err));
-
-    if (this.platform.is('android')) {
-      fcm.deleteInstance();
+    } catch (error) {
+      console.error('Error initializing FCM:', error);
     }
   }
 
-  getToken() {
-    fcm
-      .getToken()
-      .then(result => {
-        this.remoteToken = result.token;
-      })
-      .catch(err => console.log(err));
+  // [추가] 토큰 처리 공통 함수
+  private handleToken(token: string) {
+    console.log('Handling FCM Token:', token);
+    this.remoteToken = token;
+    
+    // 로컬 스토리지 저장
+    localStorage.setItem('fcmToken', token);
+    localStorage.setItem('fcmEnabled', 'on'); // 토큰을 받으면 활성화로 간주
+
+    // 서버 업데이트
+    this.updateTokenToUserTable(token);
+    this.addToNotificationGroup(token);
   }
 
-  // [Fix] deviceToken의 타입을 string으로 명시 (TS7006 해결)
+  // [수정] 토픽 구독 (메소드명 변경됨)
+  async subscribeTopic(topicName: string) {
+    try {
+      await FirebaseMessaging.subscribeToTopic({ topic: topicName });
+      console.log('Subscribed to topic:', topicName);
+    } catch (err) {
+      console.error('Error subscribing to topic:', err);
+    }
+  }
+
+  // [수정] 토픽 구독 취소 (메소드명 변경됨)
+  async unsubscribeFrom(topicName: string) {
+    try {
+      await FirebaseMessaging.unsubscribeFromTopic({ topic: topicName });
+      console.log('Unsubscribed from topic:', topicName);
+
+      // 안드로이드 인스턴스 삭제 로직은 삭제하거나, 꼭 필요하다면 아래 API 사용
+      // await FirebaseMessaging.deleteToken(); 
+    } catch (err) {
+      console.error('Error unsubscribing from topic:', err);
+    }
+  }
+
+  // [수정] 토큰 수동 조회
+  async getToken() {
+    try {
+      const { token } = await FirebaseMessaging.getToken();
+      this.remoteToken = token;
+      console.log('Current Token:', token);
+    } catch (err) {
+      console.error('Error getting token:', err);
+    }
+  }
+
+  // [유지] 레거시 Device Group 관리 (HTTP 호출은 변경 없음)
   addToNotificationGroup(deviceToken: string) {
     this.http.setDataSerializer('json');
     this.http.post(
@@ -184,36 +185,23 @@ export class FcmService {
         {
           operation: 'add',
           notification_key_name: GCP_FCM_INFO.GROUP_NAME,
-          // tslint:disable-next-line: max-line-length
           notification_key: GCP_FCM_INFO.DEFAULT_NOTIFICATION_KEY,
-          registration_ids: [
-            deviceToken
-          ]
+          registration_ids: [ deviceToken ]
         },
-        // tslint:disable-next-line: max-line-length
-        { Authorization: 'key=' + GCP_FCM_INFO.SERVER_KEY,
+        { 
+          Authorization: 'key=' + GCP_FCM_INFO.SERVER_KEY,
           project_id: GCP_FCM_INFO.SENDER_ID
-      }
+        }
       )
       .then(response => {
-        // prints 200
-        console.log(response);
-        try {
-          // response.data = JSON.parse(response.data);
-          // prints test
-          console.log(response);
-        } catch (e) {
-          console.error('JSON parsing error');
-        }
+        console.log('AddToGroup Success:', response);
       })
       .catch(response => {
-        console.log(response.status);
-        // prints Permission denied
-        console.log(response.error);
+        console.error('AddToGroup Error:', response.error);
       });
   }
 
-  // [Fix] deviceToken의 타입을 string으로 명시 (TS7006 해결)
+  // [유지] 레거시 Device Group 관리
   removeToNotificationGroup(deviceToken: string) {
     this.http.setDataSerializer('json');
     this.http.post(
@@ -221,30 +209,19 @@ export class FcmService {
         {
           operation: 'remove',
           notification_key_name: GCP_FCM_INFO.GROUP_NAME,
-          // tslint:disable-next-line: max-line-length
           notification_key: GCP_FCM_INFO.DEFAULT_NOTIFICATION_KEY,
-          registration_ids: [
-            deviceToken
-          ]
+          registration_ids: [ deviceToken ]
         },
-        // tslint:disable-next-line: max-line-length
-        { Authorization: 'key=' + GCP_FCM_INFO.SERVER_KEY,
+        { 
+          Authorization: 'key=' + GCP_FCM_INFO.SERVER_KEY,
           project_id: GCP_FCM_INFO.SENDER_ID
-      }
+        }
       )
       .then(response => {
-        // prints 200
-        console.log(response);
-        try {
-          // response.data = JSON.parse(response.data);
-          // prints test
-          console.log(response);
-        } catch (e) {
-          console.error('JSON parsing error');
-        }
+        console.log('RemoveFromGroup Success:', response);
       })
       .catch(response => {
-        console.log(response);
+        console.error('RemoveFromGroup Error:', response);
       });
   }
 }

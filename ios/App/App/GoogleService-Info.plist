@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>218065386824-rq4u98c1o54dm4k375akebuqkhuscvdd.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.218065386824-rq4u98c1o54dm4k375akebuqkhuscvdd</string>
+	<key>API_KEY</key>
+	<string>AIzaSyD9jDE-C9UWMaJX0SlSSOOq3QfkJeRM6LA</string>
+	<key>GCM_SENDER_ID</key>
+	<string>218065386824</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>kr.cnfrontier.sleep.dive</string>
+	<key>PROJECT_ID</key>
+	<string>dive-sleep</string>
+	<key>STORAGE_BUCKET</key>
+	<string>dive-sleep.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:218065386824:ios:c585d8d9864b3da0a8477d</string>
+	<key>DATABASE_URL</key>
+	<string>https://dive-sleep.firebaseio.com</string>
+</dict>
+</plist>

@@ -10,10 +10,7 @@ android {
 apply from: "../capacitor-cordova-android-plugins/cordova.variables.gradle"
 dependencies {
     implementation project(':capacitor-community-bluetooth-le')
-    implementation project(':capacitor-community-date-picker')
-    implementation project(':capacitor-community-fcm')
-    implementation project(':capacitor-community-native-audio')
-    implementation project(':capacitor-community-speech-recognition')
+    implementation project(':capacitor-firebase-messaging')
     implementation project(':capacitor-app')
     implementation project(':capacitor-camera')
     implementation project(':capacitor-device')
@@ -29,6 +26,7 @@ dependencies {
     implementation project(':capacitor-splash-screen')
     implementation project(':capacitor-status-bar')
     implementation project(':capgo-capacitor-wifi')
+    implementation project(':capgo-native-audio')
 
 }
 

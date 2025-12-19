@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { NativeAudio } from '@capacitor-community/native-audio';
+import { NativeAudio } from '@capgo/native-audio';
 import { Platform } from '@ionic/angular';
 
 enum MediaStatus {

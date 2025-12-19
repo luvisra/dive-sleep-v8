@@ -12,9 +12,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/ionic-team/capacitor-swift-pm.git", exact: "8.0.0"),
-        .package(name: "CapacitorCommunityDatePicker", path: "../../../node_modules/@capacitor-community/date-picker"),
-        .package(name: "CapacitorCommunityFcm", path: "../../../node_modules/@capacitor-community/fcm"),
-        .package(name: "CapacitorCommunityNativeAudio", path: "../../../node_modules/@capacitor-community/native-audio"),
+        .package(name: "CapacitorFirebaseMessaging", path: "../../../node_modules/@capacitor-firebase/messaging"),
         .package(name: "CapacitorApp", path: "../../../node_modules/@capacitor/app"),
         .package(name: "CapacitorCamera", path: "../../../node_modules/@capacitor/camera"),
         .package(name: "CapacitorDevice", path: "../../../node_modules/@capacitor/device"),
@@ -29,7 +27,8 @@ let package = Package(
         .package(name: "CapacitorScreenOrientation", path: "../../../node_modules/@capacitor/screen-orientation"),
         .package(name: "CapacitorSplashScreen", path: "../../../node_modules/@capacitor/splash-screen"),
         .package(name: "CapacitorStatusBar", path: "../../../node_modules/@capacitor/status-bar"),
-        .package(name: "CapgoCapacitorWifi", path: "../../../node_modules/@capgo/capacitor-wifi")
+        .package(name: "CapgoCapacitorWifi", path: "../../../node_modules/@capgo/capacitor-wifi"),
+        .package(name: "CapgoNativeAudio", path: "../../../node_modules/@capgo/native-audio")
     ],
     targets: [
         .target(
@@ -37,9 +36,7 @@ let package = Package(
             dependencies: [
                 .product(name: "Capacitor", package: "capacitor-swift-pm"),
                 .product(name: "Cordova", package: "capacitor-swift-pm"),
-                .product(name: "CapacitorCommunityDatePicker", package: "CapacitorCommunityDatePicker"),
-                .product(name: "CapacitorCommunityFcm", package: "CapacitorCommunityFcm"),
-                .product(name: "CapacitorCommunityNativeAudio", package: "CapacitorCommunityNativeAudio"),
+                .product(name: "CapacitorFirebaseMessaging", package: "CapacitorFirebaseMessaging"),
                 .product(name: "CapacitorApp", package: "CapacitorApp"),
                 .product(name: "CapacitorCamera", package: "CapacitorCamera"),
                 .product(name: "CapacitorDevice", package: "CapacitorDevice"),
@@ -54,7 +51,8 @@ let package = Package(
                 .product(name: "CapacitorScreenOrientation", package: "CapacitorScreenOrientation"),
                 .product(name: "CapacitorSplashScreen", package: "CapacitorSplashScreen"),
                 .product(name: "CapacitorStatusBar", package: "CapacitorStatusBar"),
-                .product(name: "CapgoCapacitorWifi", package: "CapgoCapacitorWifi")
+                .product(name: "CapgoCapacitorWifi", package: "CapgoCapacitorWifi"),
+                .product(name: "CapgoNativeAudio", package: "CapgoNativeAudio")
             ]
         )
     ]

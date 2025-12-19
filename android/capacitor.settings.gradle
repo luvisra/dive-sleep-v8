@@ -5,17 +5,8 @@ project(':capacitor-android').projectDir = new File('../node_modules/@capacitor/
 include ':capacitor-community-bluetooth-le'
 project(':capacitor-community-bluetooth-le').projectDir = new File('../node_modules/@capacitor-community/bluetooth-le/android')
 
-include ':capacitor-community-date-picker'
-project(':capacitor-community-date-picker').projectDir = new File('../node_modules/@capacitor-community/date-picker/android')
-
-include ':capacitor-community-fcm'
-project(':capacitor-community-fcm').projectDir = new File('../node_modules/@capacitor-community/fcm/android')
-
-include ':capacitor-community-native-audio'
-project(':capacitor-community-native-audio').projectDir = new File('../node_modules/@capacitor-community/native-audio/android')
-
-include ':capacitor-community-speech-recognition'
-project(':capacitor-community-speech-recognition').projectDir = new File('../node_modules/@capacitor-community/speech-recognition/android')
+include ':capacitor-firebase-messaging'
+project(':capacitor-firebase-messaging').projectDir = new File('../node_modules/@capacitor-firebase/messaging/android')
 
 include ':capacitor-app'
 project(':capacitor-app').projectDir = new File('../node_modules/@capacitor/app/android')
@@ -61,3 +52,6 @@ project(':capacitor-status-bar').projectDir = new File('../node_modules/@capacit
 
 include ':capgo-capacitor-wifi'
 project(':capgo-capacitor-wifi').projectDir = new File('../node_modules/@capgo/capacitor-wifi/android')
+
+include ':capgo-native-audio'
+project(':capgo-native-audio').projectDir = new File('../node_modules/@capgo/native-audio/android')
