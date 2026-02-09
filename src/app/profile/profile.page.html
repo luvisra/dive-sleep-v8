@@ -58,6 +58,24 @@
     </ion-item>
 </ion-list>
 
-<ion-button (click)="onSignOut()" *ngIf="authService.signedIn" color="danger" shape="round" expand="block">로그아웃
-</ion-button>
+<div style="padding: 1.0em;">
+  <ion-button 
+    (click)="onDeleteAccount()" 
+    *ngIf="authService.signedIn" 
+    color="danger" 
+    fill="outline"
+    shape="round" 
+    expand="block">
+    {{ 'PROFILE.deleteAccount' | translate }}
+  </ion-button>
+
+  <ion-button 
+    (click)="onSignOut()" 
+    *ngIf="authService.signedIn" 
+    color="danger" 
+    shape="round" 
+    expand="block">
+    로그아웃
+  </ion-button>
+</div>
 </ion-content>

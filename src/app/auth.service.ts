@@ -463,4 +463,98 @@ export class AuthService implements OnDestroy {
 
     console.log('[Auth retryLoadUserInfo] ==========================================');
   }
+
+  // ✅ 계정 삭제 메서드
+  async deleteUserAccount(): Promise<void> {
+    try {
+      const username = this.user?.username;
+      if (!username) {
+        throw new Error('No user logged in');
+      }
+
+      console.log('[Auth deleteUserAccount] ========== 계정 삭제 시작 ==========');
+      console.log('[Auth deleteUserAccount] Username:', username);
+
+      // 1. 가족 공유 정보 정리
+      console.log('[Auth deleteUserAccount] Step 1: 가족 공유 정보 정리');
+      await this.cleanupFamilyShareData(username);
+
+      // 2. DynamoDB 사용자 정보 삭제
+      console.log('[Auth deleteUserAccount] Step 2: DynamoDB 사용자 정보 삭제');
+      await this.apiService.DeleteDiveSleepUserinfo({ username });
+
+      // 3. AWS Cognito 사용자 삭제
+      console.log('[Auth deleteUserAccount] Step 3: AWS Cognito 사용자 삭제');
+      const { deleteUser } = await import('aws-amplify/auth');
+      await deleteUser();
+
+      // 4. 로컬 데이터 정리
+      console.log('[Auth deleteUserAccount] Step 4: 로컬 데이터 정리');
+      this.cleanupLocalData();
+
+      console.log('[Auth deleteUserAccount] ✅ 계정 삭제 완료');
+      console.log('[Auth deleteUserAccount] ==========================================');
+
+    } catch (error) {
+      console.error('[Auth deleteUserAccount] ========== 계정 삭제 에러 ==========');
+      console.error('[Auth deleteUserAccount] 에러:', error);
+      console.error('[Auth deleteUserAccount] ==========================================');
+      throw error;
+    }
+  }
+
+  // 가족 공유 데이터 정리
+  private async cleanupFamilyShareData(username: string): Promise<void> {
+    try {
+      // 본인이 requester인 경우 삭제 (내가 다른 사람에게 공유 요청한 경우)
+      const myRequests = await this.apiService.QueryDiveFamilyShareinfo(username);
+      
+      if (myRequests.items && myRequests.items.length > 0) {
+        console.log('[Auth] 가족 공유 요청 삭제:', myRequests.items.length, '개');
+        
+        for (const item of myRequests.items) {
+          if (item) {
+            await this.apiService.DeleteDiveFamilyShareInfo({
+              requester: item.requester,
+              username: item.username
+            });
+          }
+        }
+      }
+
+      // 참고: 본인이 username인 경우 (다른 사람이 나를 공유한 경우)는
+      // DynamoDB에서 자동으로 처리되거나, 백엔드에서 처리해야 합니다.
+      // 현재 API 구조상 requester로만 조회 가능하므로 여기서는 생략합니다.
+
+    } catch (error) {
+      console.error('[Auth] 가족 공유 데이터 정리 에러:', error);
+      // 에러가 발생해도 계속 진행 (중요한 단계는 Cognito 삭제)
+    }
+  }
+
+  // 로컬 데이터 정리
+  private cleanupLocalData(): void {
+    // 기존 signOut 로직 재사용
+    localStorage.removeItem('devId');
+    localStorage.removeItem('link_account');
+    localStorage.removeItem('userNickname');
+    localStorage.removeItem('fcmToken');
+    localStorage.removeItem('fcmEnabled');
+    localStorage.removeItem('username');
+    localStorage.removeItem('phoneNumber');
+
+    // 디바이스 서비스 변수 초기화
+    this.deviceService.devId = '';
+    this.deviceService.setOnline(false);
+    this.deviceService.userPhoto = null;
+    this.deviceService.isMotionBedConnected = false;
+    this.deviceService.userNickname = '';
+    this.deviceService.timerArray = [];
+    this.deviceService.timerToggleArray = [];
+
+    // 인증 상태 초기화
+    this.signedIn = false;
+    this.user = null;
+    this.signedInSubject.next(false);
+  }
 }

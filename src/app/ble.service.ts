@@ -22,33 +22,55 @@ export class BleService {
   async initializeBle() {
     try {
       await BleClient.initialize();
-      console.log('BLE Client initialized');
-    } catch (error) {
-      console.error('Error initializing BLE:', error);
+      console.log('[BLE] ✅ BLE Client initialized successfully');
+    } catch (error: any) {
+      console.error('[BLE] ❌ Error initializing BLE:', error);
+
+      // Handle different error types with helpful messages
+      if (error?.code === 'UNIMPLEMENTED') {
+        console.error('[BLE] ❌ CRITICAL: BLE plugin not properly installed or iOS simulator detected');
+        console.error('[BLE] 📱 iOS simulators do NOT support Bluetooth');
+        console.error('[BLE] 🔧 Solutions:');
+        console.error('[BLE]    1. Test on a REAL iPhone device (mandatory for BLE)');
+        console.error('[BLE]    2. Run: npx cap sync ios');
+        console.error('[BLE]    3. Clean build: Product > Clean Build Folder in Xcode');
+      } else if (error?.message?.includes('unsupported')) {
+        console.error('[BLE] ❌ BLE not supported on iOS simulator');
+        console.error('[BLE] 📱 Please test on a real iPhone device');
+      }
+
+      throw error; // Re-throw to let caller handle it
     }
   }
 
   async startBleScan() {
+    console.log('[BLE] ========== startBleScan START ==========');
     this.results = [];
+    console.log('[BLE] Results array cleared');
 
     try {
       // Initialize BLE if not already done
+      // On iOS, this will trigger Bluetooth permission request if not already granted
+      console.log('[BLE] Calling initializeBle()...');
       await this.initializeBle();
+      console.log('[BLE] initializeBle() completed successfully');
 
       // Clear any existing scan timeout
       if (this.scanTimeout) {
+        console.log('[BLE] Clearing existing scan timeout');
         clearTimeout(this.scanTimeout);
       }
 
       // Start scanning
-      console.log('Starting BLE scan...');
+      console.log('[BLE] Starting BLE scan with requestLEScan()...');
       await BleClient.requestLEScan(
         {},
         (result) => {
           this.ngZone.run(() => {
+            console.log('[BLE] Scan callback - device found:', result.localName, 'ID:', result.device.deviceId, 'RSSI:', result.rssi);
             // Filter for devices named 'Sleepss'
             if (result.localName === 'Sleepss') {
-              console.log('found the device! ' + result.device.deviceId + ' rssi = ' + result.rssi);
+              console.log('[BLE] ✅ Found Sleepss device! ' + result.device.deviceId + ' rssi = ' + result.rssi);
 
               // Convert to format compatible with existing code
               const device = {
@@ -58,29 +80,51 @@ export class BleService {
               };
 
               this.results.push(device);
+              console.log('[BLE] Added to results. Total devices:', this.results.length);
               this.bleScanResultSubject.next(this.results);
+            } else {
+              console.log('[BLE] Device ignored (not Sleepss):', result.localName);
             }
           });
         }
       );
+      console.log('[BLE] ✅ requestLEScan() started successfully - now scanning...');
 
       // Stop scanning after 3 seconds (matching original behavior)
+      console.log('[BLE] Setting 3-second timeout to stop scan...');
       this.scanTimeout = setTimeout(async () => {
         try {
+          console.log('[BLE] Timeout reached - stopping scan...');
           await BleClient.stopLEScan();
-          console.log('BLE scan stopped');
+          console.log('[BLE] ✅ BLE scan stopped after timeout');
         } catch (error) {
-          console.error('Error stopping BLE scan:', error);
+          console.error('[BLE] ❌ Error stopping BLE scan:', error);
         }
       }, 3000);
+      console.log('[BLE] Timeout scheduled');
+      console.log('[BLE] ========== startBleScan END (scanning in progress) ==========');
 
-    } catch (error) {
-      console.error('Error starting BLE scan:', error);
+    } catch (error: any) {
+      console.error('[BLE] ========== startBleScan ERROR ==========');
+      console.error('[BLE] ❌ Error starting BLE scan:', error);
+      console.error('[BLE] Error type:', error?.constructor?.name);
+      console.error('[BLE] Error message:', error?.message);
+      console.error('[BLE] Error code:', error?.code);
+      console.error('[BLE] Full error:', JSON.stringify(error, null, 2));
+
+      // Provide helpful error message for iOS simulator
+      if (error?.message?.includes('unsupported')) {
+        console.error('[BLE] BLE is not supported on iOS simulator. Please test on a real iOS device.');
+      }
+      console.error('[BLE] ========== startBleScan END (error) ==========');
     }
   }
 
   async connectToDevice(devId: string, maxRetries: number = 3): Promise<void> {
-    await this.initializeBle();
+    // 주의: initializeBle()을 여기서 호출하지 않음!
+    // iOS에서 initialize()는 새로운 CBCentralManager를 생성하여
+    // 스캔에서 발견한 peripheral 참조를 무효화시킴 → Connection timeout 발생
+    // BLE는 startBleScan()에서 이미 초기화됨
     
     console.log('[BLE] === Connection Start ===');
     console.log('[BLE] Device:', devId);
@@ -110,13 +154,39 @@ export class BleService {
         
         // 연결 시도
         console.log('[BLE] Initiating connection...');
-        await BleClient.connect(devId, (deviceId) => {
-          this.ngZone.run(() => {
-            console.log('[BLE] Device disconnected callback:', deviceId);
-            this.bleIsConnectedSubject.next(false);
-          });
+        console.log('[BLE] Device ID format check:', {
+          devId: devId,
+          length: devId?.length,
+          isUUID: devId?.includes('-'),
+          isMacFormat: /^([0-9A-F]{2}:){5}[0-9A-F]{2}$/i.test(devId || '')
         });
-        
+
+        try {
+          await BleClient.connect(devId, (deviceId) => {
+            this.ngZone.run(() => {
+              console.log('[BLE] Device disconnected callback:', deviceId);
+              this.bleIsConnectedSubject.next(false);
+            });
+          }, { timeout: 30000 }); // iOS에서 기본 10초는 부족할 수 있음
+        } catch (connectError: any) {
+          console.error('[BLE] ❌ BleClient.connect() failed');
+          console.error('[BLE] Connect Error Message:', connectError?.message);
+          console.error('[BLE] Connect Error Code:', connectError?.code);
+
+          // iOS specific: xpc connection invalid 확인
+          if (connectError?.message?.includes('xpc') ||
+              connectError?.message?.includes('XPC') ||
+              connectError?.message?.includes('invalid')) {
+            console.error('[BLE] ⚠️ iOS XPC Connection Invalid detected!');
+            console.error('[BLE] This usually means:');
+            console.error('[BLE]   1. BLE daemon communication failed');
+            console.error('[BLE]   2. Previous connection not fully cleaned up');
+            console.error('[BLE]   3. Device ID format issue (should be UUID on iOS)');
+          }
+
+          throw connectError;
+        }
+
         console.log('[BLE] ✅ Connection established');
         
         // Legacy 방식: 즉시 연결 완료 알림 (대기 없음)
@@ -247,17 +317,41 @@ export class BleService {
       // Write 시도
       const startTime = Date.now();
       console.log('[BLE WRITE] Attempting write at', new Date(startTime).toISOString());
-      
-      await BleClient.write(dev, serviceUuid, characteristicUuid, dataView);
-      
+      console.log('[BLE WRITE] Device ID format:', {
+        dev: dev,
+        isUUID: dev?.includes('-'),
+        isMacFormat: /^([0-9A-F]{2}:){5}[0-9A-F]{2}$/i.test(dev || '')
+      });
+
+      try {
+        await BleClient.write(dev, serviceUuid, characteristicUuid, dataView);
+      } catch (writeError: any) {
+        console.error('[BLE WRITE] ❌ BleClient.write() failed');
+        console.error('[BLE WRITE] Write Error Message:', writeError?.message);
+        console.error('[BLE WRITE] Write Error Code:', writeError?.code);
+
+        // iOS specific: xpc connection invalid 확인
+        if (writeError?.message?.includes('xpc') ||
+            writeError?.message?.includes('XPC') ||
+            writeError?.message?.includes('invalid')) {
+          console.error('[BLE WRITE] ⚠️ iOS XPC Connection Invalid detected during write!');
+          console.error('[BLE WRITE] Possible causes:');
+          console.error('[BLE WRITE]   1. Connection was dropped before write');
+          console.error('[BLE WRITE]   2. Device ID used for write differs from connect');
+          console.error('[BLE WRITE]   3. BLE peripheral state inconsistent');
+        }
+
+        throw writeError;
+      }
+
       const endTime = Date.now();
       const duration = endTime - startTime;
-      
+
       // Write 성공
       console.log('[BLE WRITE] ✅ Write successful!');
       console.log('[BLE WRITE] Duration:', duration, 'ms');
       console.log('[BLE WRITE] ========================================');
-      
+
       return true;
       
     } catch (error: any) {

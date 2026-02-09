@@ -1,5 +1,7 @@
 import UIKit
 import Capacitor
+import FirebaseCore
+import WebKit
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -8,6 +10,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        FirebaseApp.configure()
         return true
     }
 
@@ -27,6 +30,35 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func applicationDidBecomeActive(_ application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+        
+        // iOS 16.4+ WKWebView inspectable 설정
+        // Xcode 콘솔에서 [log] 태그로 console.log 출력을 보기 위해 필요
+        if #available(iOS 16.4, *) {
+            #if DEBUG
+            enableWebViewInspectable()
+            #endif
+        }
+    }
+    
+    private func enableWebViewInspectable() {
+        if #available(iOS 16.4, *) {
+            // 모든 Window의 subview를 재귀적으로 탐색하여 WKWebView를 찾아 inspectable 설정
+            func findAndEnableWebView(in view: UIView) {
+                if let webView = view as? WKWebView {
+                    webView.isInspectable = true
+                    print("[DEBUG] WKWebView.isInspectable enabled")
+                }
+                for subview in view.subviews {
+                    findAndEnableWebView(in: subview)
+                }
+            }
+            
+            for window in UIApplication.shared.windows {
+                if let rootView = window.rootViewController?.view {
+                    findAndEnableWebView(in: rootView)
+                }
+            }
+        }
     }
 
     func applicationWillTerminate(_ application: UIApplication) {

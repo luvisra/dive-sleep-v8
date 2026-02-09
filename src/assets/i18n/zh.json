@@ -281,5 +281,20 @@
         "default_message1": "使用newlife开始智能睡眠",
         "default_message2": "专家建议可能为多页",
         "default_message3": "正在更新专家建议，将尽快展示"
+    },
+
+    "PROFILE": {
+        "deleteAccount": "删除账号",
+        "deleteAccountWarning": "所有睡眠数据将被永久删除。是否继续？",
+        "deleteAccountFinal": "最终确认",
+        "deleteAccountFinalMessage": "您确定要删除账号吗？此操作无法撤销。",
+        "deleteAccountConfirm": "输入DELETE确认",
+        "deleteButton": "删除",
+        "deleteAccountConfirmMismatch": "输入不匹配。",
+        "deleteAccountProgress": "正在删除账号...",
+        "deleteAccountSuccessTitle": "账号已删除",
+        "deleteAccountSuccess": "您的账号已成功删除。",
+        "deleteAccountFailedTitle": "删除失败",
+        "deleteAccountFailed": "删除账号失败。请重试。"
     }
 }

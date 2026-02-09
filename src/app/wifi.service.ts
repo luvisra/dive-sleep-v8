@@ -128,11 +128,19 @@ export class WifiService {
   }
 
   async getCurrentSSID(): Promise<string> {
+    console.log('[WiFi Service] ========== getCurrentSSID START ==========');
     try {
+      console.log('[WiFi Service] Calling CapacitorWifi.getSsid()...');
       const result = await CapacitorWifi.getSsid();
-      return result.ssid || '';
+      console.log('[WiFi Service] CapacitorWifi.getSsid() returned:', result);
+      const ssid = result.ssid || '';
+      console.log('[WiFi Service] ✅ Returning SSID:', ssid);
+      console.log('[WiFi Service] ========== getCurrentSSID END ==========');
+      return ssid;
     } catch (error) {
-      console.error('Get current SSID error:', error);
+      console.error('[WiFi Service] ❌ Get current SSID error:', error);
+      console.error('[WiFi Service] Error details:', JSON.stringify(error, null, 2));
+      console.log('[WiFi Service] ========== getCurrentSSID END (error) ==========');
       return '';
     }
   }

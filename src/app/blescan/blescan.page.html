@@ -9,10 +9,32 @@
 <ion-content>
   <div class="rcorners1" slot>
     <h2>{{ 'DEVICE.connectWifi' | translate }}</h2>
-    <ion-label color="success" *ngIf="foundBleDev != null && foundBleDev != undefined && foundBleDevId !== null && deviceService.isAndroid">
-      {{ foundBleDevId }} {{ 'DEVICE.scanned' | translate }}</ion-label>
-    <ion-label color="success" *ngIf="foundBleDev != null && foundBleDev != undefined && foundBleDevId !== null && !deviceService.isAndroid">
-      {{ 'DEVICE.sensorScanned' | translate }}</ion-label>
+    
+    <!-- BLE 장치 발견 시 MAC 주소 표시 (Android & iOS 공통) -->
+    <ion-card *ngIf="foundBleDev != null && foundBleDev != undefined && foundBleDevId">
+      <ion-card-header>
+        <ion-card-subtitle>{{ 'DEVICE.sensorScanned' | translate }}</ion-card-subtitle>
+        <ion-card-title>
+          <ion-label color="success">
+            <h2 style="font-size: 1.1rem; font-weight: 600;">{{ foundBleDevId }}</h2>
+          </ion-label>
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-item lines="none">
+          <ion-icon name="bluetooth" slot="start" color="primary"></ion-icon>
+          <ion-label>
+            <p>RSSI: {{ foundBleDev.rssi }} dBm</p>
+          </ion-label>
+          <ion-button slot="end" size="small" color="medium" (click)="rescanBle()">
+            <ion-icon name="refresh" slot="start"></ion-icon>
+            재스캔
+          </ion-button>
+        </ion-item>
+      </ion-card-content>
+    </ion-card>
+    
+    <!-- BLE 장치 미발견 시 -->
     <ion-button color="danger" *ngIf="foundBleDev == null || foundBleDev == undefined" (click)="rescanBle()">
       <ion-icon name="refresh" style="margin-right: 5px;"></ion-icon>{{ 'DEVICE.retry' | translate }}
     </ion-button>

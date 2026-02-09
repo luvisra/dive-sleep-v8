@@ -284,5 +284,20 @@
         "default_message1": "Let's start smart sleep life with the DIVE.",
         "default_message2": "Sleep advice can consist of several pages.",
         "default_message3": "We are currently updating our sleep advice. We will prepare to show you as soon as possible."
+    },
+
+    "PROFILE": {
+        "deleteAccount": "Delete Account",
+        "deleteAccountWarning": "All your sleep data will be permanently deleted. Continue?",
+        "deleteAccountFinal": "Final Confirmation",
+        "deleteAccountFinalMessage": "Are you sure you want to delete your account? This action cannot be undone.",
+        "deleteAccountConfirm": "Type 'DELETE' to confirm",
+        "deleteButton": "Delete",
+        "deleteAccountConfirmMismatch": "Input does not match.",
+        "deleteAccountProgress": "Deleting account...",
+        "deleteAccountSuccessTitle": "Account Deleted",
+        "deleteAccountSuccess": "Your account has been successfully deleted.",
+        "deleteAccountFailedTitle": "Deletion Failed",
+        "deleteAccountFailed": "Failed to delete account. Please try again."
     }
 }

@@ -23,30 +23,37 @@ export class DeviceRegistrationPage implements OnInit {
   ) {}
 
   async startScan() {
+    console.log('[DeviceReg] ========== startScan CALLED ==========');
     try {
       this.disableButton = true;
+      console.log('[DeviceReg] Button disabled');
 
       // Request BLE permissions before starting scan
+      console.log('[DeviceReg] Calling ensureBlePermissions()...');
       const hasPermission = await this.permissionService.ensureBlePermissions();
+      console.log('[DeviceReg] ensureBlePermissions() returned:', hasPermission);
 
       if (!hasPermission) {
-        console.log('BLE permissions not granted');
+        console.log('[DeviceReg] BLE permissions not granted - ABORTING');
         this.disableButton = false;
         return;
       }
 
-      console.log('Navigating to blescan page...');
+      console.log('[DeviceReg] Permissions granted! Navigating to blescan page...');
       // Use setTimeout to ensure navigation happens in next tick
       setTimeout(() => {
+        console.log('[DeviceReg] setTimeout executing - navigating now...');
         this.router.navigateByUrl('/blescan').then(
-          success => console.log('Navigation success:', success),
-          error => console.error('Navigation error:', error)
+          success => console.log('[DeviceReg] Navigation success:', success),
+          error => console.error('[DeviceReg] Navigation error:', error)
         );
       }, 100);
+      console.log('[DeviceReg] setTimeout scheduled');
     } catch (error) {
-      console.error('Error in startScan:', error);
+      console.error('[DeviceReg] ❌ Error in startScan:', error);
       this.disableButton = false;
     }
+    console.log('[DeviceReg] ========== startScan END ==========');
   }
 
   ionViewDidEnter() {

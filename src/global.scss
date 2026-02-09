@@ -223,3 +223,47 @@ ion-tab-bar {
   margin-top: 0;
   margin-bottom: 0;
 }
+
+// iOS-specific header optimization
+.ios {
+  // Force dark theme colors for iOS
+  --ion-background-color: #1C1C1D;
+  --ion-background-color-rgb: 28, 28, 29;
+  --ion-text-color: #ffffff;
+  --ion-text-color-rgb: 255, 255, 255;
+  --ion-toolbar-background: #1C1C1D;
+  --ion-item-background: #1C1C1D;
+
+  ion-header {
+    background-color: #1C1C1D;
+
+    ion-toolbar {
+      --background: #1C1C1D;
+      --color: #ffffff;
+      --min-height: 44px;
+      --padding-top: 0;
+      padding-top: env(safe-area-inset-top);
+    }
+  }
+
+  ion-content {
+    --background: #1C1C1D;
+    --color: #ffffff;
+  }
+
+  ion-item {
+    --background: #1C1C1D;
+    --color: #ffffff;
+  }
+
+  // Dark background for safe area
+  ion-app {
+    background-color: #1C1C1D;
+  }
+
+  // Font smoothing for better text rendering on iOS
+  ion-label, ion-text, ion-title, ion-button {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}

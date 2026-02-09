@@ -323,6 +323,120 @@ export class ProfilePage implements OnInit {
     .catch(err => {});
   }
 
+  async onDeleteAccount() {
+    const alert = await this.alertController.create({
+      header: this.translate.instant('PROFILE.deleteAccount') || '계정 삭제',
+      message: this.translate.instant('PROFILE.deleteAccountWarning') || '계정을 삭제하면 모든 수면 데이터가 영구적으로 삭제됩니다. 계속하시겠습니까?',
+      cssClass: 'dark-alert',
+      buttons: [
+        {
+          text: this.translate.instant('COMMON.cancel') || '취소',
+          role: 'cancel',
+          cssClass: 'secondary'
+        },
+        {
+          text: this.translate.instant('COMMON.confirm') || '확인',
+          handler: () => {
+            this.showFinalConfirmation();
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  async showFinalConfirmation() {
+    const alert = await this.alertController.create({
+      header: this.translate.instant('PROFILE.deleteAccountFinal') || '최종 확인',
+      message: this.translate.instant('PROFILE.deleteAccountFinalMessage') || '정말로 계정을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.',
+      cssClass: 'dark-alert',
+      inputs: [
+        {
+          name: 'confirm',
+          type: 'text',
+          placeholder: this.translate.instant('PROFILE.deleteAccountConfirm') || '삭제하려면 "삭제"를 입력하세요'
+        }
+      ],
+      buttons: [
+        {
+          text: this.translate.instant('COMMON.cancel') || '취소',
+          role: 'cancel',
+          cssClass: 'secondary'
+        },
+        {
+          text: this.translate.instant('PROFILE.deleteButton') || '삭제',
+          cssClass: 'alert-button-confirm',
+          handler: async (data) => {
+            if (data.confirm === '삭제' || data.confirm === 'DELETE' || data.confirm === 'delete') {
+              await this.performAccountDeletion();
+              return true;
+            } else {
+              this.utilService.presentToast(
+                this.translate.instant('PROFILE.deleteAccountConfirmMismatch') || '입력이 일치하지 않습니다.',
+                2000
+              );
+              return false;
+            }
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  async performAccountDeletion() {
+    const loading = await this.alertController.create({
+      message: this.translate.instant('PROFILE.deleteAccountProgress') || '계정 삭제 중...',
+      cssClass: 'custom-loading'
+    });
+    await loading.present();
+
+    try {
+      // MQTT FCM 토큰 정리
+      if (this.deviceService.devId) {
+        this.mqttService.pubMqtt(this.deviceService.devId, 'fcm_token', '');
+      }
+
+      // AuthService의 deleteUserAccount() 호출
+      await this.authService.deleteUserAccount();
+
+      await loading.dismiss();
+
+      const successAlert = await this.alertController.create({
+        header: this.translate.instant('PROFILE.deleteAccountSuccessTitle') || '계정 삭제 완료',
+        message: this.translate.instant('PROFILE.deleteAccountSuccess') || '계정이 성공적으로 삭제되었습니다.',
+        cssClass: 'dark-alert',
+        buttons: [
+          {
+            text: this.translate.instant('COMMON.ok') || '확인',
+            handler: () => {
+              // 로그인 화면으로 이동 (intro 페이지로 이동)
+              window.location.href = '/intro';
+            }
+          }
+        ]
+      });
+
+      await successAlert.present();
+
+    } catch (error) {
+      await loading.dismiss();
+
+      console.error('Account deletion error:', error);
+
+      const errorAlert = await this.alertController.create({
+        header: this.translate.instant('PROFILE.deleteAccountFailedTitle') || '삭제 실패',
+        message: this.translate.instant('PROFILE.deleteAccountFailed') || '계정 삭제에 실패했습니다. 다시 시도해주세요.',
+        cssClass: 'dark-alert',
+        buttons: [this.translate.instant('COMMON.ok') || '확인']
+      });
+
+      await errorAlert.present();
+    }
+  }
+
   ngOnInit() {
   }
 

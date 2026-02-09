@@ -40,6 +40,7 @@ export class WificonnectionPage implements OnInit, OnDestroy {
   ssid: string = '';
   password: string = '';
   bleDevice: string = '';
+  bleMacAddress: string = '';
   wifiDevToBeConnected: string = '';
 
   // Connection status
@@ -62,8 +63,7 @@ export class WificonnectionPage implements OnInit, OnDestroy {
 
   // Timeout configuration (밀리초)
   private readonly TOTAL_TIMEOUT = 60000;            // 60초 (전체 프로세스)
-  private readonly BLE_CONNECTION_TIMEOUT = 10000;   // 10초 (BLE 연결)
-  
+
   // Timing tracking
   private connectionStartTime: number = 0;
   private bleWriteCompleteTime: number = 0;
@@ -79,7 +79,7 @@ export class WificonnectionPage implements OnInit, OnDestroy {
     private bleService: BleService,
     private ngZone: NgZone,
     private utilService: UtilService
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
@@ -88,10 +88,13 @@ export class WificonnectionPage implements OnInit, OnDestroy {
         this.ssid = navigation.extras.state['ssid'] || '';
         this.password = navigation.extras.state['password'] || '';
         this.bleDevice = navigation.extras.state['device'] || '';
+        this.bleMacAddress = navigation.extras.state['mac'] || this.bleDevice; // Fallback to device (Android)
+
         console.log('WiFi Connection params:', {
           ssid: this.ssid,
           password: this.password ? '***' : '(empty)',
-          device: this.bleDevice
+          device: this.bleDevice,
+          mac: this.bleMacAddress
         });
       }
     });
@@ -112,22 +115,23 @@ export class WificonnectionPage implements OnInit, OnDestroy {
   private initializeConnection(): void {
     console.log('[Init] ========== 연결 초기화 시작 ==========');
     console.log('[Init] 시작 시각:', new Date().toISOString());
-    
+    console.log('[Init] Params Check - Device(UUID):', this.bleDevice, ' MAC:', this.bleMacAddress);
+
     // 상태 초기화
     this.resetConnectionStatus();
 
     // WiFi MAC 주소 변환
     console.log('[MAC Convert] ========== MAC 주소 변환 ==========');
-    console.log('[MAC Convert] 입력 BLE MAC:', this.bleDevice);
-    console.log('[MAC Convert] BLE MAC 길이:', this.bleDevice?.length);
-    console.log('[MAC Convert] BLE MAC 형식:', /^[0-9A-F:]+$/i.test(this.bleDevice || '') ? '정상' : '비정상');
-    
-    this.wifiDevToBeConnected = this.utilService.convertBleMacAddress(this.bleDevice);
-    
+    console.log('[MAC Convert] 입력 BLE MAC:', this.bleMacAddress);
+    console.log('[MAC Convert] BLE MAC 길이:', this.bleMacAddress?.length);
+    console.log('[MAC Convert] BLE MAC 형식:', /^[0-9A-F:]+$/i.test(this.bleMacAddress || '') ? '정상' : '비정상');
+
+    this.wifiDevToBeConnected = this.utilService.convertBleMacAddress(this.bleMacAddress);
+
     console.log('[MAC Convert] 변환된 WiFi MAC:', this.wifiDevToBeConnected);
     console.log('[MAC Convert] WiFi MAC 형식:', this.wifiDevToBeConnected?.startsWith('DEV_') ? '정상 (DEV_ 접두사)' : '비정상');
     console.log('[MAC Convert] WiFi MAC 길이:', this.wifiDevToBeConnected?.length);
-    console.log('[MAC Convert] 변환 전 → 변환 후:', this.bleDevice, '→', this.wifiDevToBeConnected);
+    console.log('[MAC Convert] 변환 전 → 변환 후:', this.bleMacAddress, '→', this.wifiDevToBeConnected);
     console.log('[MAC Convert] ========================================');
 
     // 전체 타임아웃 설정
@@ -160,9 +164,9 @@ export class WificonnectionPage implements OnInit, OnDestroy {
     try {
       console.log('[Network] ========== 네트워크 확인 ==========');
       console.log('[Network] 확인 시각:', new Date().toISOString());
-      
+
       const isConnected = await this.mqttService.checkNetwork();
-      
+
       console.log('[Network] 네트워크 연결 상태:', isConnected ? '연결됨 ✅' : '연결 안 됨 ❌');
       console.log('[Network] ========================================');
 
@@ -178,7 +182,13 @@ export class WificonnectionPage implements OnInit, OnDestroy {
 
       // BLE 디바이스 연결 시도
       console.log('[Network] BLE 디바이스 연결 시도:', this.bleDevice);
-      this.bleService.connectToDevice(this.bleDevice);
+      try {
+        await this.bleService.connectToDevice(this.bleDevice);
+      } catch (error: any) {
+        console.error('[Network] BLE 연결 실패:', error?.message);
+        this.handleConnectionError('BLE 장치에 연결할 수 없습니다. 다시 시도해주세요.');
+        return;
+      }
 
     } catch (error) {
       console.error('[Network] ========== 네트워크 확인 에러 ==========');
@@ -189,30 +199,11 @@ export class WificonnectionPage implements OnInit, OnDestroy {
   }
 
   private subscribeBleConnection(): void {
-    // BLE 연결 10초 타임아웃 설정
-    this.bleConnectionTimeout = setTimeout(() => {
-      if (!this.connectionStatus.bleWriteSuccess) {
-        console.warn('[BLE Timeout] BLE 연결이 10초 내에 완료되지 않음, 재시도...');
-        
-        // 기존 연결 해제
-        this.bleService.tryToDisconnectBle(this.bleDevice);
-        
-        // 1초 후 재연결 시도
-        setTimeout(() => {
-          console.log('[BLE Timeout] BLE 재연결 시도...');
-          this.bleService.connectToDevice(this.bleDevice);
-        }, 1000);
-      }
-    }, this.BLE_CONNECTION_TIMEOUT);
-    
+    // connectToDevice()가 자체 retry 로직을 가지고 있으므로
+    // 별도 타이머 기반 재시도는 제거 (동시 연결 시도 충돌 방지)
+
     const bleSub = this.bleService.bleIsConnectedSubject.subscribe(async (isConnected) => {
       if (isConnected) {
-        // BLE 연결 성공 시 타임아웃 클리어
-        if (this.bleConnectionTimeout) {
-          clearTimeout(this.bleConnectionTimeout);
-          this.bleConnectionTimeout = null;
-        }
-        
         console.log('BLE connected, starting WiFi configuration...');
         await this.handleBleConnected();
       }
@@ -225,19 +216,28 @@ export class WificonnectionPage implements OnInit, OnDestroy {
       console.log('[BLE Connected] ========== BLE 연결 완료 처리 ==========');
       console.log('[BLE Connected] 시각:', new Date().toISOString());
       console.log('[BLE Connected] 플랫폼:', this.deviceService.isAndroid ? 'Android' : 'iOS');
-      
-      // iOS의 경우 WiFi MAC 주소를 BLE에서 읽어옴
+      console.log('[BLE Connected] BLE Device (UUID):', this.bleDevice);
+      console.log('[BLE Connected] BLE MAC Address:', this.bleMacAddress);
+
+      // iOS: 연결된 상태에서 MAC 주소 읽기 (blescan에서는 연결하지 않음)
       if (!this.deviceService.isAndroid) {
-        console.log('[BLE Connected] iOS 플랫폼: BLE에서 WiFi MAC 읽기 시도...');
-        const wifiMac = await this.bleService.readBLE(this.bleDevice);
-        
-        if (wifiMac) {
-          console.log('[BLE Connected] iOS: BLE로부터 WiFi MAC 읽기 성공');
-          console.log('[BLE Connected] 이전 WiFi MAC:', this.wifiDevToBeConnected);
-          console.log('[BLE Connected] 새 WiFi MAC:', wifiMac);
-          this.wifiDevToBeConnected = wifiMac;
-        } else {
-          console.warn('[BLE Connected] iOS: BLE로부터 WiFi MAC 읽기 실패, 변환된 값 사용');
+        try {
+          console.log('[BLE Connected] iOS: BLE에서 MAC 주소 읽기 시작...');
+          const macAddr = await this.bleService.readBLE(this.bleDevice);
+          console.log('[BLE Connected] iOS: MAC 읽기 성공:', macAddr);
+
+          this.bleMacAddress = macAddr;
+          // readBLE가 이미 'DEV_XXXXXXXXXXXX' 형태로 반환하므로 변환 불필요
+          this.wifiDevToBeConnected = macAddr;
+          console.log('[BLE Connected] iOS: WiFi MAC:', this.wifiDevToBeConnected);
+
+          // iOS: MAC을 알게 된 시점에서 MQTT 구독
+          console.log('[BLE Connected] iOS: MQTT 구독 시작...');
+          this.mqttService.subscribeToDevice(this.wifiDevToBeConnected);
+        } catch (error) {
+          console.error('[BLE Connected] iOS: MAC 읽기 실패:', error);
+          this.handleConnectionError('장치 MAC 주소를 읽을 수 없습니다. 다시 시도해주세요.');
+          return;
         }
       } else {
         console.log('[BLE Connected] Android: 변환된 WiFi MAC 사용:', this.wifiDevToBeConnected);
@@ -245,14 +245,14 @@ export class WificonnectionPage implements OnInit, OnDestroy {
 
       console.log('[BLE Connected] 최종 사용할 WiFi MAC:', this.wifiDevToBeConnected);
 
-      // ✅ MQTT 메시지 수신 대기 (blescan에서 이미 구독 시작됨)
+      // MQTT 메시지 수신 대기
       console.log('[BLE Connected] MQTT 메시지 수신 대기 시작...');
       this.subscribeMqttMessage();
 
       // WiFi 정보를 BLE로 전송
       console.log('[BLE Connected] WiFi 정보 전송 시작...');
       await this.writeWifiCredentials();
-      
+
       console.log('[BLE Connected] =================================================');
 
     } catch (error) {
@@ -269,19 +269,19 @@ export class WificonnectionPage implements OnInit, OnDestroy {
       console.log('[WiFi Connection] === Write Process Start ===');
       console.log('[WiFi Connection] Verifying BLE connection before write...');
       console.log('[WiFi Connection] BLE Device:', this.bleDevice);
-      console.log('[WiFi Connection] Connection status:', 
+      console.log('[WiFi Connection] Connection status:',
         this.bleService.bleIsConnectedSubject.value);
-      
+
       if (!this.bleService.bleIsConnectedSubject.value) {
         throw new Error('BLE not connected before write attempt');
       }
-      
+
       const queryString = this.generateQueryString();
       console.log('[WiFi Connection] SSID:', this.ssid);
       console.log('[WiFi Connection] Password length:', this.password ? this.password.length : 0);
       console.log('[WiFi Connection] Query String:', queryString);
       console.log('[WiFi Connection] Query Length:', queryString.length, 'bytes');
-      
+
       // Legacy 방식: 즉시 write 시도 (대기 없음!)
       console.log('[WiFi Connection] Starting write immediately (Legacy mode)...');
 
@@ -293,7 +293,7 @@ export class WificonnectionPage implements OnInit, OnDestroy {
       if (success) {
         this.bleWriteCompleteTime = Date.now();
         const elapsedSinceStart = this.bleWriteCompleteTime - this.connectionStartTime;
-        
+
         this.ngZone.run(() => {
           this.connectionStatus.bleWriteSuccess = true;
           this.connectionStatus.currentStep = ConnectionStep.WAITING_ALIVE;
@@ -315,10 +315,10 @@ export class WificonnectionPage implements OnInit, OnDestroy {
         name: error?.name,
         code: error?.code
       }, null, 2));
-      
+
       // Status 133 등 구체적인 에러 메시지
       let errorMessage = 'WiFi 정보 전송에 실패했습니다.';
-      
+
       if (error?.message?.includes('133') || error?.message?.includes('GATT')) {
         errorMessage = 'BLE 연결 오류가 발생했습니다. 앱을 재시작하고 디바이스를 다시 켜주세요.';
       } else if (error?.message?.includes('timeout')) {
@@ -330,7 +330,7 @@ export class WificonnectionPage implements OnInit, OnDestroy {
       } else if (error?.message?.includes('not connected')) {
         errorMessage = 'BLE 연결이 완료되지 않았습니다. 잠시 후 다시 시도해주세요.';
       }
-      
+
       this.handleConnectionError(errorMessage);
     }
   }
@@ -370,17 +370,17 @@ export class WificonnectionPage implements OnInit, OnDestroy {
     console.log('[Device Alive] ========== handleDeviceAlive 호출 ==========');
     console.log('[Device Alive] 호출 시각:', new Date().toISOString());
     console.log('[Device Alive] 전달받은 data:', JSON.stringify(data, null, 2));
-    
+
     if (!data) {
       console.warn('[Device Alive] ❌ EARLY RETURN: data가 null/undefined입니다.');
       console.log('[Device Alive] ===============================================');
       return;
     }
-    
+
     // 다양한 메시지 형식 지원
     let hasValidMessage = false;
     let messageContent = null;
-    
+
     // 형식 1: data.value.message
     if (data.value && data.value.message) {
       console.log('[Device Alive] ✅ 형식 1 감지: data.value.message');
@@ -399,7 +399,7 @@ export class WificonnectionPage implements OnInit, OnDestroy {
       hasValidMessage = true;
       messageContent = data;
     }
-    
+
     if (!hasValidMessage) {
       console.warn('[Device Alive] ❌ EARLY RETURN: 유효한 메시지 형식을 찾을 수 없음');
       console.warn('[Device Alive] 시도한 경로들:');
@@ -417,7 +417,7 @@ export class WificonnectionPage implements OnInit, OnDestroy {
 
     const elapsedSinceStart = Date.now() - this.connectionStartTime;
     const elapsedSinceWrite = this.bleWriteCompleteTime > 0 ? Date.now() - this.bleWriteCompleteTime : 0;
-    
+
     console.log('[Device Alive] 🎉 장치 연결 확인 성공!');
     console.log('[Device Alive] 연결 시작부터 경과:', elapsedSinceStart, 'ms (', (elapsedSinceStart / 1000).toFixed(1), '초)');
     if (elapsedSinceWrite > 0) {
@@ -426,11 +426,11 @@ export class WificonnectionPage implements OnInit, OnDestroy {
 
     this.ngZone.run(() => {
       console.log('[Device Alive] NgZone 내부 실행 시작');
-      
+
       this.connectionStatus.deviceAlive = true;
       this.connectionStatus.currentStep = ConnectionStep.REGISTERING_SERVER;
       this.connectionStatus.progress = 60;
-      
+
       console.log('[Device Alive] 연결 상태 업데이트:', JSON.stringify({
         deviceAlive: this.connectionStatus.deviceAlive,
         currentStep: this.connectionStatus.currentStep,
@@ -440,7 +440,7 @@ export class WificonnectionPage implements OnInit, OnDestroy {
       // 디바이스 ID 저장
       this.deviceService.devIdSubject.next(this.wifiDevToBeConnected);
       localStorage.setItem('devId', this.wifiDevToBeConnected);
-      
+
       console.log('[Device Alive] 디바이스 ID 저장됨:', this.wifiDevToBeConnected);
       console.log('[Device Alive] localStorage에도 저장 완료');
 
@@ -448,7 +448,7 @@ export class WificonnectionPage implements OnInit, OnDestroy {
       console.log('[Device Alive] 서버 등록 시작...');
       this.registerDeviceToServer(this.wifiDevToBeConnected);
     });
-    
+
     console.log('[Device Alive] ===============================================');
   }
 
@@ -485,7 +485,7 @@ export class WificonnectionPage implements OnInit, OnDestroy {
       console.log('[Server Reg] [3/3] MQTT로 사용자명 설정 시작...');
       await this.setUsernameViaMqtt(userName, targetDev);
       console.log('[Server Reg] [3/3] 완료');
-      
+
       console.log('[Server Reg] ✅ 서버 등록 전체 완료!');
       console.log('[Server Reg] ==========================================');
 
@@ -561,20 +561,20 @@ export class WificonnectionPage implements OnInit, OnDestroy {
       console.log('[Server Reg] [3/3] MQTT 발행: set_username');
       console.log('[Server Reg] 대상 디바이스:', targetDev);
       console.log('[Server Reg] 사용자명:', userName);
-      
+
       const success = await this.mqttService.pubMqtt(
         targetDev,
         'set_username',
         userName
       );
-      
+
       console.log('[Server Reg] MQTT 발행 결과:', success);
 
       if (success) {
         const totalElapsed = Date.now() - this.connectionStartTime;
         console.log('[Server Reg] ✅ MQTT 발행 성공!');
         console.log('[Server Reg] 전체 연결 소요 시간:', totalElapsed, 'ms (', (totalElapsed / 1000).toFixed(1), '초)');
-        
+
         this.ngZone.run(() => {
           this.connectionStatus.serverRegistered = true;
           this.connectionStatus.currentStep = ConnectionStep.COMPLETED;
@@ -618,16 +618,16 @@ export class WificonnectionPage implements OnInit, OnDestroy {
 
   private setTotalTimeout(): void {
     this.connectionStartTime = Date.now();
-    
+
     console.log('[Timeout] ========== 타임아웃 설정 ==========');
     console.log('[Timeout] 시작 시각:', new Date(this.connectionStartTime).toISOString());
     console.log('[Timeout] 타임아웃:', this.TOTAL_TIMEOUT, 'ms (', this.TOTAL_TIMEOUT / 1000, '초)');
     console.log('[Timeout] 타임아웃 만료 예정 시각:', new Date(this.connectionStartTime + this.TOTAL_TIMEOUT).toISOString());
     console.log('[Timeout] ======================================');
-    
+
     this.connectionTimeout = setTimeout(() => {
       const elapsedTime = Date.now() - this.connectionStartTime;
-      
+
       console.warn('[Timeout] ========== 타임아웃 발생 ==========');
       console.warn('[Timeout] 현재 시각:', new Date().toISOString());
       console.warn('[Timeout] 경과 시간:', elapsedTime, 'ms (', (elapsedTime / 1000).toFixed(1), '초)');
@@ -637,17 +637,17 @@ export class WificonnectionPage implements OnInit, OnDestroy {
         deviceAlive: this.connectionStatus.deviceAlive,
         serverRegistered: this.connectionStatus.serverRegistered
       }));
-      
+
       if (this.bleWriteCompleteTime > 0) {
         const timeSinceWrite = Date.now() - this.bleWriteCompleteTime;
         console.warn('[Timeout] BLE Write 완료 후 경과:', timeSinceWrite, 'ms (', (timeSinceWrite / 1000).toFixed(1), '초)');
       }
-      
+
       if (this.mqttSubscribeTime > 0) {
         const timeSinceSubscribe = Date.now() - this.mqttSubscribeTime;
         console.warn('[Timeout] MQTT 구독 후 경과:', timeSinceSubscribe, 'ms (', (timeSinceSubscribe / 1000).toFixed(1), '초)');
       }
-      
+
       if (!this.connectionStatus.serverRegistered) {
         console.warn('[Timeout] 서버 등록 미완료로 연결 실패 처리');
         this.handleConnectionError('연결 시간이 초과되었습니다. 다시 시도해주세요.');
@@ -768,8 +768,8 @@ export class WificonnectionPage implements OnInit, OnDestroy {
 
   get isSuccess(): boolean {
     return !this.showConnectionStatus &&
-           this.connectionStatus.serverRegistered &&
-           !this.connectionStatus.failed;
+      this.connectionStatus.serverRegistered &&
+      !this.connectionStatus.failed;
   }
 
   get isFailed(): boolean {

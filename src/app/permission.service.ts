@@ -25,55 +25,66 @@ export class PermissionService {
    * Check if all required BLE permissions are granted
    */
   async checkBlePermissions(): Promise<boolean> {
+    console.log('[Permission] ========== checkBlePermissions START ==========');
     if (!this.platform.is('hybrid')) {
+      console.log('[Permission] Not hybrid platform - returning true');
       return true; // Web platform doesn't need permissions
     }
 
     try {
-      // Initialize BLE client first
-      await BleClient.initialize();
-
-      // Check location permission (required for BLE scanning on Android)
-      const locationPermission = await Geolocation.checkPermissions();
-
       if (this.platform.is('android')) {
-        // On Android, location permission is required for BLE scanning
+        console.log('[Permission] Android platform detected');
+        // Android: Initialize BLE and check permissions
+        console.log('[Permission] Initializing BLE...');
+        await BleClient.initialize();
+        console.log('[Permission] BLE initialized');
+
+        // Check location permission (required for BLE scanning on Android)
+        console.log('[Permission] Checking location permission...');
+        const locationPermission = await Geolocation.checkPermissions();
+        console.log('[Permission] Location permission status:', locationPermission);
         const hasLocationPermission = locationPermission.location === 'granted' ||
                locationPermission.coarseLocation === 'granted';
+        console.log('[Permission] Has location permission:', hasLocationPermission);
 
         if (!hasLocationPermission) {
+          console.log('[Permission] Location permission not granted - returning false');
           return false;
         }
 
         // Check if Bluetooth is enabled
         try {
+          console.log('[Permission] Checking if Bluetooth is enabled...');
           const isEnabled = await BleClient.isEnabled();
+          console.log('[Permission] Bluetooth enabled:', isEnabled);
           return isEnabled;
         } catch (error) {
-          console.error('Error checking Bluetooth status:', error);
+          console.error('[Permission] [Android] Error checking Bluetooth status:', error);
           return false;
         }
       } else if (this.platform.is('ios')) {
-        // On iOS, check location permission and Bluetooth status
-        const hasLocationPermission = locationPermission.location === 'granted' ||
-               locationPermission.location === 'prompt';
-
-        if (!hasLocationPermission) {
-          return false;
-        }
-
-        try {
-          const isEnabled = await BleClient.isEnabled();
-          return isEnabled;
-        } catch (error) {
-          console.error('Error checking Bluetooth status:', error);
-          return false;
-        }
+        console.log('[Permission] iOS platform detected');
+        // iOS: Only check location permission
+        // BLE initialization and Bluetooth permission are handled when BLE is actually used
+        console.log('[Permission] Checking location permission...');
+        const locationPermission = await Geolocation.checkPermissions();
+        console.log('[Permission] Location permission status:', locationPermission);
+        const hasLocationPermission = locationPermission.location === 'granted';
+        console.log('[Permission] Has location permission:', hasLocationPermission);
+        console.log('[Permission] ========== checkBlePermissions END (iOS) ==========');
+        return hasLocationPermission;
       }
 
+      console.log('[Permission] Unknown platform - returning false');
       return false;
-    } catch (error) {
-      console.error('Error checking BLE permissions:', error);
+    } catch (error: any) {
+      console.error('[Permission] ❌ Error checking BLE permissions:', error);
+      console.error('[Permission] Error details:', JSON.stringify(error, null, 2));
+      // On iOS simulator, BLE is not supported - this is expected
+      if (this.platform.is('ios') && error?.message?.includes('unsupported')) {
+        console.warn('[Permission] [iOS] BLE not supported on simulator. Test on real device.');
+      }
+      console.log('[Permission] ========== checkBlePermissions END (error) ==========');
       return false;
     }
   }
@@ -87,30 +98,52 @@ export class PermissionService {
     }
 
     try {
+      if (this.platform.is('android')) {
+        return await this.requestBlePermissionsAndroid();
+      } else if (this.platform.is('ios')) {
+        return await this.requestBlePermissionsIOS();
+      }
+      return false;
+    } catch (error: any) {
+      console.error('[Permission] Error requesting BLE permissions:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Request BLE permissions on Android
+   */
+  private async requestBlePermissionsAndroid(): Promise<boolean> {
+    try {
       // Initialize BLE client
       await BleClient.initialize();
 
       // Check current permission status
       const currentStatus = await Geolocation.checkPermissions();
 
-      // If permission is already granted, check Bluetooth
+      // If permission is already granted
       if (currentStatus.location === 'granted' || currentStatus.coarseLocation === 'granted') {
         // Check if Bluetooth is enabled
-        const isEnabled = await BleClient.isEnabled();
-        if (!isEnabled) {
-          // Request to enable Bluetooth
-          try {
-            await BleClient.requestEnable();
-          } catch (error) {
-            console.error('User denied Bluetooth enable request:', error);
-            return false;
+        try {
+          const isEnabled = await BleClient.isEnabled();
+          if (!isEnabled) {
+            // Request to enable Bluetooth
+            try {
+              await BleClient.requestEnable();
+            } catch (error) {
+              console.error('[Android] User denied Bluetooth enable request:', error);
+              return false;
+            }
           }
+        } catch (error) {
+          console.error('[Android] Error checking Bluetooth status:', error);
+          return false;
         }
         return true;
       }
 
-      // If permission was denied, show explanation first (Android only)
-      if (this.platform.is('android') && currentStatus.location === 'denied') {
+      // If permission was denied, show explanation first
+      if (currentStatus.location === 'denied') {
         const shouldRequest = await this.showPermissionExplanationAlert();
         if (!shouldRequest) {
           return false;
@@ -126,19 +159,70 @@ export class PermissionService {
       }
 
       // After location permission is granted, check Bluetooth
-      const isEnabled = await BleClient.isEnabled();
-      if (!isEnabled) {
-        try {
-          await BleClient.requestEnable();
-        } catch (error) {
-          console.error('User denied Bluetooth enable request:', error);
-          return false;
+      try {
+        const isEnabled = await BleClient.isEnabled();
+        if (!isEnabled) {
+          try {
+            await BleClient.requestEnable();
+          } catch (error) {
+            console.error('[Android] User denied Bluetooth enable request:', error);
+            return false;
+          }
         }
+      } catch (error) {
+        console.error('[Android] Error checking Bluetooth status:', error);
+        return false;
       }
 
       return true;
     } catch (error) {
-      console.error('Error requesting BLE permissions:', error);
+      console.error('[Android] Error in requestBlePermissions:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Request BLE permissions on iOS
+   */
+  private async requestBlePermissionsIOS(): Promise<boolean> {
+    console.log('[Permission] ========== requestBlePermissionsIOS START ==========');
+    try {
+      // Check current location permission status
+      console.log('[Permission] [iOS] Checking current location permission status...');
+      const currentStatus = await Geolocation.checkPermissions();
+      console.log('[Permission] [iOS] Current location permission status:', currentStatus);
+
+      // If location permission is already granted, return true
+      if (currentStatus.location === 'granted') {
+        console.log('[Permission] [iOS] ✅ Location permission already granted');
+        console.log('[Permission] ========== requestBlePermissionsIOS END (already granted) ==========');
+        return true;
+      }
+
+      // Request location permission
+      console.log('[Permission] [iOS] Requesting location permission from user...');
+      const permission = await Geolocation.requestPermissions();
+      console.log('[Permission] [iOS] Permission request result:', permission);
+      const locationGranted = permission.location === 'granted';
+      console.log('[Permission] [iOS] Location granted:', locationGranted);
+
+      if (!locationGranted) {
+        console.warn('[Permission] [iOS] ❌ Location permission denied by user');
+        console.log('[Permission] ========== requestBlePermissionsIOS END (denied) ==========');
+        return false;
+      }
+
+      console.log('[Permission] [iOS] ✅ Location permission granted');
+      console.log('[Permission] [iOS] Note: Bluetooth permission will be requested automatically by the system');
+      console.log('[Permission] [iOS] when BleClient.initialize() or BLE operations are performed');
+      console.log('[Permission] ========== requestBlePermissionsIOS END (success) ==========');
+      // On iOS, Bluetooth permission will be requested automatically by the system
+      // when BleClient.initialize() or BLE operations are performed
+      return true;
+    } catch (error: any) {
+      console.error('[Permission] [iOS] ❌ Error in requestBlePermissions:', error);
+      console.error('[Permission] [iOS] Error details:', JSON.stringify(error, null, 2));
+      console.log('[Permission] ========== requestBlePermissionsIOS END (error) ==========');
       return false;
     }
   }
@@ -211,18 +295,34 @@ export class PermissionService {
    * Returns true if permissions are granted, false otherwise
    */
   async ensureBlePermissions(): Promise<boolean> {
+    console.log('[Permission] ========== ensureBlePermissions START ==========');
+    console.log('[Permission] Platform:', this.platform.platforms());
+    console.log('[Permission] Is hybrid:', this.platform.is('hybrid'));
+    console.log('[Permission] Is iOS:', this.platform.is('ios'));
+    console.log('[Permission] Is Android:', this.platform.is('android'));
+
+    console.log('[Permission] Checking existing permissions...');
     const hasPermission = await this.checkBlePermissions();
-    
+    console.log('[Permission] checkBlePermissions returned:', hasPermission);
+
     if (hasPermission) {
+      console.log('[Permission] ✅ Permissions already granted!');
+      console.log('[Permission] ========== ensureBlePermissions END (already granted) ==========');
       return true;
     }
 
+    console.log('[Permission] Permissions not yet granted, requesting...');
     const granted = await this.requestBlePermissions();
-    
+    console.log('[Permission] requestBlePermissions returned:', granted);
+
     if (!granted) {
+      console.log('[Permission] ❌ Permissions denied, showing alert...');
       await this.showPermissionDeniedAlert();
+    } else {
+      console.log('[Permission] ✅ Permissions granted!');
     }
 
+    console.log('[Permission] ========== ensureBlePermissions END (granted:', granted, ') ==========');
     return granted;
   }
 }

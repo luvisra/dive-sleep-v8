@@ -5,7 +5,8 @@ import { Router } from '@angular/router';
 import { TranslateConfigService } from './translate-config.service';
 import { UtilService } from './util.service';
 import { AuthService } from './auth.service';
-import { StatusBar } from '@capacitor/status-bar';
+import { FcmService } from './fcm.service';
+import { StatusBar, Style } from '@capacitor/status-bar';
 import { ScreenOrientation } from '@capacitor/screen-orientation';
 @Component({
   selector: 'app-root',
@@ -23,16 +24,25 @@ export class AppComponent {
     public router: Router,
     private utilService: UtilService,
     private translateConfigService: TranslateConfigService,
-    private authService: AuthService
+    private authService: AuthService,
+    private fcmService: FcmService
   ) {
     this.initializeApp();
   }
 
   async initStatusBar() {
     try {
-      await StatusBar.hide();
+      if (this.platform.is('ios')) {
+        // iOS: StatusBar를 overlay 모드로 설정
+        await StatusBar.setOverlaysWebView({ overlay: true });
+        await StatusBar.setStyle({ style: Style.Dark });
+        await StatusBar.setBackgroundColor({ color: '#1C1C1D' });
+      } else {
+        // Android: StatusBar 숨김 유지
+        await StatusBar.hide();
+      }
     } catch (error) {
-      console.log('StatusBar hide error:', error);
+      console.log('StatusBar error:', error);
     }
   }
 
@@ -53,6 +63,9 @@ export class AppComponent {
 
       const currentLang = this.translateConfigService.getDefaultLanguage();
       this.translateConfigService.setLanguage(currentLang);
+
+      // FCM 초기화 (Firebase 설정 후)
+      await this.fcmService.initFCM();
     }
 
     // ✅ 인증 초기화 대기 (레이스 컨디션 방지)

@@ -1,0 +1,9 @@
+// iOS safe area handling for iframe
+.ios {
+  .ios-safe-content {
+    iframe {
+      margin-top: env(safe-area-inset-top);
+      height: calc(100% - env(safe-area-inset-top)) !important;
+    }
+  }
+}
